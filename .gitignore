@@ -1,0 +1,11 @@
+# yml파일
+application.yml
+application-oauth.yml
+application.properties
+/src/main/generated/
+
+
+# build파일
+.gradle
+**/build/
+!src/**/build/
