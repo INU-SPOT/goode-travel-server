@@ -1,13 +1,13 @@
-package com.spot.todaygwangju;
+package com.spot.good2travel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TodaygwangjuApplication {
+public class Good2travelApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TodaygwangjuApplication.class, args);
+        SpringApplication.run(Good2travelApplication.class, args);
     }
 
 }
