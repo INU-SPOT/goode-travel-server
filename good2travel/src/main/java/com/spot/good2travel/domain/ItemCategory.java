@@ -16,9 +16,11 @@ public class ItemCategory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @Column(nullable = false)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
+    @Column(nullable = false)
     private Item item;
 }

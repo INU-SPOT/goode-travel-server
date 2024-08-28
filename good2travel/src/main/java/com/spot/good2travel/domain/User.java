@@ -16,14 +16,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String email;
 
-    private String name;
+    @Column(nullable = false)
+    private String nickname;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(nullable = false)
     private List<String> role;
 
+    @Column(nullable = false)
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

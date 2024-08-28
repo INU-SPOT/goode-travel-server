@@ -16,16 +16,17 @@ public class Folder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> sequence;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_id")
-    private ItemFolder itemFolder;
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
+    private List<ItemFolder> itemFolders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @Column(nullable = false)
     private User user;
 }

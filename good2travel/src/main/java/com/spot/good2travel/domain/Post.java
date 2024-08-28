@@ -17,6 +17,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     private String firstContent;
@@ -30,8 +31,10 @@ public class Post {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> sequence;
 
+    @Column(nullable = false)
     private LocalDate startDate;
 
+    @Column(nullable = false)
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -42,6 +45,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @Column(nullable = false)
     private User user;
 
 }

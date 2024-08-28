@@ -17,8 +17,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String type;
 
+    @Column(nullable = false)
     private String title;
 
     private String imageUrl;
@@ -27,6 +29,7 @@ public class Item {
 
     private String address;
 
+    @Column(nullable = false)
     private Boolean isOfficial;
 
     private String emoji;

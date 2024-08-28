@@ -14,15 +14,18 @@ public class ItemFolder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Boolean isMain;
 
     private Boolean isFinished;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
+    @Column(nullable = false)
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id")
+    @Column(nullable = false)
     private Folder folder;
 }
