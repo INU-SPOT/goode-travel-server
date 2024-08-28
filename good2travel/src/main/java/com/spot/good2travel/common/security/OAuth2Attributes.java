@@ -35,7 +35,8 @@ public class OAuth2Attributes {
         } else if ("google".equals(socialName)) {
             return ofGoogle("email", attributes);
         }
-        return ofNaver("login", attributes);
+        log.info(socialName);
+        return ofNaver("id", attributes);
     }
 
 
@@ -65,13 +66,15 @@ public class OAuth2Attributes {
     }
 
     private static OAuth2Attributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        log.info(response.toString());
         return OAuth2Attributes.builder()
-                .name(String.valueOf(attributes.get("name")))
-                .email(String.valueOf(attributes.get("email")))
-                .profileImageUrl(String.valueOf(attributes.get("picture")))
-                .attributes(attributes)
+                .name(String.valueOf(response.get("name")))
+                .email(String.valueOf(response.get("id")))
+                .profileImageUrl(String.valueOf(response.get("profile_image")))
+                .attributes(response)
                 .nameAttributesKey(userNameAttributeName)
-                .provider("google")
+                .provider("naver")
                 .build();
     }
 

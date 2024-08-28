@@ -47,6 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+        log.info(oAuth2User + " " + oAuth2User.getAuthorities());
         User user = userRepository.findByEmail(oAuth2User.getName()).get();
 
         redirectToken(request, response, user);
