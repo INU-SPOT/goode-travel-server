@@ -27,5 +27,5 @@ public class ItemPost {
     private Post post;
 
     @OneToMany(mappedBy ="itemPost",cascade = CascadeType.ALL)
-    private List<PostPicture> postPictures;
+    private List<PostImage> postImages;
 }
