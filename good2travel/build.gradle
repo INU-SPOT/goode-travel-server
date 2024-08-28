@@ -28,7 +28,19 @@ dependencies {
     //mysql 의존성
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    //oauth2 관련 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    //security 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //redis 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //jwt 토큰 의존성
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 }
 
 tasks.named('test') {

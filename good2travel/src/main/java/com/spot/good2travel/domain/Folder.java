@@ -27,6 +27,5 @@ public class Folder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Column(nullable = false)
     private User user;
 }

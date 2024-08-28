@@ -21,7 +21,6 @@ public class LocalGovernment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "metropolitan_government_id")
-    @Column(nullable = false)
     private MetropolitanGovernment metropolitanGovernment;
 
     @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
