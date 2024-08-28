@@ -17,5 +17,5 @@ public class PostPicture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String picture;
+    private String pictureUrl;
 }

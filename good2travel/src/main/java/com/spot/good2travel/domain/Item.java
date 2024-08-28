@@ -21,7 +21,7 @@ public class Item {
 
     private String title;
 
-    private String picture;
+    private String imageUrl;
 
     private String description;
 

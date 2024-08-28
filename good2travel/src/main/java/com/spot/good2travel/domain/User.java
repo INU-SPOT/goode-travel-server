@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,8 +20,10 @@ public class User {
 
     private String name;
 
-    private String role;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(nullable = false)
+    private List<String> role;
 
-    private String profileImage;
+    private String profileImageUrl;
 
 }
