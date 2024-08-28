@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.engine.internal.Cascade;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class User {
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<BigComment> bigComments;
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<SmallComment> smallComments;

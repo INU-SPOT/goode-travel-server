@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BigComment {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class BigComment {
 
     private Integer report;
 
-    @OneToMany(mappedBy = "bigComment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<SmallComment> smallComments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

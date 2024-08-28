@@ -38,7 +38,7 @@ public class Post {
     private List<ItemPost> itemPosts;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<BigComment> bigComments;
+    private List<Comment> comments;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

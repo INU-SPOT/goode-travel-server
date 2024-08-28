@@ -24,5 +24,5 @@ public class SmallComment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "big_comment_id")
-    private BigComment bigComment;
+    private Comment comment;
 }
