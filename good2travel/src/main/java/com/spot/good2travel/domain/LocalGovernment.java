@@ -1,12 +1,11 @@
 package com.spot.good2travel.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,4 +17,15 @@ public class LocalGovernment {
     private Long id;
 
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "metropolitan_government_id")
+    private MetropolitanGovernment metropolitanGovernment;
+
+    @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
+    private List<Weather> weathers;
+
+    @OneToMany(mappedBy = "localGovernment",cascade = CascadeType.ALL)
+    private List<Item> items;
+
 }

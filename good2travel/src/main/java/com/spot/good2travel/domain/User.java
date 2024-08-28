@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.engine.internal.Cascade;
 
 import java.util.List;
 
@@ -25,5 +26,21 @@ public class User {
     private List<String> role;
 
     private String profileImageUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<BigComment> bigComments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<SmallComment> smallComments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Folder> folders;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "metropolitan_government")
+    private MetropolitanGovernment metropolitanGovernment;
 
 }

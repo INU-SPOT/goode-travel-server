@@ -1,12 +1,12 @@
 package com.spot.good2travel.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,4 +18,7 @@ public class Category {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<ItemCategory> itemCategories = new ArrayList<>();
 }

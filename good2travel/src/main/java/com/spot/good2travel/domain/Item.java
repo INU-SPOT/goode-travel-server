@@ -1,12 +1,12 @@
 package com.spot.good2travel.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,4 +30,17 @@ public class Item {
     private Boolean isOfficial;
 
     private String emoji;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemCategory> itemCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemPost> itemPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemFolder> itemFolders = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_government_id")
+    private LocalGovernment localGovernment;
 }

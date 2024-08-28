@@ -34,4 +34,14 @@ public class Post {
 
     private LocalDate endDate;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<ItemPost> itemPosts;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<BigComment> bigComments;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

@@ -1,9 +1,6 @@
 package com.spot.good2travel.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +20,7 @@ public class Weather {
 
     private Integer temperature;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_government_id")
+    private LocalGovernment localGovernment;
 }
