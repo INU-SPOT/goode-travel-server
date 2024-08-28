@@ -20,12 +20,10 @@ public class ItemPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    @Column(nullable = false)
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    @Column(nullable = false)
     private Post post;
 
     @OneToMany(mappedBy ="itemPost",cascade = CascadeType.ALL)

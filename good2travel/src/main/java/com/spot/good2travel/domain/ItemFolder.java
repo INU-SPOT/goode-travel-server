@@ -21,11 +21,9 @@ public class ItemFolder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    @Column(nullable = false)
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id")
-    @Column(nullable = false)
     private Folder folder;
 }
