@@ -1,0 +1,48 @@
+package com.spot.good2travel.domain;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String nickname;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(nullable = false)
+    private List<String> role;
+
+    @Column(nullable = false)
+    private String profileImageUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<SmallComment> smallComments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Folder> folders;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "metropolitan_government")
+    private MetropolitanGovernment metropolitanGovernment;
+
+}
