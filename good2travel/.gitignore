@@ -1,6 +1,7 @@
 
 
 *.yml
+**/resources
 
 HELP.mdr
 .gradle
