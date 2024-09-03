@@ -23,9 +23,9 @@ public class FcmConfig {
                     )
                     .build();
             FirebaseApp.initializeApp(options);
-            log.info("FCM 설정 성공");
+            log.info("[FcmConfig] FCM 설정 성공");
         } catch (IOException exception){
-            log.error("Fcm 연결 오류 {}", exception.getMessage());
+            log.error("[FcmConfig] Fcm 연결 오류 {}", exception.getMessage());
         }
     }
 }
