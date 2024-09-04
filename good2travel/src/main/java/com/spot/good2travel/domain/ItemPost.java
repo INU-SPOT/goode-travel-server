@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemPost extends BaseEntity {
+public class ItemPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

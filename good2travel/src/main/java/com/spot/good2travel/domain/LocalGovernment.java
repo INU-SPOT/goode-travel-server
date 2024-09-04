@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LocalGovernment extends BaseEntity {
+public class LocalGovernment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

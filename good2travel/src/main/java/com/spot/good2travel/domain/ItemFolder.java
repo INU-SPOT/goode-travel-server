@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemFolder extends BaseEntity {
+public class ItemFolder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
