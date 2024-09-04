@@ -7,7 +7,7 @@ import lombok.*;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FcmMessageDto {
+public class FcmMessage {
     private boolean validateOnly;
     private Message message;
 
