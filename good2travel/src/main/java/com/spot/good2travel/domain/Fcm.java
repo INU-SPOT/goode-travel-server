@@ -1,7 +1,6 @@
-package com.spot.good2travel.common.fcm;
+package com.spot.good2travel.domain;
 
 import com.spot.good2travel.common.entity.BaseEntity;
-import com.spot.good2travel.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

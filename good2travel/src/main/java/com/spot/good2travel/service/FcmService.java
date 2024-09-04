@@ -1,10 +1,12 @@
-package com.spot.good2travel.common.fcm;
+package com.spot.good2travel.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.spot.good2travel.common.fcm.dto.FcmMessageDto;
-import com.spot.good2travel.common.fcm.dto.FcmRequestDto;
+import com.spot.good2travel.repository.FcmRepository;
+import com.spot.good2travel.common.fcm.dto.FcmMessage;
+import com.spot.good2travel.common.fcm.dto.FcmRequest;
+import com.spot.good2travel.domain.Fcm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -28,8 +30,8 @@ public class FcmService {
     private final ObjectMapper objectMapper;
     private final FcmRepository fcmRepository;
 
-    public String sendMessageTo(FcmRequestDto fcmRequestDto) throws IOException{
-        String message = makeMessage(fcmRequestDto.getFcmToken(), fcmRequestDto.getTitle(), fcmRequestDto.getBody(), fcmRequestDto.isValidateOnly());
+    public String sendMessageTo(FcmRequest fcmRequest) throws IOException{
+        String message = makeMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody(), fcmRequest.isValidateOnly());
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
@@ -45,10 +47,10 @@ public class FcmService {
     }
 
     private String makeMessage(String fcmToken, String title, String message, boolean validateOnly) throws JsonProcessingException {
-        FcmMessageDto fcmMessage = FcmMessageDto.builder()
-                        .message(FcmMessageDto.Message.builder()
+        FcmMessage fcmMessage = FcmMessage.builder()
+                        .message(FcmMessage.Message.builder()
                                 .token(fcmToken)
-                                .notification(FcmMessageDto.Notification.builder()
+                                .notification(FcmMessage.Notification.builder()
                                         .title(title)
                                         .body(message)
                                         .build())
@@ -70,7 +72,7 @@ public class FcmService {
     }
 
     @Transactional
-    public String updateToken(FcmRequestDto.FcmUpdateDto fcmUpdateDto){
+    public String updateToken(FcmRequest.FcmUpdateDto fcmUpdateDto){
         //todo 유저 정보 가져오기
        Fcm fcm = fcmRepository.findFcmByUserId(1L);
        fcm.toUpdate(fcmUpdateDto.getFcmToken());
