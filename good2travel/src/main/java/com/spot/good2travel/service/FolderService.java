@@ -1,7 +1,7 @@
 package com.spot.good2travel.service;
 
 import com.spot.good2travel.domain.Folder;
-import com.spot.good2travel.dto.FolderRequest;
+import com.spot.good2travel.dto.FolderCreateRequest;
 import com.spot.good2travel.repository.FolderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class FolderService {
     /*
     새 폴더 만들기
      */
-    public void create(FolderRequest.FolderCreate folderRequest) {
+    public void create(FolderCreateRequest folderRequest) {
         Folder newFolder = Folder.builder()
                 .title(folderRequest.getTitle())
 //                .user() todo 유저 추가

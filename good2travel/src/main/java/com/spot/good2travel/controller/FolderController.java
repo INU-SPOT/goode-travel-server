@@ -1,7 +1,7 @@
 package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
-import com.spot.good2travel.dto.FolderRequest;
+import com.spot.good2travel.dto.FolderCreateRequest;
 import com.spot.good2travel.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class FolderController {
                     "<br><br> request : FolderRequest.FolderCreate, 헤더에 accessToken 추가" +
                     "<br><br> response : null"
     )
-    public CommonResponse<?> createFolder(@RequestBody FolderRequest.FolderCreate folderRequest){
+    public CommonResponse<?> createFolder(@RequestBody FolderCreateRequest folderRequest){
         folderService.create(folderRequest);
         return CommonResponse.success("새 폴더 생성 완료",
                 null);
