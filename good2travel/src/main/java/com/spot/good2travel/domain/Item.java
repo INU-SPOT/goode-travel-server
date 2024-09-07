@@ -46,4 +46,8 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
+
+    public void toUpdateTitle(String title){
+        this.title = title;
+    }
 }

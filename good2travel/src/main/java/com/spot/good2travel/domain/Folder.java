@@ -28,4 +28,8 @@ public class Folder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void toUpdateSequence(List<Integer> sequence){
+        this.sequence = sequence;
+    }
 }
