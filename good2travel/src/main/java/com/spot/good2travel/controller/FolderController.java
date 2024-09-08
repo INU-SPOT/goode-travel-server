@@ -30,9 +30,11 @@ public class FolderController {
 
     @PutMapping("/v1/plans/{planId}")
     @Operation(
-            summary = "폴더 안의 계획 수정",
+            summary = "폴더 안의 계획 제목 및 순서 수정",
             description = "사용자의 폴더 안에 있는 계획들을 Type에 따라 수정" +
-                    "<br><br> - request : FolderUpdateRequest " +
+                    "<br><br> - request : " +
+                    "planId = item의 DB상의 pk" +
+                    "[FolderUpdateRequest] " +
                     "<br> > type 1 : 계획 제목 수정 (title), " +
                     "<br> > type 2 : 계획 순서 수정 ,planId 가 몇번째(pos)로 갔는지 " +
                     "<br> 헤더에 accessToken 추가" +
@@ -46,6 +48,21 @@ public class FolderController {
         } catch (Exception e) {
             return CommonResponse.error("계획 수정 중 에러 발생", e.getMessage());
         }
+    }
+
+    @GetMapping("/v1/plans")
+    @Operation(
+            summary = "사용자의 폴더 목록 제공",
+            description = "사용자의 폴더 목록을 제공" +
+                    "<br><br> - request : X" +
+                    "<br><br> - response : " +
+                    "[FolderListResponse]" +
+                    "<br> 폴더에 굳이가 없을 경우 imageUrl = null"
+    )
+    public CommonResponse<?> getFolderList(){
+        //todo 유저 정보 필요
+        return CommonResponse.success("폴더 목록 반환 성공",
+                folderService.getFolderList());
     }
 
 }

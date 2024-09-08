@@ -18,7 +18,7 @@ public class Item {
     private Long id;
 
     @Column(nullable = false)
-    private String type;
+    private ItemType type;
 
     @Column(nullable = false)
     private String title;
@@ -50,4 +50,10 @@ public class Item {
     public void toUpdateTitle(String title){
         this.title = title;
     }
+
+    public enum ItemType{
+        GOODE, PLAN
+    }
 }
+
+

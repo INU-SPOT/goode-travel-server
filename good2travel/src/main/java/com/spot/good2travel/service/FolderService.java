@@ -7,6 +7,7 @@ import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemFolder;
 import com.spot.good2travel.dto.FolderCreateRequest;
+import com.spot.good2travel.dto.FolderListResponse;
 import com.spot.good2travel.dto.FolderUpdateRequest;
 import com.spot.good2travel.repository.FolderRepository;
 import com.spot.good2travel.repository.ItemFolderRepository;
@@ -16,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,5 +65,26 @@ public class FolderService {
         itemFolder.getFolder().toUpdateSequence(sequence);
         log.info("[updateSequence] 계획 순서 변경");
         return itemFolder.getFolder().getSequence();
+    }
+
+    public List<FolderListResponse> getFolderList() {
+        long userId = 1; //todo 유저 정보
+        List<Folder> folders = folderRepository.findAllByUserId(userId);
+        return folders
+                .stream()
+                .map(this::toListResponse)
+                .toList();
+    }
+
+    public FolderListResponse toListResponse(Folder folder){
+        List<ItemFolder> itemFolders = folder.getItemFolders();
+        Optional<Item> goodeItem = itemFolders.stream()
+                .map(ItemFolder::getItem)
+                .filter(item -> item.getType() == Item.ItemType.GOODE).findAny();
+//                .min(Comparator.comparing(Item::getCreatedDate)); todo BaseEntity merge 후
+
+        return goodeItem
+                .map(item -> new FolderListResponse(folder.getTitle(), item.getImageUrl()))
+                .orElseGet(() -> new FolderListResponse(folder.getTitle(), null));
     }
 }
