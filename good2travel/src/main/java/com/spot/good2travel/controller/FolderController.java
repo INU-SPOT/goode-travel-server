@@ -28,23 +28,23 @@ public class FolderController {
                 null);
     }
 
-    @PutMapping("/v1/plans/{planId}")
+    @PutMapping("/v1/plans/{itemId}")
     @Operation(
             summary = "폴더 안의 계획 제목 및 순서 수정",
             description = "사용자의 폴더 안에 있는 계획들을 Type에 따라 수정" +
                     "<br><br> - request : " +
-                    "planId = item의 DB상의 pk" +
+                    "itemId = item의 DB상의 pk" +
                     "[FolderUpdateRequest] " +
                     "<br> > type 1 : 계획 제목 수정 (title), " +
-                    "<br> > type 2 : 계획 순서 수정 ,planId 가 몇번째(pos)로 갔는지 " +
+                    "<br> > type 2 : 계획 순서 수정 ,itemId 가 몇번째(pos)로 갔는지 " +
                     "<br> 헤더에 accessToken 추가" +
                     "<br><br> - response : " +
                     " <br> > type 1 : 변경된 제목 (title) " +
-                    " <br> > type 2 : 변경된 순서 대로 planId(pk) 출력"
+                    " <br> > type 2 : 변경된 순서 대로 itemId(pk) 출력"
     )
-    public CommonResponse<?> updatePlan(@PathVariable("planId") Long planId, @RequestBody FolderUpdateRequest folderUpdateRequest){
+    public CommonResponse<?> updatePlan(@PathVariable("itemId") Long itemId, @RequestBody FolderUpdateRequest folderUpdateRequest){
         try {
-            return CommonResponse.success("계획 수정 완료", folderService.updatePlan(folderUpdateRequest, planId));
+            return CommonResponse.success("계획 수정 완료", folderService.updatePlan(folderUpdateRequest, itemId));
         } catch (Exception e) {
             return CommonResponse.error("계획 수정 중 에러 발생", e.getMessage());
         }
@@ -57,6 +57,7 @@ public class FolderController {
                     "<br><br> - request : X" +
                     "<br><br> - response : " +
                     "[FolderListResponse]" +
+                    "<br> 제일 처음 저장된 굳이 imageUrl 반환" +
                     "<br> 폴더에 굳이가 없을 경우 imageUrl = null"
     )
     public CommonResponse<?> getFolderList(){

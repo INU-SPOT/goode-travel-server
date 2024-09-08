@@ -43,26 +43,26 @@ public class FolderService {
     }
 
     @Transactional
-    public Object updatePlan(FolderUpdateRequest folderUpdateRequest, Long planId) {
+    public Object updatePlan(FolderUpdateRequest folderUpdateRequest, Long itemId) {
         if (folderUpdateRequest.getType()==1){ //계획의 제목 수정
-            Item item = itemRepository.findById(planId)
+            Item item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new ItemException(ExceptionMessage.ITEM_NOT_FOUND));
             item.toUpdateTitle(folderUpdateRequest.getTitle());
             log.info("[updatePlan] 계획 제목 변경");
             return item.getTitle();
         } else if (folderUpdateRequest.getType()==2){ //계획의 순서 수정
-            return updateSequence(folderUpdateRequest, planId);
+            return updateSequence(folderUpdateRequest, itemId);
         }
         throw new FolderException(ExceptionMessage.FOLDER_BAD_REQUEST);
     }
 
-    private List<Integer> updateSequence(FolderUpdateRequest folderUpdateRequest, Long planId) {
-        ItemFolder itemFolder = itemFolderRepository.findByItemId(planId);
+    private List<Integer> updateSequence(FolderUpdateRequest folderUpdateRequest, Long itemId) {
+        ItemFolder itemFolder = itemFolderRepository.findByItemId(itemId);
         if (itemFolder==null) throw new ItemException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND);
 
         List<Integer> sequence = itemFolder.getFolder().getSequence();
-        sequence.remove((Object) planId.intValue());
-        sequence.add(folderUpdateRequest.getPos()-1, planId.intValue());
+        sequence.remove((Object) itemId.intValue());
+        sequence.add(folderUpdateRequest.getPos()-1, itemId.intValue());
         itemFolder.getFolder().toUpdateSequence(sequence);
         log.info("[updateSequence] 계획 순서 변경");
         return itemFolder.getFolder().getSequence();
