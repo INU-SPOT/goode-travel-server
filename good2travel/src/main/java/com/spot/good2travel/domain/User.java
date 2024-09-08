@@ -56,10 +56,10 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    public User updateUser(String nickname, String profileImageUrl){
+    public User updateUser(String nickname, String profileImageUrl, MetropolitanGovernment metropolitanGovernment){
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
-
+        this.metropolitanGovernment = metropolitanGovernment;
         return this;
     }
 
