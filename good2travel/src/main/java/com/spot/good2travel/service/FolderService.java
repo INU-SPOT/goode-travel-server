@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +68,7 @@ public class FolderService {
         return itemFolder.getFolder().getSequence();
     }
 
+    @Transactional
     public List<FolderListResponse> getFolderList() {
         long userId = 1; //todo 유저 정보
         List<Folder> folders = folderRepository.findAllByUserId(userId);
@@ -80,8 +82,8 @@ public class FolderService {
         List<ItemFolder> itemFolders = folder.getItemFolders();
         Optional<Item> goodeItem = itemFolders.stream()
                 .map(ItemFolder::getItem)
-                .filter(item -> item.getType() == Item.ItemType.GOODE).findAny();
-//                .min(Comparator.comparing(Item::getCreatedDate)); todo BaseEntity merge 후
+                .filter(item -> item.getType() == Item.ItemType.GOODE)
+                .min(Comparator.comparing(Item::getCreateDate));
 
         return goodeItem
                 .map(item -> new FolderListResponse(folder.getTitle(), item.getImageUrl()))
