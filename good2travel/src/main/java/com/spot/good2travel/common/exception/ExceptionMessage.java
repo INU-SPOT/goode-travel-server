@@ -12,8 +12,10 @@ public enum ExceptionMessage {
         MEMBER_NOT_FOUND("멤버가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
         TOKEN_NOT_FOUND("토큰이 비었거나 null입니다", 0, HttpStatus.BAD_REQUEST),
         TOKEN_TYPE_INVALID("토큰 타입이 틀렸습니다.", 0, HttpStatus.BAD_REQUEST),
-        MEMBER_PROJECT_NOT_FOUND("멤버-프로젝트가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
-        MEMBER_UNAUTHENTICATED("접근 권한이 없는 페이지입니다.", 0, HttpStatus.UNAUTHORIZED),;
+        MEMBER_UNAUTHENTICATED("접근 권한이 없는 페이지입니다.", 0, HttpStatus.UNAUTHORIZED),
+        IMAGE_EMPTY("이미지가 비었습니다.", 0, HttpStatus.BAD_REQUEST),
+        IMAGE_SEND_ERROR("이미지 처리 중 예기치 못한 오류가 발생했습니다.", 0, HttpStatus.BAD_REQUEST),
+        IMAGE_READ_ERROR("이미지를 읽을 수 없습니다.", 0, HttpStatus.BAD_REQUEST);
 
 
 private final String message;

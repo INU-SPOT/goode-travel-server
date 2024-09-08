@@ -1,7 +1,7 @@
 package com.spot.good2travel.common.security;
 
-import com.spot.good2travel.common.redis.RefreshToken;
-import com.spot.good2travel.common.redis.RefreshTokenRepository;
+import com.spot.good2travel.common.redisRepository.RefreshToken;
+import com.spot.good2travel.common.redisRepository.RefreshTokenRepository;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;

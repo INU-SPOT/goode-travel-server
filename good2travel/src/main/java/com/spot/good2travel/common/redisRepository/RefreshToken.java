@@ -1,4 +1,4 @@
-package com.spot.good2travel.common.redis;
+package com.spot.good2travel.common.redisRepository;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
