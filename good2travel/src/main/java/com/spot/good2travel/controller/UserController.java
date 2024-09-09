@@ -45,7 +45,7 @@ public class UserController {
         return CommonResponse.success("유저 정보 출력 성공", userService.getUserInfo(userDetails));
     }
 
-    @PostMapping(value = "/v1/user")
+    @PutMapping(value = "/v1/user")
     @Operation(summary = "유저 가입(기본정보수정)", description = "유저를 회원가입(기본정보수정) 시킵니다.(닉네임과 사는지역 설정 가능) <br><br> - request: <br> UserRegisterUpdateRequest <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: UserInfoResponse")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공", content = @Content(schema = @Schema(implementation = UserResponse.UserInfoResponse.class))),
