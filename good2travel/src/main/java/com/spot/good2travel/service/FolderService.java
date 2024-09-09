@@ -6,17 +6,19 @@ import com.spot.good2travel.common.exception.ItemException;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemFolder;
-import com.spot.good2travel.dto.FolderCreateRequest;
-import com.spot.good2travel.dto.FolderListResponse;
-import com.spot.good2travel.dto.FolderUpdateRequest;
+import com.spot.good2travel.dto.*;
+import com.spot.good2travel.dto.record.Goode;
+import com.spot.good2travel.dto.record.Plan;
 import com.spot.good2travel.repository.FolderRepository;
 import com.spot.good2travel.repository.ItemFolderRepository;
 import com.spot.good2travel.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -88,5 +90,44 @@ public class FolderService {
         return goodeItem
                 .map(item -> new FolderListResponse(folder.getTitle(), item.getImageUrl()))
                 .orElseGet(() -> new FolderListResponse(folder.getTitle(), null));
+    }
+
+    @Transactional
+    public ItemListResponse getItemList(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
+        return getGoodeAndPlan(folder);
+    }
+
+    @NotNull
+    private ItemListResponse getGoodeAndPlan(Folder folder) {
+        List<Integer> itemSequence = folder.getSequence();
+        List<Goode> goodeList = new ArrayList<>();
+        List<Plan> planList = new ArrayList<>();
+        for (Integer id : itemSequence){
+            Item item = itemRepository.findById(Long.valueOf(id))
+                    .orElseThrow(() -> new ItemException(ExceptionMessage.ITEM_NOT_FOUND));
+            ItemFolder itemFolder = itemFolderRepository.findByItemId(Long.valueOf(id));
+            if (item.getType() == Item.ItemType.GOODE){
+                Goode goode = new Goode(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getImageUrl()==null ? item.getEmoji() : item.getImageUrl(),
+                        item.getAddress(),
+                        itemFolder.getIsMain()
+                );
+                goodeList.add(goode);
+            } else {
+                Plan plan = new Plan(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getImageUrl()==null ? item.getEmoji() : item.getImageUrl(),
+                        item.getCreateDate().toLocalDate(),
+                        itemFolder.getIsFinished()
+                );
+                planList.add(plan);
+            }
+        }
+        return new ItemListResponse(goodeList, planList);
     }
 }

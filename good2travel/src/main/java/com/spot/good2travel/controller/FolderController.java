@@ -66,4 +66,22 @@ public class FolderController {
                 folderService.getFolderList());
     }
 
+    @GetMapping("/v1/plans/{folderId}")
+    @Operation(
+            summary = "폴더 안의 계획 목록 제공",
+            description = "폴더 안의 계획 목록을 제공한다." +
+                    "<br><br> - request : folderId - Folder DB 상의 PK" +
+                    "<br><br> - response : [ItemListResponse]" +
+                    "<br> Goode와 Plan으로 나눠 리스트 반환"
+    )
+    public CommonResponse<?> getFolderItemList(@PathVariable("folderId") Long folderId){
+        try {
+            return CommonResponse.success("폴더 안의 계획 리스트 반환 성공"
+                    ,folderService.getItemList(folderId));
+        } catch (Exception e) {
+            return CommonResponse.success("폴더 안의 계획 리스트 반환 중 오류 발생"
+                    ,e.getMessage());
+        }
+    }
+
 }
