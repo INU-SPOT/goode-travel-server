@@ -19,7 +19,7 @@ public class UserRequest {
 
         @Schema(example = "frog.jpeg")
         @NotBlank(message = "프로필 이미지 이름은 빈 값이 될 수 없습니다.")
-        String imageName;
+        String profileImageName;
     }
 
 }

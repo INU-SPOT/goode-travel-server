@@ -42,10 +42,10 @@ public class UserService {
         MetropolitanGovernment metropolitanGovernment = metropolitanGovernmentRepository.findById(request.getMetropolitanGovernmentId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.METROPOLITANGOVERNMENT_NOT_FOUND));
 
-        user.updateUser(request.getNickname(), request.getImageName(), metropolitanGovernment);
+        user.updateUser(request.getNickname(), request.getProfileImageName(), metropolitanGovernment);
         userRepository.save(user);
 
-        return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment().getName(), user.getProfileImageUrl());
+        return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment().getName(), user.getProfileImageName());
     }
 
     public UserInfoResponse getUserInfo(UserDetails userDetails){
@@ -53,7 +53,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
-        String imageUrl = imageService.getImageGetUrl(user.getProfileImageUrl());
+        String imageUrl = imageService.getImageGetUrl(user.getProfileImageName());
 
         UserInfoResponse response = UserResponse.UserInfoResponse
                 .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageUrl);
