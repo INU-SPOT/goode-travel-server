@@ -47,6 +47,9 @@ public class FolderService {
         log.info("[createFolder] 새 폴더 생성");
     }
 
+    /*
+    계획 제목 및 순서 수정
+     */
     @Transactional
     public Object updatePlan(FolderUpdateRequest folderUpdateRequest, Long itemId) {
         if (folderUpdateRequest.getType()==1){ //계획의 제목 수정
@@ -73,6 +76,9 @@ public class FolderService {
         return itemFolder.getFolder().getSequence();
     }
 
+    /*
+    폴더 목록 조회
+     */
     @Transactional
     public List<FolderListResponse> getFolderList() {
         long userId = 1; //todo 유저 정보
@@ -89,12 +95,15 @@ public class FolderService {
                 .map(ItemFolder::getItem)
                 .filter(item -> item.getType() == Item.ItemType.GOODE)
                 .min(Comparator.comparing(Item::getCreateDate));
-
+        log.info("[getFolderList] 폴더 목록 조회");
         return goodeItem
                 .map(item -> new FolderListResponse(folder.getTitle(), item.getImageUrl()))
                 .orElseGet(() -> new FolderListResponse(folder.getTitle(), null));
     }
 
+    /*
+    폴더 안 계획 조회
+     */
     @Transactional
     public ItemListResponse getItemList(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
@@ -131,14 +140,19 @@ public class FolderService {
                 planList.add(plan);
             }
         }
+        log.info("[getItemList] {}번 폴더의 계획 목록 조회", folder.getId());
         return new ItemListResponse(goodeList, planList);
     }
 
+    /*
+    폴더 삭제
+     */
     @Transactional
     public void deleteFolder(Long folderId) {
         //공식적이지 않은 item들만 삭제
         List<Item> items = itemFolderRepository.findUnOfficialItemsInFolder(folderId);
         itemRepository.deleteAll(items);
         folderRepository.deleteById(folderId);
+        log.info("[deleteFolder] {}번 폴더 삭제",folderId);
     }
 }
