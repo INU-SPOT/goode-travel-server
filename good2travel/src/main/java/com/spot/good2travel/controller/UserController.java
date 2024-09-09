@@ -50,15 +50,14 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공", content = @Content(schema = @Schema(implementation = UserResponse.UserInfoResponse.class))),
     })
-    public CommonResponse<?> userUpdateRegister(UserRegisterUpdateRequest request, @RequestPart(value = "image", required = false)MultipartFile image
-            , @AuthenticationPrincipal UserDetails userDetails) {
+    public CommonResponse<?> userUpdateRegister(@RequestBody UserRegisterUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("기본정보수정 성공", userService.userRegisterUpdate(request, userDetails));
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "유저 프로필 이미지 등록", description = "유저의 프로필 이미지를 nginx에 등록합니다. <br><br> - request: <br> MultipartFile <br><br> - response: 이미지 이름(이미지가 없으면 null 반환)")
+    @Operation(summary = "유저 프로필 이미지 등록", description = "유저의 프로필 이미지를 nginx에 등록합니다. <br><br> - request: <br> MultipartFile <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: 이미지 이름(이미지가 없으면 null 반환)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원가입 성공", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "200", description = "사진 등록 성공", content = @Content(schema = @Schema(implementation = String.class))),
     })
     public CommonResponse<?> uploadImage(@RequestPart(value = "file", required = false) MultipartFile file) {
         return CommonResponse.success("사진 등록 성공", imageService.uploadImageToNginx(file));
