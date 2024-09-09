@@ -1,7 +1,6 @@
 package com.spot.good2travel.service;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
-import com.spot.good2travel.common.exception.ImageEmptyException;
 import com.spot.good2travel.common.exception.ImageReadException;
 import com.spot.good2travel.common.exception.ImageSendException;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +25,17 @@ public class ImageService {
     @Value("${spring.image-import-url}")
     private String imageImportUrl;
 
+    @Value("${spring.image-get-url}")
+    private String imageGetUrl;
+
     private final WebClient webClient;
 
     public String uploadImageToNginx(MultipartFile file) {
-
-        if (file.isEmpty()) {
-            throw new ImageEmptyException(ExceptionMessage.IMAGE_EMPTY);
+        if (file == null) {
+            return null;
         }
-
         String uniqueFilename = generateUniqueFilename(file);
-
         MultiValueMap<String, Object> body = createMultipartBody(file, uniqueFilename);
-
         uploadToServer(body);
 
         return uniqueFilename;
@@ -48,6 +46,7 @@ public class ImageService {
         String extension = (originalFilename != null && originalFilename.contains("."))
                 ? originalFilename.substring(originalFilename.lastIndexOf("."))
                 : "";
+
         return UUID.randomUUID() + extension;
     }
 
@@ -74,5 +73,13 @@ public class ImageService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    public String getImageGetUrl(String imageName){
+        if(imageName.isEmpty()){
+            return null;
+        }
+
+        return imageGetUrl + "/" + imageName;
     }
 }

@@ -10,21 +10,12 @@ import com.spot.good2travel.repository.MetropolitanGovernmentRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
+import static com.spot.good2travel.dto.UserRequest.UserRegisterUpdateRequest;
 import static com.spot.good2travel.dto.UserResponse.UserInfoResponse;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MetropolitanGovernmentRepository metropolitanGovernmentRepository;
+    private final ImageService imageService;
 
     public Boolean isRegistered(UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -39,20 +31,21 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
 
-        if(user.getNickname() == null){
-            return false;
-        }
-        return true;
+        return user.getNickname() != null;
     }
 
-    public void register(String nickname, MultipartFile image, Long metroId,UserDetails userDetails){
+    public UserInfoResponse userRegisterUpdate(UserRegisterUpdateRequest request, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
-        MetropolitanGovernment metropolitanGovernment = metropolitanGovernmentRepository.findById(metroId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
-        user.updateUser(nickname, null, metropolitanGovernment);
+        MetropolitanGovernment metropolitanGovernment = metropolitanGovernmentRepository.findById(request.getMetropolitanGovernmentId())
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.METROPOLITANGOVERNMENT_NOT_FOUND));
+
+        user.updateUser(request.getNickname(), request.getImageName(), metropolitanGovernment);
         userRepository.save(user);
+
+        return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment().getName(), user.getProfileImageUrl());
     }
 
     public UserInfoResponse getUserInfo(UserDetails userDetails){
@@ -60,8 +53,10 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+        String imageUrl = imageService.getImageGetUrl(user.getProfileImageUrl());
 
-        UserInfoResponse response = UserResponse.UserInfoResponse.of(user.getNickname(), user.getProfileImageUrl());
+        UserInfoResponse response = UserResponse.UserInfoResponse
+                .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageUrl);
 
         return response;
     }
