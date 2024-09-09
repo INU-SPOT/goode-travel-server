@@ -84,4 +84,16 @@ public class FolderController {
         }
     }
 
+    @DeleteMapping("/v1/plans/{folderId}")
+    @Operation(
+            summary = "폴더 삭제",
+            description = "폴더를 삭제한다." +
+                    "<br><br> - request : folderId - Folder DB 상의 PK" +
+                    "<br><br> - response : X"
+    )
+    public CommonResponse<?> deleteFolder(@PathVariable("folderId") Long folderId){
+        folderService.deleteFolder(folderId);
+        return CommonResponse.success("폴더 삭제 성공", null);
+    }
+
 }

@@ -6,7 +6,10 @@ import com.spot.good2travel.common.exception.ItemException;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemFolder;
-import com.spot.good2travel.dto.*;
+import com.spot.good2travel.dto.FolderCreateRequest;
+import com.spot.good2travel.dto.FolderListResponse;
+import com.spot.good2travel.dto.FolderUpdateRequest;
+import com.spot.good2travel.dto.ItemListResponse;
 import com.spot.good2travel.dto.record.Goode;
 import com.spot.good2travel.dto.record.Plan;
 import com.spot.good2travel.repository.FolderRepository;
@@ -129,5 +132,13 @@ public class FolderService {
             }
         }
         return new ItemListResponse(goodeList, planList);
+    }
+
+    @Transactional
+    public void deleteFolder(Long folderId) {
+        //공식적이지 않은 item들만 삭제
+        List<Item> items = itemFolderRepository.findUnOfficialItemsInFolder(folderId);
+        itemRepository.deleteAll(items);
+        folderRepository.deleteById(folderId);
     }
 }
