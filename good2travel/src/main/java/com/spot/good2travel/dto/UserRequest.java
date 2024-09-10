@@ -1,11 +1,14 @@
 package com.spot.good2travel.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
+@Valid
 public class UserRequest {
     @Getter
     public static class UserRegisterUpdateRequest{
@@ -14,11 +17,11 @@ public class UserRequest {
         String nickname;
 
         @Schema(example = "1")
-        @NotEmpty(message = "사는 지역을 골라주세요.")
+        @NotNull(message = "사는 지역을 골라주세요.")
         Long MetropolitanGovernmentId;
 
         @Schema(example = "frog.jpeg")
-        @NotBlank(message = "프로필 이미지 이름은 빈 값이 될 수 없습니다.")
+        @NotEmpty(message = "프로필 이미지 이름은 빈 값이 될 수 없습니다.")
         String profileImageName;
     }
 

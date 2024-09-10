@@ -70,4 +70,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[handleImageSendException] {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("유효성 검사 실패: {}", errorMessage);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ExceptionMessage.FAILED_VALIDATION.getMessage(), errorMessage));
+    }
 }

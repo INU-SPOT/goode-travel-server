@@ -30,7 +30,7 @@ public class ImageService {
 
     private final WebClient webClient;
 
-    public String uploadImageToNginx(MultipartFile file) {
+    public String uploadUserImageToNginx(MultipartFile file) {
         if (file == null) {
             return null;
         }
@@ -75,7 +75,7 @@ public class ImageService {
                 .block();
     }
 
-    public String getImageGetUrl(String imageName){
+    public String getImageUrl(String imageName){
         if(imageName.isEmpty()){
             return null;
         }

@@ -16,10 +16,11 @@ public enum ExceptionMessage {
         IMAGE_EMPTY("이미지가 비었습니다.", 0, HttpStatus.BAD_REQUEST),
         IMAGE_SEND_ERROR("이미지 처리 중 예기치 못한 오류가 발생했습니다.", 0, HttpStatus.BAD_REQUEST),
         IMAGE_READ_ERROR("이미지를 읽을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
-        METROPOLITANGOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND);
+        METROPOLITANGOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
+        FAILED_VALIDATION("유효성 검사 실패", 0, HttpStatus.BAD_REQUEST);
 
 
-private final String message;
+        private final String message;
 
 private final Integer errorCode;
 
