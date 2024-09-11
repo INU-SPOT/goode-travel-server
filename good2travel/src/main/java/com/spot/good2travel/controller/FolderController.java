@@ -42,12 +42,8 @@ public class FolderController {
                     " <br> > type 1 : 변경된 제목 (title) " +
                     " <br> > type 2 : 변경된 순서 대로 itemId(pk) 출력"
     )
-    public CommonResponse<?> updatePlan(@PathVariable("itemId") Long itemId, @RequestBody FolderUpdateRequest folderUpdateRequest){
-        try {
-            return CommonResponse.success("계획 수정 완료", folderService.updatePlan(folderUpdateRequest, itemId));
-        } catch (Exception e) {
-            return CommonResponse.error("계획 수정 중 에러 발생", e.getMessage());
-        }
+    public CommonResponse<?> updatePlan(@PathVariable("itemId") Long itemId, @RequestBody FolderUpdateRequest folderUpdateRequest) {
+        return CommonResponse.success("계획 수정 완료", folderService.updatePlan(folderUpdateRequest, itemId));
     }
 
     @GetMapping("/v1/plans")
@@ -75,13 +71,9 @@ public class FolderController {
                     "<br> Goode와 Plan으로 나눠 리스트 반환"
     )
     public CommonResponse<?> getFolderItemList(@PathVariable("folderId") Long folderId){
-        try {
-            return CommonResponse.success("폴더 안의 계획 리스트 반환 성공"
+        return CommonResponse.success("폴더 안의 계획 리스트 반환 성공"
                     ,folderService.getItemList(folderId));
-        } catch (Exception e) {
-            return CommonResponse.success("폴더 안의 계획 리스트 반환 중 오류 발생"
-                    ,e.getMessage());
-        }
+
     }
 
     @DeleteMapping("/v1/plans/{folderId}")
@@ -95,5 +87,4 @@ public class FolderController {
         folderService.deleteFolder(folderId);
         return CommonResponse.success("폴더 삭제 성공", null);
     }
-
 }
