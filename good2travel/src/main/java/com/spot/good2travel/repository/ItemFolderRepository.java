@@ -12,6 +12,9 @@ import java.util.List;
 public interface ItemFolderRepository extends JpaRepository<ItemFolder, Long> {
     ItemFolder findByItemId(Long itemId);
 
-    @Query("SELECT if.item FROM ItemFolder if WHERE if.item.isOfficial = false AND if.folder.id = :folderId")
+    @Query("SELECT i FROM ItemFolder if " +
+            "JOIN Item i ON i.id = if.item.id " +
+            "JOIN Folder f ON if.folder.id = f.id " +
+            "WHERE i.isOfficial = false AND f.id = :folderId")
     List<Item> findUnOfficialItemsInFolder(Long folderId);
 }
