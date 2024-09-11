@@ -6,6 +6,7 @@ import com.spot.good2travel.common.exception.ItemException;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemFolder;
+import com.spot.good2travel.domain.ItemType;
 import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.FolderResponse;
 import com.spot.good2travel.dto.ItemListResponse;
@@ -85,7 +86,7 @@ public class FolderService {
         List<ItemFolder> itemFolders = folder.getItemFolders();
         Optional<Item> goodeItem = itemFolders.stream()
                 .map(ItemFolder::getItem)
-                .filter(item -> item.getType() == Item.ItemType.GOODE)
+                .filter(item -> item.getType() == ItemType.GOODE)
                 .min(Comparator.comparing(Item::getCreateDate));
         log.info("[getFolderList] 폴더 목록 조회");
         return goodeItem
@@ -112,7 +113,7 @@ public class FolderService {
             Item item = itemRepository.findById(Long.valueOf(id))
                     .orElseThrow(() -> new ItemException(ExceptionMessage.ITEM_NOT_FOUND));
             ItemFolder itemFolder = itemFolderRepository.findByItemId(Long.valueOf(id));
-            if (item.getType() == Item.ItemType.GOODE){
+            if (item.getType() == ItemType.GOODE){
                 Goode goode = new Goode(
                         item.getId(),
                         item.getTitle(),
