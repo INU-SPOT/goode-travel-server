@@ -48,13 +48,7 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
 
-    public void toUpdateTitle(String title){
-        this.title = title;
-    }
 
-    public enum ItemType{
-        GOODE, PLAN
-    }
 }
 
 
