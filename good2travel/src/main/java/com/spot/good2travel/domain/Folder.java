@@ -8,8 +8,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Folder extends BaseEntity {
 
@@ -29,6 +27,12 @@ public class Folder extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder
+    public Folder(String title, User user){
+        this.title = title;
+        this.user = user;
+    }
 
     public void updateSequence(List<Integer> sequence){
         this.sequence = sequence;
