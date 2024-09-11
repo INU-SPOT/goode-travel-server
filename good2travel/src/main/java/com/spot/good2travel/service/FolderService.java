@@ -6,9 +6,8 @@ import com.spot.good2travel.common.exception.ItemException;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemFolder;
-import com.spot.good2travel.dto.FolderCreateRequest;
-import com.spot.good2travel.dto.FolderListResponse;
-import com.spot.good2travel.dto.FolderUpdateRequest;
+import com.spot.good2travel.dto.FolderRequest;
+import com.spot.good2travel.dto.FolderResponse;
 import com.spot.good2travel.dto.ItemListResponse;
 import com.spot.good2travel.dto.record.Goode;
 import com.spot.good2travel.dto.record.Plan;
@@ -38,7 +37,7 @@ public class FolderService {
     /*
     새 폴더 만들기
      */
-    public void create(FolderCreateRequest folderRequest) {
+    public void create(FolderRequest.FolderCreateRequest folderRequest) {
         Folder newFolder = Folder.builder()
                 .title(folderRequest.getTitle())
 //                .user() todo 유저 추가
@@ -48,39 +47,32 @@ public class FolderService {
     }
 
     /*
-    계획 제목 및 순서 수정
+    계획 순서 수정
      */
     @Transactional
-    public Object updatePlan(FolderUpdateRequest folderUpdateRequest, Long itemId) {
-        if (folderUpdateRequest.getType()==1){ //계획의 제목 수정
-            Item item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new ItemException(ExceptionMessage.ITEM_NOT_FOUND));
-            item.toUpdateTitle(folderUpdateRequest.getTitle());
-            log.info("[updatePlan] 계획 제목 변경");
-            return item.getTitle();
-        } else if (folderUpdateRequest.getType()==2){ //계획의 순서 수정
-            return updateSequence(folderUpdateRequest, itemId);
-        }
-        throw new FolderException(ExceptionMessage.FOLDER_BAD_REQUEST);
+    public Object updatePlanList(FolderRequest.PlanListUpdateRequest planUpdateRequest, Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
+        folder.updateSequence(planUpdateRequest.getSequence());
+        return folder.getSequence();
     }
 
-    private List<Integer> updateSequence(FolderUpdateRequest folderUpdateRequest, Long itemId) {
-        ItemFolder itemFolder = itemFolderRepository.findByItemId(itemId);
-        if (itemFolder==null) throw new ItemException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND);
-
-        List<Integer> sequence = itemFolder.getFolder().getSequence();
-        sequence.remove((Object) itemId.intValue());
-        sequence.add(folderUpdateRequest.getPos()-1, itemId.intValue());
-        itemFolder.getFolder().toUpdateSequence(sequence);
-        log.info("[updateSequence] 계획 순서 변경");
-        return itemFolder.getFolder().getSequence();
+    /*
+    폴더 제목 수정
+     */
+    @Transactional
+    public Object updateFolderTitle(FolderRequest.FolderTitleUpdateRequest folderUpdateRequest, Long folderId){
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
+        folder.updateTitle(folderUpdateRequest.getTitle());
+        return folder.getTitle();
     }
 
     /*
     폴더 목록 조회
      */
     @Transactional
-    public List<FolderListResponse> getFolderList() {
+    public List<FolderResponse.FolderListResponse> getFolderList() {
         long userId = 1; //todo 유저 정보
         List<Folder> folders = folderRepository.findAllByUserId(userId);
         return folders
@@ -89,7 +81,7 @@ public class FolderService {
                 .toList();
     }
 
-    public FolderListResponse toListResponse(Folder folder){
+    public FolderResponse.FolderListResponse toListResponse(Folder folder){
         List<ItemFolder> itemFolders = folder.getItemFolders();
         Optional<Item> goodeItem = itemFolders.stream()
                 .map(ItemFolder::getItem)
@@ -97,8 +89,8 @@ public class FolderService {
                 .min(Comparator.comparing(Item::getCreateDate));
         log.info("[getFolderList] 폴더 목록 조회");
         return goodeItem
-                .map(item -> new FolderListResponse(folder.getTitle(), item.getImageUrl()))
-                .orElseGet(() -> new FolderListResponse(folder.getTitle(), null));
+                .map(item -> new FolderResponse.FolderListResponse(folder.getTitle(), item.getImageUrl()))
+                .orElseGet(() -> new FolderResponse.FolderListResponse(folder.getTitle(), null));
     }
 
     /*

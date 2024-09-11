@@ -30,7 +30,11 @@ public class Folder extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void toUpdateSequence(List<Integer> sequence){
+    public void updateSequence(List<Integer> sequence){
         this.sequence = sequence;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
     }
 }

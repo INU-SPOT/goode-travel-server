@@ -5,19 +5,20 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
+
 public class FolderRequest {
 
-    public static class FolderCreateReqeust{
+    @Getter
+    public static class FolderCreateRequest{
         private String title;
     }
-
-    public static class FolderListUpdateRequest{
+    @Getter
+    public static class PlanListUpdateRequest {
         private List<Integer> sequence;
     }
 
-    public static class FolderTitleUpdateReqeust{
+    @Getter
+    public static class FolderTitleUpdateRequest{
         private String title;
     }
 }
