@@ -27,20 +27,20 @@ public class FolderController {
                 null);
     }
 
-    @PutMapping("/v1/plans/title/{folderId}")
+    @PutMapping("/v1/plans/sequence/{folderId}")
     @Operation(
-            summary = "폴더 안의 계획 제목 및 순서 수정",
-            description = "사용자의 폴더 안에 있는 계획들을 Type에 따라 수정" +
+            summary = "폴더안의 계획 순서 수정",
+            description = "사용자의 폴더 안에 있는 계획들의 순서를 수정" +
                     "<br><br> - request : " +
                     "folderId = folder DB 상의 pk, [PlanListUpdateRequest]" +
                     "<br><br> - response :" +
                     "폴더 안 계획들의 일련의 pk"
     )
     public CommonResponse<?> updatePlanList(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.PlanListUpdateRequest planUpdateRequest) {
-        return CommonResponse.success("계획 수정 완료", folderService.updatePlanList(planUpdateRequest, folderId));
+        return CommonResponse.success("계획 순서 수정 완료", folderService.updatePlanList(planUpdateRequest, folderId));
     }
 
-    @PutMapping("/v1/plans/sequence/{folderId}")
+    @PutMapping("/v1/plans/title/{folderId}")
     @Operation(
             summary = "폴더 제목 수정",
             description = "사용자의 폴더 제목 수정" +
@@ -48,7 +48,7 @@ public class FolderController {
                     "<br><br> - response : 업데이트 된 폴더 title"
     )
     public CommonResponse<?> updateFolderTitle(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.FolderTitleUpdateRequest folderUpdateRequest) {
-        return CommonResponse.success("계획 수정 완료", folderService.updateFolderTitle(folderUpdateRequest, folderId));
+        return CommonResponse.success("폴더 제목 수정 완료", folderService.updateFolderTitle(folderUpdateRequest, folderId));
     }
 
     @GetMapping("/v1/plans")
