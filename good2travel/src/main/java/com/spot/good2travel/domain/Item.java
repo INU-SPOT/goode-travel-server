@@ -47,4 +47,7 @@ public class Item extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
+
+
+
 }

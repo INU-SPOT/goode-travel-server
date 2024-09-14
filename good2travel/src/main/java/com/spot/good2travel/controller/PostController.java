@@ -1,6 +1,8 @@
 package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
+import com.spot.good2travel.dto.PostRequest;
+import com.spot.good2travel.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,13 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("")
 public class PostController {
 
+    private final PostService postService;
+
     @PostMapping("/v1/posts")
     @Operation(summary = "게시글 등록 기능", description = "")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 등록 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "200", description = "게시글 등록 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> createPost(@AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("게시글 등록 성공", null);
+    public CommonResponse<?> createPost(@RequestBody PostRequest.PostCreateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("게시글 등록 성공", postService.createPost(request, userDetails));
     }
 
     @GetMapping("/v1/posts")

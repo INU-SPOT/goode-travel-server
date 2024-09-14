@@ -14,15 +14,15 @@ public class UserRequest {
     public static class UserRegisterUpdateRequest{
         @Schema(example = "깨구링")
         @NotBlank(message = "서비스에서 사용 할 닉네임을 정해 주세요.")
-        String nickname;
+        private String nickname;
 
         @Schema(example = "1")
         @NotNull(message = "사는 지역을 골라주세요.")
-        Long MetropolitanGovernmentId;
+        private Long MetropolitanGovernmentId;
 
         @Schema(example = "frog.jpeg")
         @NotEmpty(message = "프로필 이미지 이름은 빈 값이 될 수 없습니다.")
-        String profileImageName;
+        private String profileImageName;
     }
 
 }
