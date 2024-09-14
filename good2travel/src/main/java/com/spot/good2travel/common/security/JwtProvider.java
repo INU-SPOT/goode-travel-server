@@ -76,7 +76,7 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret 값 세팅
                 .compact();
 
-        log.info("[createAccessToken] 토큰 생성 완료");
+        log.info("[createAccessToken] 토큰 생성 완료 : {}", token);
         return token;
     }
 

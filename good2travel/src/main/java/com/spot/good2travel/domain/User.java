@@ -25,7 +25,7 @@ public class User extends BaseEntity {
 
     private String nickname;
 
-    private String profileImageUrl;
+    private String profileImageName;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> role;
@@ -48,18 +48,18 @@ public class User extends BaseEntity {
 
 
     @Builder
-    public User(String provider, String email, String nickname, String profileImageUrl, List<String> role){
+    public User(String provider, String email, String nickname, String profileImageName, List<String> role){
         this.provider = provider;
         this.email = email;
         this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageName = profileImageName;
         this.role = role;
     }
 
-    public User updateUser(String nickname, String profileImageUrl){
+    public User updateUser(String nickname, String profileImageUrl, MetropolitanGovernment metropolitanGovernment){
         this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-
+        this.profileImageName = profileImageUrl;
+        this.metropolitanGovernment = metropolitanGovernment;
         return this;
     }
 

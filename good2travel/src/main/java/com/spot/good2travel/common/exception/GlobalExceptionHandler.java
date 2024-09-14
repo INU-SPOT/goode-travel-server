@@ -21,7 +21,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<CommonResponse> handleNotFoundElementException(NotFoundElementException ex) {
         log.error("[handleNotFoundElementException] {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(CommonResponse.error(ex.getMessage(), null));
-
     }
 
     @ExceptionHandler(value = FailedTokenCreateException.class)
@@ -54,5 +53,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
 
+    @ExceptionHandler(value = ImageEmptyException.class)
+    public ResponseEntity<CommonResponse<?>> handleImageEmptyException(ImageEmptyException ex) {
+        log.error("[handleImageEmptyException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
 
+    @ExceptionHandler(value = ImageReadException.class)
+    public ResponseEntity<CommonResponse<?>> handleImageReadException(ImageReadException ex){
+        log.error("[handleImageReadException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = ImageSendException.class)
+    public ResponseEntity<CommonResponse<?>> handleImageReadException(ImageSendException ex){
+        log.error("[handleImageSendException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.error("유효성 검사 실패: {}", errorMessage);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ExceptionMessage.FAILED_VALIDATION.getMessage(), errorMessage));
+    }
 }
