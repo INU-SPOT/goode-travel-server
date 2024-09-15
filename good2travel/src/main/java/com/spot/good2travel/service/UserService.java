@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.spot.good2travel.dto.UserRequest.UserRegisterUpdateRequest;
 import static com.spot.good2travel.dto.UserResponse.UserInfoResponse;
@@ -48,6 +49,7 @@ public class UserService {
         return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment().getName(), user.getProfileImageName());
     }
 
+    @Transactional
     public UserInfoResponse getUserInfo(UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
 

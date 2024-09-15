@@ -1,8 +1,9 @@
 package com.spot.good2travel.domain;
 
-import com.spot.good2travel.common.entity.BaseEntity;
+import com.spot.good2travel.dto.PostRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,5 +29,28 @@ public class ItemPost {
     private Post post;
 
     @OneToMany(mappedBy ="itemPost",cascade = CascadeType.ALL)
-    private List<PostImage> postImages;
+    private List<ItemPostImage> itemPostImages;
+
+    @Builder
+    public ItemPost(String content, Item item, Post post, List<ItemPostImage> itemPostImages){
+        this.content = content;
+        this.item = item;
+        this.post = post;
+        this.itemPostImages = itemPostImages;
+    }
+
+    public static ItemPost of(PostRequest.ItemPostCreateUpdateRequest request, Item item, Post post){
+        return ItemPost.builder()
+                .content(request.getContent())
+                .item(item)
+                .post(post).build();
+    }
+
+    public ItemPost updateItemPost(PostRequest.ItemPostCreateUpdateRequest request){
+        this.content = request.getContent();
+        this.item = item;
+        this.post = post;
+
+        return this;
+    }
 }
