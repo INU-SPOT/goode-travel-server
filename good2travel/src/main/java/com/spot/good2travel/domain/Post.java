@@ -37,7 +37,7 @@ public class Post extends BaseEntity {
 
     private Integer report;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Long> sequence;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -66,7 +66,7 @@ public class Post extends BaseEntity {
         this.user = user;
     }
 
-    public static Post of(PostRequest.PostCreateRequest request, User user){
+    public static Post of(PostRequest.PostCreateUpdateRequest request, User user){
         return Post.builder()
                 .title(request.getTitle())
                 .firstContent(request.getFirstContent())
@@ -82,6 +82,16 @@ public class Post extends BaseEntity {
     public Post updatePostSequence(List<Long> sequence){
         this.sequence = sequence;
 
+        return this;
+    }
+
+    public Post updatePost(PostRequest.PostCreateUpdateRequest request, List<Long> sequence){
+        this.title = request.getTitle();
+        this.firstContent = request.getFirstContent();
+        this.lastContent =request.getLastContent();
+        this.startDate = request.getStartDate();
+        this.endDate = request.getEndDate();
+        this.sequence = sequence;
         return this;
     }
 

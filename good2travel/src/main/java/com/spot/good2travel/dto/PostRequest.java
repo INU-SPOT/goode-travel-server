@@ -13,7 +13,7 @@ import java.util.List;
 public class PostRequest {
 
     @Getter
-    public static class PostCreateRequest{
+    public static class PostCreateUpdateRequest {
 
         @Schema(example = "환기리의 꿀잼 인천여행")
         @NotBlank(message = "제목을 입력해주세요.")
@@ -32,15 +32,19 @@ public class PostRequest {
         private LocalDate endDate;
 
         @Valid
-        private List<ItemPostCreateRequest> itemPosts;
+        private List<ItemPostCreateUpdateRequest> itemPosts;
 
     }
 
     @Getter
-    public static class ItemPostCreateRequest{
+    public static class ItemPostCreateUpdateRequest {
+
+        private Long itemPostId;
 
         @Schema(example = "1")
         private Long itemId;
+
+        private String itemTitle;
 
         @Schema(example = "사진을 찍었는데 저작권에 걸려서 제가 좋아하는 개구리 사진으로 대체하겠습니다ㅠㅠ")
         private String content;
@@ -52,10 +56,11 @@ public class PostRequest {
     @Getter
     public static class ItemPostImageRequest{
 
+        private Long itemPostImageId;
+
         @Schema(example = "frog.jpeg")
         @NotNull(message = "사진의 파일명을 입력 해 주세요.")
         private String imageName;
 
     }
-
 }

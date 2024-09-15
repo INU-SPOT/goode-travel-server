@@ -39,10 +39,18 @@ public class ItemPost {
         this.itemPostImages = itemPostImages;
     }
 
-    public static ItemPost of(PostRequest.ItemPostCreateRequest request, Item item, Post post){
+    public static ItemPost of(PostRequest.ItemPostCreateUpdateRequest request, Item item, Post post){
         return ItemPost.builder()
                 .content(request.getContent())
                 .item(item)
                 .post(post).build();
+    }
+
+    public ItemPost updateItemPost(PostRequest.ItemPostCreateUpdateRequest request){
+        this.content = request.getContent();
+        this.item = item;
+        this.post = post;
+
+        return this;
     }
 }

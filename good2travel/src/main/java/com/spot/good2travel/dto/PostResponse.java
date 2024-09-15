@@ -115,15 +115,18 @@ public class PostResponse {
     @Getter
     public static class ItemPostImageResponse{
 
-        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
-        private final String imageName;
+        private final Long itemPostImageId;
 
-        public ItemPostImageResponse(String imageName){
-            this.imageName = imageName;
+        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
+        private final String imageUrl;
+
+        public ItemPostImageResponse(Long itemPostImageId, String imageUrl){
+            this.itemPostImageId = itemPostImageId;
+            this.imageUrl = imageUrl;
         }
 
-        public static ItemPostImageResponse of(String imageName){
-            return new ItemPostImageResponse(imageName);
+        public static ItemPostImageResponse of(Long itemPostImageId, String imageUrl){
+            return new ItemPostImageResponse(itemPostImageId, imageUrl);
         }
 
     }
