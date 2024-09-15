@@ -86,6 +86,11 @@ public class PostService {
 
         return PostResponse.PostDetailResponse.of(post, itemPostResponses);
     }
+
+//    @Transactional
+//    public PostResponse.PostDetailResponse getPosts(){
+//
+//    }
 }
 
 

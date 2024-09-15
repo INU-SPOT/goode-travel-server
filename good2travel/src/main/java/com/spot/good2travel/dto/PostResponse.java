@@ -14,6 +14,11 @@ public class PostResponse {
 
     @Getter
     public static class PostDetailResponse{
+
+        @Schema(example = "1")
+        private final Long writerId;
+
+        @Schema(example = "3")
         private final Long postId;
 
         @Schema(example = "환기리의 꿀잼 인천여행")
@@ -34,8 +39,9 @@ public class PostResponse {
         private final List<ItemPostResponse> itemPosts;
 
         @Builder
-        public PostDetailResponse(Long postId, String title, String firstContent, String lastContent,
+        public PostDetailResponse(Long writerId, Long postId, String title, String firstContent, String lastContent,
                                   LocalDate startDate, LocalDate endDate, List<ItemPostResponse> itemPosts){
+            this.writerId = writerId;
             this.postId = postId;
             this.title = title;
             this.firstContent = firstContent;
@@ -47,6 +53,7 @@ public class PostResponse {
 
         public static PostDetailResponse of(Post post, List<ItemPostResponse> itemPosts){
             return PostDetailResponse.builder()
+                    .writerId(post.getUser().getId())
                     .postId(post.getId())
                     .title(post.getTitle())
                     .firstContent(post.getFirstContent())
@@ -69,16 +76,25 @@ public class PostResponse {
         @Schema(example = "Good Eats Restaurant")
         private final String itemTitle;
 
+        @Schema(example = "PLAN")
+        private final String itemType;
+
+        @Schema(example = "true")
+        private final Boolean isOfficial;
+
         @Schema(example = "사진을 찍었는데 저작권에 걸려서 제가 좋아하는 개구리 사진으로 대체하겠습니다ㅠㅠ")
         private final String content;
 
         private final List<ItemPostImageResponse> images;
 
         @Builder
-        public ItemPostResponse(Long itemPostId, Long itemId, String itemTitle, String content, List<ItemPostImageResponse> images){
+        public ItemPostResponse(Long itemPostId, Long itemId, String itemTitle, String itemType, Boolean isOfficial,
+                                String content, List<ItemPostImageResponse> images){
             this.itemPostId = itemPostId;
             this.itemId = itemId;
             this.itemTitle = itemTitle;
+            this.itemType = itemType;
+            this.isOfficial = isOfficial;
             this.content = content;
             this.images = images;
         }
@@ -88,10 +104,11 @@ public class PostResponse {
                     .itemPostId(itemPost.getId())
                     .itemId(itemPost.getItem().getId())
                     .itemTitle(itemPost.getItem().getTitle())
+                    .itemType(itemPost.getItem().getType())
+                    .isOfficial(itemPost.getItem().getIsOfficial())
                     .content(itemPost.getContent())
                     .images(itemPostImageResponses)
                     .build();
-
         }
     }
 
@@ -111,7 +128,51 @@ public class PostResponse {
 
     }
 
+    @Getter
+    public static class PostThumbnailsResponse{
+        private List<PostThumbnailsResponse> postThumbnailsResponses;
+
+    }
+
+    @Getter
     public static class PostThumbnailResponse{
+
+        @Schema(example = "ㅈㅎㄱ")
+        private final String writerName;
+
+        @Schema(example = "3")
+        private final Long postId;
+
+        @Schema(example = "환기리의 꿀잼 인천여행")
+        private final String title;
+
+        private final String imageUrl;
+
+        private final List<ItemPostThumbnailResponse> items;
+
+
+        @Builder
+        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items){
+            this.writerName = writerName;
+            this.postId = postId;
+            this.title = title;
+            this.imageUrl = imageUrl;
+            this.items = items;
+        }
+
+        public static PostThumbnailResponse of(Post post, , List<String> items){
+            return PostThumbnailResponse.builder()
+                    .writerName(post.getUser().getNickname())
+                    .postId(post.getId())
+                    .title(post.getTitle())
+                    .imageUrl()
+                    .items(items)
+                    .build();
+        }
+    }
+    public static class ItemPostThumbnailResponse{
+
+        private final 
 
     }
 
