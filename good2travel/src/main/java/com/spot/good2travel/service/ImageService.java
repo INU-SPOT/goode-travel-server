@@ -76,7 +76,7 @@ public class ImageService {
     }
 
     public String getImageUrl(String imageName){
-        if(imageName.isEmpty()){
+        if(imageName == null || imageName.isEmpty()){
             return null;
         }
 
