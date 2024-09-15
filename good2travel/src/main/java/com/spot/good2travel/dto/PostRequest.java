@@ -39,11 +39,13 @@ public class PostRequest {
     @Getter
     public static class ItemPostCreateUpdateRequest {
 
+        @Schema(example = "1")
         private Long itemPostId;
 
         @Schema(example = "1")
         private Long itemId;
 
+        @Schema(example = "굳이? 개구리처럼 수영하기")
         private String itemTitle;
 
         @Schema(example = "사진을 찍었는데 저작권에 걸려서 제가 좋아하는 개구리 사진으로 대체하겠습니다ㅠㅠ")
@@ -56,6 +58,7 @@ public class PostRequest {
     @Getter
     public static class ItemPostImageRequest{
 
+        @Schema(example = "1")
         private Long itemPostImageId;
 
         @Schema(example = "frog.jpeg")

@@ -2,6 +2,7 @@ package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.PostRequest;
+import com.spot.good2travel.dto.PostResponse;
 import com.spot.good2travel.service.ImageService;
 import com.spot.good2travel.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +39,7 @@ public class PostController {
     @GetMapping("/v1/posts")
     @Operation(summary = "게시글 목록(썸네일) 불러오기 기능", description = "")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
     public CommonResponse<?> getPosts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                       @RequestParam(defaultValue = "7", required = false) Integer size) {

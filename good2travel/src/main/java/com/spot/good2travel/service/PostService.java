@@ -1,5 +1,6 @@
 package com.spot.good2travel.service;
 
+import com.spot.good2travel.common.dto.CommonPagingResponse;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.security.CustomUserDetails;
@@ -91,7 +92,7 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostResponse.PostThumbnailResponse> getPosts(Integer page, Integer size){
+    public CommonPagingResponse<?> getPosts(Integer page, Integer size){
         PageRequest pageable = PageRequest.of(page, size);
 
         Page<Post> postPage = postRepository.findAll(pageable);
@@ -107,7 +108,7 @@ public class PostService {
                     }).toList());
                 }).toList();
 
-        return postThumbnailResponses;
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
     }
 
     @Transactional
