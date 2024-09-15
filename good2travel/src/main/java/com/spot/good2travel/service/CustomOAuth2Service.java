@@ -1,8 +1,8 @@
 package com.spot.good2travel.service;
 
+import com.spot.good2travel.common.security.OAuth2Attributes;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.repository.UserRepository;
-import com.spot.good2travel.common.security.OAuth2Attributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
