@@ -36,8 +36,9 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
     })
-    public CommonResponse<?> getPosts() {
-        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", null);
+    public CommonResponse<?> getPosts(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                      @RequestParam(defaultValue = "7", required = false) Integer size) {
+        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.getPosts(page, size));
     }
 
     @GetMapping("/v1/posts/{postid}")

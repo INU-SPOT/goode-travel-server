@@ -9,6 +9,8 @@ import com.spot.good2travel.dto.PostResponse;
 import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,10 +89,28 @@ public class PostService {
         return PostResponse.PostDetailResponse.of(post, itemPostResponses);
     }
 
-//    @Transactional
-//    public PostResponse.PostDetailResponse getPosts(){
-//
-//    }
+    @Transactional
+    public List<PostResponse.PostThumbnailResponse> getPosts(Integer page, Integer size){
+        PageRequest pageable = PageRequest.of(page, size);
+
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
+                .map(post -> {
+                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND)).getItem().getImageUrl());
+                    return PostResponse.PostThumbnailResponse.of(post, imageUrl, post.getSequence().stream().map(num -> {
+
+                                ItemPost itemPost = itemPostRepository.findById(num)
+                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+
+                                return PostResponse.ItemPostThumbnailResponse.of(itemPost);
+                    }).toList());
+                }).toList();
+
+        return postThumbnailResponses;
+    }
+
 }
 
 

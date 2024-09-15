@@ -129,12 +129,6 @@ public class PostResponse {
     }
 
     @Getter
-    public static class PostThumbnailsResponse{
-        private List<PostThumbnailsResponse> postThumbnailsResponses;
-
-    }
-
-    @Getter
     public static class PostThumbnailResponse{
 
         @Schema(example = "ㅈㅎㄱ")
@@ -150,30 +144,49 @@ public class PostResponse {
 
         private final List<ItemPostThumbnailResponse> items;
 
+        private final Integer commentCount;
+
+        private final Integer goodCount;
 
         @Builder
-        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items){
+        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items, Integer commentCount, Integer goodCount){
             this.writerName = writerName;
             this.postId = postId;
             this.title = title;
             this.imageUrl = imageUrl;
             this.items = items;
+            this.commentCount = commentCount;
+            this.goodCount = goodCount;
         }
 
-        public static PostThumbnailResponse of(Post post, , List<String> items){
+        public static PostThumbnailResponse of(Post post, String imageUrl, List<ItemPostThumbnailResponse> items){
             return PostThumbnailResponse.builder()
                     .writerName(post.getUser().getNickname())
                     .postId(post.getId())
                     .title(post.getTitle())
-                    .imageUrl()
+                    .imageUrl(imageUrl)
                     .items(items)
+                    .commentCount(null)
+                    .goodCount(post.getGood())
                     .build();
         }
     }
+
+    @Getter
     public static class ItemPostThumbnailResponse{
 
-        private final 
+        private final String itemType;
 
+        private final String itemTitle;
+
+        public ItemPostThumbnailResponse(String itemType, String itemTitle){
+            this.itemType = itemType;
+            this.itemTitle = itemTitle;
+        }
+
+        public static ItemPostThumbnailResponse of(ItemPost itemPost){
+            return new ItemPostThumbnailResponse(itemPost.getItem().getType(), itemPost.getItem().getTitle());
+        }
     }
 
 }
