@@ -17,7 +17,12 @@ public enum ExceptionMessage {
         IMAGE_SEND_ERROR("이미지 처리 중 예기치 못한 오류가 발생했습니다.", 0, HttpStatus.BAD_REQUEST),
         IMAGE_READ_ERROR("이미지를 읽을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
         METROPOLITANGOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
-        FAILED_VALIDATION("유효성 검사 실패", 0, HttpStatus.BAD_REQUEST);
+        FAILED_VALIDATION("유효성 검사 실패", 0, HttpStatus.BAD_REQUEST),
+        POST_NOT_FOUND("존재하지 않는 게시글입니다.", 0, HttpStatus.NOT_FOUND),
+        ITEM_POST_NOT_FOUND("존재하지 않는 ITEMPOST 연결 테이블입니다.", 0, HttpStatus.NOT_FOUND),
+        ITEM_POST_IMAGE_NOT_FOUND("존재하지 않는 게시글 이미지입니다.", 0, HttpStatus.NOT_FOUND),
+        ITEM_NOT_FOUND("존재하지 않는 굳이/계획 입니다.", 0, HttpStatus.NOT_FOUND)
+        ;
 
 
         private final String message;

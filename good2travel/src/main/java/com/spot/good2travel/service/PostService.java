@@ -54,7 +54,7 @@ public class PostService {
         Item item;
         if (itemId != null) {
             item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         } else {
             //item 만드는 로직이 아직 없습니다.
             item = null;
@@ -71,12 +71,12 @@ public class PostService {
 
     @Transactional
     public PostResponse.PostDetailResponse getPost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.IMAGE_READ_ERROR));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
                     ItemPost itemPost = itemPostRepository.findById(num)
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
 
                     List<PostResponse.ItemPostImageResponse> itemPostImageResponses = itemPost.getItemPostImages().stream()
                             .map( a -> PostResponse.ItemPostImageResponse.of(imageService.getImageUrl(a.getImageUrl())))
@@ -98,13 +98,11 @@ public class PostService {
         List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
                 .map(post -> {
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND)).getItem().getImageUrl());
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
                     return PostResponse.PostThumbnailResponse.of(post, imageUrl, post.getSequence().stream().map(num -> {
-
                                 ItemPost itemPost = itemPostRepository.findById(num)
-                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
-
-                                return PostResponse.ItemPostThumbnailResponse.of(itemPost);
+                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+                                    return PostResponse.ItemPostThumbnailResponse.of(itemPost);
                     }).toList());
                 }).toList();
 
