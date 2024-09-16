@@ -3,6 +3,7 @@ package com.spot.good2travel.dto;
 import com.spot.good2travel.domain.ItemPost;
 import com.spot.good2travel.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -42,17 +43,17 @@ public class PostResponse {
 
         private final Long visitNum;
 
-        private final Integer goodNum;
+        private final Integer likeNum;
 
-        private final Boolean isPushGood;
+        private final Boolean isPushLike;
 
         private final Boolean isOwner;
 
         private final List<ItemPostResponse> itemPosts;
 
-        @Builder
+        @Builder(access = AccessLevel.PRIVATE)
         public PostDetailResponse(Long writerId, String writerNickname, String writerImageUrl, Long postId, String title, String firstContent, String lastContent,
-                                  LocalDate startDate, LocalDate endDate, Long visitNum, Integer goodNum, Boolean isPushGood, Boolean isOwner, List<ItemPostResponse> itemPosts){
+                                  LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             this.writerId = writerId;
             this.writerNickname = writerNickname;
             this.writerImageUrl = writerImageUrl;
@@ -63,14 +64,14 @@ public class PostResponse {
             this.startDate = startDate;
             this.endDate = endDate;
             this.visitNum = visitNum;
-            this.goodNum = goodNum;
-            this.isPushGood = isPushGood;
+            this.likeNum = likeNum;
+            this.isPushLike = isPushLike;
             this.isOwner = isOwner;
             this.itemPosts = itemPosts;
         }
 
         public static PostDetailResponse of(Post post, Long visitNum, String writerImageUrl,
-                                            Integer goodNum, Boolean isPushGood, Boolean isOwner, List<ItemPostResponse> itemPosts){
+                                            Integer likeNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             return PostDetailResponse.builder()
                     .writerId(post.getUser().getId())
                     .writerNickname(post.getUser().getNickname())
@@ -82,8 +83,8 @@ public class PostResponse {
                     .startDate(post.getStartDate())
                     .endDate(post.getEndDate())
                     .visitNum(visitNum)
-                    .goodNum(goodNum)
-                    .isPushGood(isPushGood)
+                    .likeNum(likeNum)
+                    .isPushLike(isPushLike)
                     .isOwner(isOwner)
                     .itemPosts(itemPosts)
                     .build();
@@ -112,7 +113,7 @@ public class PostResponse {
 
         private final List<ItemPostImageResponse> images;
 
-        @Builder
+        @Builder(access = AccessLevel.PRIVATE)
         public ItemPostResponse(Long itemPostId, Long itemId, String itemTitle, String itemType, Boolean isOfficial,
                                 String content, List<ItemPostImageResponse> images){
             this.itemPostId = itemPostId;
@@ -172,30 +173,31 @@ public class PostResponse {
 
         private final List<ItemPostThumbnailResponse> items;
 
-        private final Long commentCount;
+        private final Long commentNum;
 
-        private final Integer goodCount;
+        private final Integer likeNum;
 
-        @Builder
-        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items, Long commentCount, Integer    goodCount){
+        @Builder(access = AccessLevel.PRIVATE)
+        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl
+                , List<ItemPostThumbnailResponse> items, Long commentNum, Integer likeNum){
             this.writerName = writerName;
             this.postId = postId;
             this.title = title;
             this.imageUrl = imageUrl;
             this.items = items;
-            this.commentCount = commentCount;
-            this.goodCount = goodCount;
+            this.commentNum = commentNum;
+            this.likeNum = likeNum;
         }
 
-        public static PostThumbnailResponse of(Post post, Integer goodNum, Long commentCount, String imageUrl, List<ItemPostThumbnailResponse> items){
+        public static PostThumbnailResponse of(Post post, Integer likeNum, Long commentNum, String imageUrl, List<ItemPostThumbnailResponse> items){
             return PostThumbnailResponse.builder()
                     .writerName(post.getUser().getNickname())
                     .postId(post.getId())
                     .title(post.getTitle())
                     .imageUrl(imageUrl)
                     .items(items)
-                    .commentCount(commentCount)
-                    .goodCount(goodNum)
+                    .commentNum(commentNum)
+                    .likeNum(likeNum)
                     .build();
         }
     }

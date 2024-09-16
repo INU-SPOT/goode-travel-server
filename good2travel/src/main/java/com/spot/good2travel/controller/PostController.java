@@ -49,7 +49,7 @@ public class PostController {
     @GetMapping("/v1/posts/{postid}")
     @Operation(summary = "게시글 내용 조회하기", description = "")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 내용 불러오기 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "200", description = "게시글 내용 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostDetailResponse.class))),
     })
     public CommonResponse<?> getPost(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("게시글 내용 불러오기 성공", postService.getPost(postid, userDetails));
@@ -67,10 +67,10 @@ public class PostController {
     @PostMapping(value = "/v1/posts/{postid}/good")
     @Operation(summary = "조하요~ 누르기", description = "게시글에 좋아요 누르기/해제하기 <br><br> - request: <br> Long postid <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: 해당 기능 수행 후 좋아요 수")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사진 등록 성공", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "200", description = "좋아요 누르기/해제하기 성공", content = @Content(schema = @Schema(implementation = String.class))),
     })
     public CommonResponse<?> updateGood(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("사진 등록 성공", postService.updateGoodNum(postid, userDetails));
+        return CommonResponse.success("좋아요 누르기/해제하기 성공", postService.updateLikeNum(postid, userDetails));
     }
 
     @PatchMapping("/v1/posts/{postid}")
@@ -82,5 +82,14 @@ public class PostController {
                                         @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("게시글 내용 불러오기 성공", postService.updatePost(postid, request, userDetails));
     }
+
+//    @GetMapping("/v1/posts/top-like")
+//    @Operation(summary = "좋아요가 가장 많은 글 불러오기", description = "")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "게시글 수정하기 성공", content = @Content(schema = @Schema(implementation = Long.class))),
+//    })
+//    public CommonResponse<?> getTopGoodPost() {
+//        return CommonResponse.success("좋아요가 가장 많은 게시글 불러오기 성공",);
+//    }
 
 }

@@ -5,7 +5,6 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.*;
-import com.spot.good2travel.dto.PostRequest;
 import com.spot.good2travel.dto.PostResponse;
 import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.spot.good2travel.dto.PostRequest.ItemPostCreateUpdateRequest;
 import static com.spot.good2travel.dto.PostRequest.PostCreateUpdateRequest;
+import static com.spot.good2travel.dto.PostResponse.ItemPostThumbnailResponse;
+import static com.spot.good2travel.dto.PostResponse.PostDetailResponse;
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +35,7 @@ public class PostService {
     private final ItemPostImageRepository itemPostImageRepository;
     private final ImageService imageService;
     private final RedisTemplate<String, Object> redisTemplate;
+
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -48,11 +51,11 @@ public class PostService {
 
         post.updatePostSequence(sequence);
         postRepository.save(post);
-        createGoodAndVisit(post.getId(), 0, 0);
+        createLikeAndVisit(post.getId(), 0, 0);
         return post.getId();
     }
 
-    public Long createItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
+    public Long createItemPost(ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
         Long itemId = itemPostCreateUpdateRequest.getItemId();
         Item item;
         if (itemId != null) {
@@ -72,22 +75,22 @@ public class PostService {
         return itemPost.getId();
     }
 
-    public void createGoodAndVisit(Long postId, Integer visitNum, Integer goodNum) {
+    public void createLikeAndVisit(Long postId, Integer visitNum, Integer likeNum) {
         String key = "postId:" + postId;
 
         redisTemplate.opsForHash().put(key, "visitNum", visitNum);
-        redisTemplate.opsForHash().put(key, "goodNum", goodNum);
+        redisTemplate.opsForHash().put(key, "likeNum", likeNum);
     }
 
     @Transactional
-    public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
+    public PostDetailResponse getPost(Long postId, UserDetails userDetails) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
         Long visitNum = updateVisitNum(postId, userDetails);
-        Integer goodNum = getGoodNum(postId);
-        Boolean isPushGood = getIsPushGood(postId, userDetails);
+        Integer likeNum = getLikeNum(postId);
+        Boolean isPushLike = getIsPushLike(postId, userDetails);
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
 
         String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
@@ -105,7 +108,7 @@ public class PostService {
                 })
                 .toList();
 
-        return PostResponse.PostDetailResponse.of(post, visitNum, writerImageUrl, goodNum, isPushGood, isOwner,itemPostResponses);
+        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, isPushLike, isOwner,itemPostResponses);
     }
 
     @Transactional
@@ -118,14 +121,14 @@ public class PostService {
                 .map(post -> {
 
                     Long commentNum = null; //아직 로직없음
-                    Integer goodNum = getGoodNum(post.getId());
+                    Integer likeNum = getLikeNum(post.getId());
 
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
-                    return PostResponse.PostThumbnailResponse.of(post, goodNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
                                 ItemPost itemPost = itemPostRepository.findById(num)
                                         .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-                                return PostResponse.ItemPostThumbnailResponse.of(itemPost);
+                                return ItemPostThumbnailResponse.of(itemPost);
                     }).toList());
                 }).toList();
 
@@ -160,7 +163,7 @@ public class PostService {
         return null;
     }
 
-    // 특정 postId에 해당하는 goodNum과 visitNum을 업데이트하는 메서드
+    // 특정 postId에 해당하는 likeNum과 visitNum을 업데이트하는 메서드
     public Long updateVisitNum(Long postId, UserDetails userDetails) {
         String postVisitNumKey = "postId:" + postId;
 
@@ -179,50 +182,64 @@ public class PostService {
                 return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
             }
         }
-        return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 0);
+        return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
     }
 
-    public Long updateGoodNum(Long postId, UserDetails userDetails) {
-        String postGoodNumKey = "postId:" + postId;
+    public Long updateLikeNum(Long postId, UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+        }
 
-        if(userDetails != null){
-            Long userId = ((CustomUserDetails) userDetails).getId();
-            String userGoodKey = "user:" + userId + "goods";
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        String userLikeKey = "user:" + userId + ":likes";  // 사용자 좋아요 키
+        String postLikeNumKey = "postId:" + postId + ":likeNum";  // 게시글 좋아요 수
 
-            Boolean hasGood = redisTemplate.opsForSet().isMember(userGoodKey, postId);
+        // 사용자가 해당 게시글을 좋아요 했는지 여부 확인
+        Boolean hasLike = redisTemplate.opsForSet().isMember(userLikeKey, postId);
 
-            if (Boolean.FALSE.equals(hasGood)) {
+        if (Boolean.FALSE.equals(hasLike)) {
+            // 좋아요 추가
+            redisTemplate.opsForSet().add(userLikeKey, postId);  // 사용자 좋아요 목록에 추가
+            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", 1);  // 좋아요 수 증가
+            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);  // 정렬된 집합에 좋아요 수 반영
 
-                redisTemplate.opsForSet().add(userGoodKey, postId);
+            return updatedLikeNum;
+        } else if (Boolean.TRUE.equals(hasLike)) {
+            // 좋아요 취소
+            redisTemplate.opsForSet().remove(userLikeKey, postId);  // 사용자 좋아요 목록에서 제거
+            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", -1);  // 좋아요 수 감소
+            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);  // 정렬된 집합에 좋아요 수 반영
 
-                return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", 1);
-            }
-            else if(Boolean.TRUE.equals(hasGood)){
-
-                redisTemplate.opsForSet().remove(userGoodKey, postId);
-
-                return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", -1);
-            }
+            return updatedLikeNum;
         }
 
         throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
     }
 
-    public Integer getGoodNum(Long postId) {
+
+    public Integer getLikeNum(Long postId) {
         String postVisitNumKey = "postId:" + postId;
 
-        return (Integer) redisTemplate.opsForHash().get(postVisitNumKey, "goodNum");
+        return (Integer) redisTemplate.opsForHash().get(postVisitNumKey, "likeNum");
     }
 
-    public Boolean getIsPushGood(Long postId, UserDetails userDetails){
+    public Boolean getIsPushLike(Long postId, UserDetails userDetails){
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            String userGoodKey = "user:" + userId + "goods";
+            String userLikeKey = "user:" + userId + "likes";
 
-            return redisTemplate.opsForSet().isMember(userGoodKey, postId);
+            return redisTemplate.opsForSet().isMember(userLikeKey, postId);
         }
         return null;
     }
+
+//    public PostThumbnailResponse getTopLikePosts() {
+//        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postLikes", 0, 0);
+//
+//        Long postId = Long.valueOf(topPostIds.toString());
+//        Post post =postRepository.findById(postId).orElseThrow(()->new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+//        return PostThumbnailResponse.of(post);
+//    }
 
 }
 
