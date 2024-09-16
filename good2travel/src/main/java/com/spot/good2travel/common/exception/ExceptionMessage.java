@@ -24,11 +24,19 @@ public enum ExceptionMessage {
         POST_NOT_FOUND("존재하지 않는 게시글입니다.", 0, HttpStatus.NOT_FOUND),
         ITEM_POST_NOT_FOUND("존재하지 않는 ITEMPOST 연결 테이블입니다.", 0, HttpStatus.NOT_FOUND),
         ITEM_POST_IMAGE_NOT_FOUND("존재하지 않는 게시글 이미지입니다.", 0, HttpStatus.NOT_FOUND),
-        ITEM_NOT_FOUND("존재하지 않는 굳이/계획 입니다.", 0, HttpStatus.NOT_FOUND)
-        ;
+        ITEM_NOT_FOUND("존재하지 않는 굳이/계획 입니다.", 0, HttpStatus.NOT_FOUND),
+
+        //유저
+        MEMBER_PROJECT_NOT_FOUND("멤버-프로젝트가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
+
+        //Item
+        ITEM_FOLDER_NOT_FOUND("해당 Item이 포함된 폴더를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+
+        //Folder
+        FOLDER_NOT_FOUND("Folder가 존재하지 않습니다.",0,HttpStatus.NOT_FOUND);
 
 
-        private final String message;
+private final String message;
 
 private final Integer errorCode;
 

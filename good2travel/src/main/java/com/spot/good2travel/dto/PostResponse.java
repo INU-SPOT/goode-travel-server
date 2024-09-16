@@ -104,7 +104,7 @@ public class PostResponse {
                     .itemPostId(itemPost.getId())
                     .itemId(itemPost.getItem().getId())
                     .itemTitle(itemPost.getItem().getTitle())
-                    .itemType(itemPost.getItem().getType())
+                    .itemType(itemPost.getItem().getType().name())
                     .isOfficial(itemPost.getItem().getIsOfficial())
                     .content(itemPost.getContent())
                     .images(itemPostImageResponses)
@@ -188,7 +188,7 @@ public class PostResponse {
         }
 
         public static ItemPostThumbnailResponse of(ItemPost itemPost){
-            return new ItemPostThumbnailResponse(itemPost.getItem().getType(), itemPost.getItem().getTitle());
+            return new ItemPostThumbnailResponse(itemPost.getItem().getType().name(), itemPost.getItem().getTitle());
         }
     }
 
