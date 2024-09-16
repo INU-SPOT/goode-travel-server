@@ -51,8 +51,8 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 내용 불러오기 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
     })
-    public CommonResponse<?> getPost(@PathVariable Long postid) {
-        return CommonResponse.success("게시글 내용 불러오기 성공", postService.getPost(postid));
+    public CommonResponse<?> getPost(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("게시글 내용 불러오기 성공", postService.getPost(postid, userDetails));
     }
 
     @PostMapping(value = "/v1/posts/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

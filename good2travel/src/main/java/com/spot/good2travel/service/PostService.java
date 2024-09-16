@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.spot.good2travel.dto.PostRequest.PostCreateUpdateRequest;
 @Service
@@ -47,7 +48,7 @@ public class PostService {
 
         post.updatePostSequence(sequence);
         postRepository.save(post);
-        createGoodAndVisit(post.getId(), 0L, 0L);
+        createGoodAndVisit(post.getId(), 0, 0);
         return post.getId();
     }
 
@@ -71,7 +72,7 @@ public class PostService {
         return itemPost.getId();
     }
 
-    public void createGoodAndVisit(Long postId, Long visitNum, Long goodNum) {
+    public void createGoodAndVisit(Long postId, Integer visitNum, Integer goodNum) {
         String key = "postId:" + postId;
 
         redisTemplate.opsForHash().put(key, "visitNum", visitNum);
@@ -79,9 +80,12 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse.PostDetailResponse getPost(Long postId) {
+    public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+
+        Long visitNum = updateVisitNum(postId, userDetails);
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
@@ -96,7 +100,7 @@ public class PostService {
                 })
                 .toList();
 
-        return PostResponse.PostDetailResponse.of(post, itemPostResponses);
+        return PostResponse.PostDetailResponse.of(post, visitNum, itemPostResponses);
     }
 
     @Transactional
@@ -107,9 +111,13 @@ public class PostService {
 
         List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
                 .map(post -> {
+
+                    Long commentNum = null; //아직 로직없음
+                    Long goodNum = getGoodNum(post.getId());
+
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
-                    return PostResponse.PostThumbnailResponse.of(post, imageUrl, post.getSequence().stream().map(num -> {
+                    return PostResponse.PostThumbnailResponse.of(post, goodNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
                                 ItemPost itemPost = itemPostRepository.findById(num)
                                         .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
                                 return PostResponse.ItemPostThumbnailResponse.of(itemPost);
@@ -144,7 +152,62 @@ public class PostService {
             throw new RuntimeException(ExceptionMessage.MEMBER_UNAUTHENTICATED.getMessage());
         }
     }
-    
+
+    // 특정 postId에 해당하는 goodNum과 visitNum을 업데이트하는 메서드
+    public Long updateVisitNum(Long postId, UserDetails userDetails) {
+        String postVisitNumKey = "postId:" + postId;
+
+        if(userDetails != null){
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            String userVisitKey = "user:" + userId + "visits";
+
+            Boolean hasVisited = redisTemplate.opsForSet().isMember(userVisitKey, postId);
+            log.info(hasVisited.toString());
+            if (Boolean.FALSE.equals(hasVisited)) {
+
+                redisTemplate.opsForSet().add(userVisitKey, postId);
+
+                redisTemplate.expire(userVisitKey, 24, TimeUnit.HOURS);
+
+                return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
+            }
+        }
+        return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 0);
+    }
+
+    public Long updateGoodNum(Long postId, UserDetails userDetails) {
+        String postVisitNumKey = "postId:" + postId;
+
+        if(userDetails != null){
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            String userVisitKey = "user:" + userId + ":good";
+
+            Boolean hasGood = redisTemplate.opsForHash().hasKey(userVisitKey, postId);
+
+            if (Boolean.FALSE.equals(hasGood)) {
+
+                redisTemplate.opsForHash().put(userVisitKey, postId, "1");
+
+                return redisTemplate.opsForHash().increment(postVisitNumKey, "goodNum", 1);
+            }
+            else if(Boolean.TRUE.equals(hasGood)){
+
+                redisTemplate.opsForHash().delete(userVisitKey, postId);
+
+                return redisTemplate.opsForHash().increment(postVisitNumKey, "goodNum", -1);
+            }
+        }
+
+        throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+    }
+
+    public Long getGoodNum(Long postId) {
+        String postVisitNumKey = "postId:" + postId;
+
+        return (Long) redisTemplate.opsForHash().get(postVisitNumKey, "visitNum");
+    }
+
+
 }
 
 

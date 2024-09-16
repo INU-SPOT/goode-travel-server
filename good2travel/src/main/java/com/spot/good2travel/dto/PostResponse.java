@@ -36,11 +36,13 @@ public class PostResponse {
         @Schema(example = "2024-09-12")
         private final LocalDate endDate;
 
+        private final Long visitNum;
+
         private final List<ItemPostResponse> itemPosts;
 
         @Builder
         public PostDetailResponse(Long writerId, Long postId, String title, String firstContent, String lastContent,
-                                  LocalDate startDate, LocalDate endDate, List<ItemPostResponse> itemPosts){
+                                  LocalDate startDate, LocalDate endDate, Long visitNum, List<ItemPostResponse> itemPosts){
             this.writerId = writerId;
             this.postId = postId;
             this.title = title;
@@ -48,10 +50,11 @@ public class PostResponse {
             this.lastContent = lastContent;
             this.startDate = startDate;
             this.endDate = endDate;
+            this.visitNum = visitNum;
             this.itemPosts = itemPosts;
         }
 
-        public static PostDetailResponse of(Post post, List<ItemPostResponse> itemPosts){
+        public static PostDetailResponse of(Post post, Long visitNum, List<ItemPostResponse> itemPosts){
             return PostDetailResponse.builder()
                     .writerId(post.getUser().getId())
                     .postId(post.getId())
@@ -60,6 +63,7 @@ public class PostResponse {
                     .lastContent(post.getLastContent())
                     .startDate(post.getStartDate())
                     .endDate(post.getEndDate())
+                    .visitNum(visitNum)
                     .itemPosts(itemPosts)
                     .build();
         }
@@ -147,12 +151,12 @@ public class PostResponse {
 
         private final List<ItemPostThumbnailResponse> items;
 
-        private final Integer commentCount;
+        private final Long commentCount;
 
-        private final Integer goodCount;
+        private final Long goodCount;
 
         @Builder
-        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items, Integer commentCount, Integer goodCount){
+        public PostThumbnailResponse(String writerName, Long postId, String title, String imageUrl, List<ItemPostThumbnailResponse> items, Long commentCount, Long goodCount){
             this.writerName = writerName;
             this.postId = postId;
             this.title = title;
@@ -162,15 +166,15 @@ public class PostResponse {
             this.goodCount = goodCount;
         }
 
-        public static PostThumbnailResponse of(Post post, String imageUrl, List<ItemPostThumbnailResponse> items){
+        public static PostThumbnailResponse of(Post post, Long goodNum, Long commentCount, String imageUrl, List<ItemPostThumbnailResponse> items){
             return PostThumbnailResponse.builder()
                     .writerName(post.getUser().getNickname())
                     .postId(post.getId())
                     .title(post.getTitle())
                     .imageUrl(imageUrl)
                     .items(items)
-                    .commentCount(null)
-                    .goodCount(post.getGood())
+                    .commentCount(commentCount)
+                    .goodCount(goodNum)
                     .build();
         }
     }
