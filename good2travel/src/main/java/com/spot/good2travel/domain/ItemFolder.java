@@ -15,9 +15,6 @@ public class ItemFolder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Boolean isMain;
-
     private Boolean isFinished;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -28,6 +28,10 @@ public class Folder extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_goode_id")
+    private Item mainGoode;
+
     @Builder
     public Folder(String title, User user){
         this.title = title;
