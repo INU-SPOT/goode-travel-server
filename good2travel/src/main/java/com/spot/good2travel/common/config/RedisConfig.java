@@ -1,4 +1,4 @@
-package com.spot.good2travel.common.redis;
+package com.spot.good2travel.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

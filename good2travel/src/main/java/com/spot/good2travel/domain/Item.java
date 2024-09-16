@@ -49,6 +49,5 @@ public class Item extends BaseEntity {
     private LocalGovernment localGovernment;
 
 
+
 }
-
-

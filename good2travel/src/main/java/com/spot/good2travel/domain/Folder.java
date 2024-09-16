@@ -18,7 +18,7 @@ public class Folder extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<Integer> sequence;
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)

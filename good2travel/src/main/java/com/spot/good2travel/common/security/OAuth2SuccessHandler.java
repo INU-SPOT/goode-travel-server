@@ -1,7 +1,7 @@
 package com.spot.good2travel.common.security;
 
-import com.spot.good2travel.common.redis.RefreshToken;
-import com.spot.good2travel.common.redis.RefreshTokenRepository;
+import com.spot.good2travel.common.redisRepository.RefreshToken;
+import com.spot.good2travel.common.redisRepository.RefreshTokenRepository;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,9 +69,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private URI createURI(String accessToken, String refreshToken, Long userId) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.add("user_id", String.valueOf(userId));
-        queryParams.add("access_token", accessToken);
-        queryParams.add("refresh_token", refreshToken);
+        queryParams.add("accessToken", accessToken);
+        queryParams.add("refreshToken", refreshToken);
         log.info("{}", frontHost);
         return UriComponentsBuilder.newInstance()
                 .scheme(frontScheme)
