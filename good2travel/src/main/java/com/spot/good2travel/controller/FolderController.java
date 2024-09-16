@@ -5,6 +5,8 @@ import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,8 +23,8 @@ public class FolderController {
                     "<br><br> - request : FolderCreateRequest, 헤더에 accessToken 추가" +
                     "<br><br> - response : null"
     )
-    public CommonResponse<?> createFolder(@RequestBody FolderRequest.FolderCreateRequest folderRequest){
-        folderService.create(folderRequest);
+    public CommonResponse<?> createFolder(@RequestBody FolderRequest.FolderCreateRequest folderRequest, @AuthenticationPrincipal UserDetails userDetails){
+        folderService.create(folderRequest, userDetails);
         return CommonResponse.success("새 폴더 생성 완료",
                 null);
     }
@@ -45,10 +47,9 @@ public class FolderController {
                     "<br><br> - request : X" +
                     "<br><br> - response : FolderListResponse"
     )
-    public CommonResponse<?> getFolderList(){
-        //todo 유저 정보 필요
+    public CommonResponse<?> getFolderList(@AuthenticationPrincipal UserDetails userDetails){
         return CommonResponse.success("폴더 목록 반환 성공",
-                folderService.getFolderList());
+                folderService.getFolderList(userDetails));
     }
 
     @GetMapping("/v1/plans/{folderId}")

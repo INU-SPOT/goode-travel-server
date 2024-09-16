@@ -2,15 +2,19 @@ package com.spot.good2travel.service;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
+import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
+import com.spot.good2travel.domain.User;
 import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.FolderResponse;
 import com.spot.good2travel.repository.FolderRepository;
 import com.spot.good2travel.repository.ItemFolderRepository;
 import com.spot.good2travel.repository.ItemRepository;
+import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +28,18 @@ public class FolderService {
     private final FolderRepository folderRepository;
     private final ItemRepository itemRepository;
     private final ItemFolderRepository itemFolderRepository;
+    private final UserRepository userRepository;
 
     /*
     새 폴더 만들기
      */
-    public void create(FolderRequest.FolderCreateRequest folderRequest) {
+    public void create(FolderRequest.FolderCreateRequest folderRequest, UserDetails userDetails) {
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
         Folder newFolder = Folder.builder()
                 .title(folderRequest.getTitle())
-//                .user() todo 유저 추가
+                .user(user)
                 .build();
         folderRepository.save(newFolder);
         log.info("[createFolder] 새 폴더 생성");
@@ -55,8 +63,8 @@ public class FolderService {
     폴더 목록 조회
      */
     @Transactional
-    public List<FolderResponse.FolderListResponse> getFolderList() {
-        long userId = 1; //todo 유저 정보
+    public List<FolderResponse.FolderListResponse> getFolderList(UserDetails userDetails) {
+        long userId = ((CustomUserDetails) userDetails).getId();
         List<Folder> folders = folderRepository.findAllByUserId(userId);
         return folders
                 .stream()
