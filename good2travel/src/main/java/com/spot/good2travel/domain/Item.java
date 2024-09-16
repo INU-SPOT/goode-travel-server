@@ -1,8 +1,10 @@
 package com.spot.good2travel.domain;
 
 import com.spot.good2travel.common.entity.BaseEntity;
+import com.spot.good2travel.dto.ItemRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,6 +50,31 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
 
+    @Builder
+    public Item(String type, String title, String imageUrl, String description, String address,
+                Boolean isOfficial, String emoji, LocalGovernment localGovernment) {
+        this.type = type;
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.address = address;
+        this.isOfficial = isOfficial;
+        this.emoji = emoji;
+        this.localGovernment = localGovernment;
+    }
 
+
+    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
+        return Item.builder()
+                .type(request.getType())
+                .title(request.getTitle())
+                .imageUrl(request.getImageUrl())
+                .description(request.getDescription())
+                .address(request.getAddress())
+                .isOfficial(true)
+                .emoji(request.getEmoji())
+                .localGovernment(localGovernment)
+                .build();
+    }
 
 }

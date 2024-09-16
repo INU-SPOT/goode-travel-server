@@ -1,8 +1,8 @@
 package com.spot.good2travel.domain;
 
-import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +22,11 @@ public class ItemCategory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    @Builder
+    public ItemCategory(Category category, Item item) {
+        this.category = category;
+        this.item = item;
+    }
+
 }
