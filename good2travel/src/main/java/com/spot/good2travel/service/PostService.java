@@ -154,7 +154,7 @@ public class PostService {
 
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            return post.getUser().getId() != userId;
+            return post.getUser().getId() == userId;
         }
 
         return null;
@@ -187,19 +187,19 @@ public class PostService {
 
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            String userVisitKey = "user:" + userId + "goods";
+            String userGoodKey = "user:" + userId + "goods";
 
-            Boolean hasGood = redisTemplate.opsForSet().isMember(userVisitKey, postId);
+            Boolean hasGood = redisTemplate.opsForSet().isMember(userGoodKey, postId);
 
             if (Boolean.FALSE.equals(hasGood)) {
 
-                redisTemplate.opsForHash().put(userVisitKey, postId, "1");
+                redisTemplate.opsForSet().add(userGoodKey, postId);
 
                 return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", 1);
             }
             else if(Boolean.TRUE.equals(hasGood)){
 
-                redisTemplate.opsForHash().delete(userVisitKey, postId);
+                redisTemplate.opsForSet().remove(userGoodKey, postId);
 
                 return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", -1);
             }
@@ -215,8 +215,6 @@ public class PostService {
     }
 
     public Boolean getIsPushGood(Long postId, UserDetails userDetails){
-        String postGoodNumKey = "postId:" + postId;
-
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
             String userGoodKey = "user:" + userId + "goods";
@@ -225,7 +223,6 @@ public class PostService {
         }
         return null;
     }
-
 
 }
 

@@ -64,6 +64,15 @@ public class PostController {
         return CommonResponse.success("사진 등록 성공", imageService.uploadUserImageToNginx(file));
     }
 
+    @PostMapping(value = "/v1/posts/{postid}/good")
+    @Operation(summary = "조하요~ 누르기", description = "게시글에 좋아요 누르기/해제하기 <br><br> - request: <br> Long postid <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: 해당 기능 수행 후 좋아요 수")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사진 등록 성공", content = @Content(schema = @Schema(implementation = String.class))),
+    })
+    public CommonResponse<?> updateGood(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("사진 등록 성공", postService.updateGoodNum(postid, userDetails));
+    }
+
     @PatchMapping("/v1/posts/{postid}")
     @Operation(summary = "게시글 수정하기", description = "")
     @ApiResponses(value = {
@@ -73,4 +82,5 @@ public class PostController {
                                         @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("게시글 내용 불러오기 성공", postService.updatePost(postid, request, userDetails));
     }
+
 }
