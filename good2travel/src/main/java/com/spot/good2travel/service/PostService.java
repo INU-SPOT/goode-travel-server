@@ -86,6 +86,11 @@ public class PostService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
         Long visitNum = updateVisitNum(postId, userDetails);
+        Integer goodNum = getGoodNum(postId);
+        Boolean isPushGood = getIsPushGood(postId, userDetails);
+        Boolean isOwner = validateUserIsPostOwner(post, userDetails);
+
+        String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
@@ -100,7 +105,7 @@ public class PostService {
                 })
                 .toList();
 
-        return PostResponse.PostDetailResponse.of(post, visitNum, itemPostResponses);
+        return PostResponse.PostDetailResponse.of(post, visitNum, writerImageUrl, goodNum, isPushGood, isOwner,itemPostResponses);
     }
 
     @Transactional
@@ -113,7 +118,7 @@ public class PostService {
                 .map(post -> {
 
                     Long commentNum = null; //아직 로직없음
-                    Long goodNum = getGoodNum(post.getId());
+                    Integer goodNum = getGoodNum(post.getId());
 
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
@@ -145,12 +150,14 @@ public class PostService {
         return postId;
     }
 
-    public void validateUserIsPostOwner(Post post, UserDetails userDetails){
-        Long userId = ((CustomUserDetails) userDetails).getId();
+    public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
 
-        if(post.getUser().getId() != userId){
-            throw new RuntimeException(ExceptionMessage.MEMBER_UNAUTHENTICATED.getMessage());
+        if(userDetails != null){
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            return post.getUser().getId() != userId;
         }
+
+        return null;
     }
 
     // 특정 postId에 해당하는 goodNum과 visitNum을 업데이트하는 메서드
@@ -176,35 +183,47 @@ public class PostService {
     }
 
     public Long updateGoodNum(Long postId, UserDetails userDetails) {
-        String postVisitNumKey = "postId:" + postId;
+        String postGoodNumKey = "postId:" + postId;
 
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            String userVisitKey = "user:" + userId + ":good";
+            String userVisitKey = "user:" + userId + "goods";
 
-            Boolean hasGood = redisTemplate.opsForHash().hasKey(userVisitKey, postId);
+            Boolean hasGood = redisTemplate.opsForSet().isMember(userVisitKey, postId);
 
             if (Boolean.FALSE.equals(hasGood)) {
 
                 redisTemplate.opsForHash().put(userVisitKey, postId, "1");
 
-                return redisTemplate.opsForHash().increment(postVisitNumKey, "goodNum", 1);
+                return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", 1);
             }
             else if(Boolean.TRUE.equals(hasGood)){
 
                 redisTemplate.opsForHash().delete(userVisitKey, postId);
 
-                return redisTemplate.opsForHash().increment(postVisitNumKey, "goodNum", -1);
+                return redisTemplate.opsForHash().increment(postGoodNumKey, "goodNum", -1);
             }
         }
 
         throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
     }
 
-    public Long getGoodNum(Long postId) {
+    public Integer getGoodNum(Long postId) {
         String postVisitNumKey = "postId:" + postId;
 
-        return (Long) redisTemplate.opsForHash().get(postVisitNumKey, "visitNum");
+        return (Integer) redisTemplate.opsForHash().get(postVisitNumKey, "goodNum");
+    }
+
+    public Boolean getIsPushGood(Long postId, UserDetails userDetails){
+        String postGoodNumKey = "postId:" + postId;
+
+        if(userDetails != null){
+            Long userId = ((CustomUserDetails) userDetails).getId();
+            String userGoodKey = "user:" + userId + "goods";
+
+            return redisTemplate.opsForSet().isMember(userGoodKey, postId);
+        }
+        return null;
     }
 
 

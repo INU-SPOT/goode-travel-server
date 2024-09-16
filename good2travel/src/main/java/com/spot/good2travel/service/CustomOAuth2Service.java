@@ -46,6 +46,8 @@ public class CustomOAuth2Service implements OAuth2UserService<OAuth2UserRequest,
         Optional<User> user = userRepository.findByEmailAndProvider(authAttributes.getEmail(), authAttributes.getProvider());
         User returnMember;
 
+        log.info(authAttributes.getEmail());
+
         if (user.isEmpty()) {
             returnMember = new User(authAttributes.getProvider(), authAttributes.getEmail(),
                     null, null, List.of("ROLE_USER"));

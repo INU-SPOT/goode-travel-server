@@ -19,6 +19,7 @@ public class Item extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ItemType type;
 
     @Column(nullable = false)
@@ -47,7 +48,5 @@ public class Item extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
-
-
 
 }
