@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class PostService {
     private final ItemRepository itemRepository;
     private final ItemPostImageRepository itemPostImageRepository;
     private final ImageService imageService;
-
+    private final RedisTemplate<String, Object> redisTemplate;
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -46,7 +47,7 @@ public class PostService {
 
         post.updatePostSequence(sequence);
         postRepository.save(post);
-
+        createGoodAndVisit(post.getId(), 0L, 0L);
         return post.getId();
     }
 
@@ -68,6 +69,13 @@ public class PostService {
         itemPostImageRepository.saveAll(itemPostImages);
 
         return itemPost.getId();
+    }
+
+    public void createGoodAndVisit(Long postId, Long visitNum, Long goodNum) {
+        String key = "postId:" + postId;
+
+        redisTemplate.opsForHash().put(key, "visitNum", visitNum);
+        redisTemplate.opsForHash().put(key, "goodNum", goodNum);
     }
 
     @Transactional
@@ -136,7 +144,7 @@ public class PostService {
             throw new RuntimeException(ExceptionMessage.MEMBER_UNAUTHENTICATED.getMessage());
         }
     }
-
+    
 }
 
 
