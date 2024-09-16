@@ -2,6 +2,7 @@ package com.spot.good2travel.common.security;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.JwtEmptyException;
+import com.spot.good2travel.common.exception.MismatchTokenTypeException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -49,19 +50,22 @@ public class JwtProvider {
         claims.put("memberId", id);
         claims.put("roles", roles);
         claims.put("type", "refresh");
+
         Date now = new Date();
-        return Jwts
-                .builder()
+
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenValidTime))//유효시간
                 .signWith(SignatureAlgorithm.HS256, secretKey) //HS256알고리즘으로 key를 암호화 해줄것이다.
                 .compact();
+
+        log.info("[createRefreshToken] 토큰 생성 완료 : {}", token);
+        return token;
     }
 
 
     public String createAccessToken(Long id, String email, List<String> roles) {
-        log.info("[createAccessToken] 토큰 생성 시작");
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", roles);
         claims.put("memberId", id);
@@ -90,6 +94,21 @@ public class JwtProvider {
                 userDetails.getAuthorities());
     }
 
+    public Boolean validAccessToken(String token) {
+        if (Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("type").equals("access")) {
+            return true;
+        } else {
+            throw new MismatchTokenTypeException(ExceptionMessage.TOKEN_TYPE_INVALID.getMessage());
+        }
+    }
+
+    public Boolean validRefreshToken(String token) {
+        if (Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("type").equals("refresh")) {
+            return true;
+        } else {
+            throw new MismatchTokenTypeException(ExceptionMessage.TOKEN_TYPE_INVALID.getMessage());
+        }
+    }
 
     private String getMemberEmail(String token) {
         log.info("[getMemberEmail] 토큰 기반 회원 구별 정보 추출");

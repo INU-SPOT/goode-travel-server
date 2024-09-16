@@ -1,5 +1,6 @@
 package com.spot.good2travel.common.config;
 
+import com.spot.good2travel.common.exception.JwtExceptionHandlerFilter;
 import com.spot.good2travel.common.security.JwtAuthFilter;
 import com.spot.good2travel.common.security.JwtProvider;
 import com.spot.good2travel.common.security.OAuth2SuccessHandler;
@@ -16,7 +17,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -59,6 +59,8 @@ public class SecurityConfig {
                                 .userService(customOAuth2Service)
                         )
                         .successHandler(oAuth2SuccessHandler))
+                .addFilterBefore(new JwtExceptionHandlerFilter(),
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtAuthFilter(jwtProvider),
                         UsernamePasswordAuthenticationFilter.class)
 
