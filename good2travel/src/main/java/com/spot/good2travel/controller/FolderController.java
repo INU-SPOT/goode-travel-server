@@ -27,28 +27,15 @@ public class FolderController {
                 null);
     }
 
-    @PutMapping("/v1/plans/sequence/{folderId}")
+    @PutMapping("/v1/plans/{folderId}")
     @Operation(
-            summary = "폴더안의 계획 순서 수정",
-            description = "사용자의 폴더 안에 있는 계획들의 순서를 수정" +
-                    "<br><br> - request : " +
-                    "folderId = folder DB 상의 pk, [PlanListUpdateRequest]" +
-                    "<br><br> - response :" +
-                    "폴더 안 계획들의 일련의 pk"
+            summary = "폴더 안의 계획 제목 및 순서 수정",
+            description = "사용자의 폴더 안에 있는 계획들을 Type에 따라 수정" +
+                    "<br><br> - request : itemId = folder DB상의 pk, FolderUpdateRequest, 헤더에 accessToken 추가"+
+                    "<br><br> - response : FolderUpdateResponse"
     )
-    public CommonResponse<?> updatePlanList(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.PlanListUpdateRequest planUpdateRequest) {
-        return CommonResponse.success("계획 순서 수정 완료", folderService.updatePlanList(planUpdateRequest, folderId));
-    }
-
-    @PutMapping("/v1/plans/title/{folderId}")
-    @Operation(
-            summary = "폴더 제목 수정",
-            description = "사용자의 폴더 제목 수정" +
-                    "<br><br> - request : folderId = folder DB 상의 pk, [FolderTitleUpdateRequest]" +
-                    "<br><br> - response : 업데이트 된 폴더 title"
-    )
-    public CommonResponse<?> updateFolderTitle(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.FolderTitleUpdateRequest folderUpdateRequest) {
-        return CommonResponse.success("폴더 제목 수정 완료", folderService.updateFolderTitle(folderUpdateRequest, folderId));
+    public CommonResponse<?> updatePlanList(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.FolderUpdateRequest planUpdateRequest) {
+        return CommonResponse.success("폴더 수정 완료", folderService.updatePlanList(planUpdateRequest, folderId));
     }
 
     @GetMapping("/v1/plans")
@@ -56,10 +43,7 @@ public class FolderController {
             summary = "사용자의 폴더 목록 제공",
             description = "사용자의 폴더 목록을 제공" +
                     "<br><br> - request : X" +
-                    "<br><br> - response : " +
-                    "[FolderListResponse]" +
-                    "<br> 제일 처음 저장된 굳이 imageUrl 반환" +
-                    "<br> 폴더에 굳이가 없을 경우 imageUrl = null"
+                    "<br><br> - response : FolderListResponse"
     )
     public CommonResponse<?> getFolderList(){
         //todo 유저 정보 필요
@@ -72,8 +56,7 @@ public class FolderController {
             summary = "폴더 안의 계획 목록 제공",
             description = "폴더 안의 계획 목록을 제공한다." +
                     "<br><br> - request : folderId - Folder DB 상의 PK" +
-                    "<br><br> - response : [ItemListResponse]" +
-                    "<br> Goode와 Plan으로 나눠 리스트 반환"
+                    "<br><br> - response : ItemListResponse"
     )
     public CommonResponse<?> getFolderItemList(@PathVariable("folderId") Long folderId){
         return CommonResponse.success("폴더 안의 계획 리스트 반환 성공"

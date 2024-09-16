@@ -1,30 +1,20 @@
 package com.spot.good2travel.service;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
-import com.spot.good2travel.common.exception.FolderException;
-import com.spot.good2travel.common.exception.ItemException;
+import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
-import com.spot.good2travel.domain.ItemFolder;
-import com.spot.good2travel.domain.ItemType;
 import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.FolderResponse;
-import com.spot.good2travel.dto.ItemListResponse;
-import com.spot.good2travel.dto.record.Goode;
-import com.spot.good2travel.dto.record.Plan;
 import com.spot.good2travel.repository.FolderRepository;
 import com.spot.good2travel.repository.ItemFolderRepository;
 import com.spot.good2travel.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,25 +38,17 @@ public class FolderService {
     }
 
     /*
-    계획 순서 수정
+    폴더 수정
      */
     @Transactional
-    public Object updatePlanList(FolderRequest.PlanListUpdateRequest planUpdateRequest, Long folderId) {
+    public FolderResponse.FolderUpdateResponse updatePlanList(FolderRequest.FolderUpdateRequest folderUpdateRequest, Long folderId) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
-        folder.updateSequence(planUpdateRequest.getSequence());
-        return folder.getSequence();
-    }
-
-    /*
-    폴더 제목 수정
-     */
-    @Transactional
-    public Object updateFolderTitle(FolderRequest.FolderTitleUpdateRequest folderUpdateRequest, Long folderId){
-        Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        folder.updateSequence(folderUpdateRequest.getSequence());
         folder.updateTitle(folderUpdateRequest.getTitle());
-        return folder.getTitle();
+        return new FolderResponse.FolderUpdateResponse(
+                folder.getTitle(), folder.getSequence()
+        );
     }
 
     /*
@@ -83,59 +65,32 @@ public class FolderService {
     }
 
     public FolderResponse.FolderListResponse toListResponse(Folder folder){
-        List<ItemFolder> itemFolders = folder.getItemFolders();
-        Optional<Item> goodeItem = itemFolders.stream()
-                .map(ItemFolder::getItem)
-                .filter(item -> item.getType() == ItemType.GOODE)
-                .min(Comparator.comparing(Item::getCreateDate));
+        Item item = itemRepository.findById(folder.getMainGoode().getId())
+                        .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         log.info("[getFolderList] 폴더 목록 조회");
-        return goodeItem
-                .map(item -> new FolderResponse.FolderListResponse(folder.getTitle(), item.getImageUrl()))
-                .orElseGet(() -> new FolderResponse.FolderListResponse(folder.getTitle(), null));
+        return new FolderResponse.FolderListResponse(folder.getTitle(), item.getImageUrl());
     }
 
     /*
     폴더 안 계획 조회
      */
     @Transactional
-    public ItemListResponse getItemList(Long folderId) {
+    public FolderResponse.ItemListResponse getItemList(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(() -> new FolderException(ExceptionMessage.FOLDER_NOT_FOUND));
-        return getGoodeAndPlan(folder);
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        return getItems(folder);
     }
 
-    @NotNull
-    private ItemListResponse getGoodeAndPlan(Folder folder) {
-        List<Integer> itemSequence = folder.getSequence();
-        List<Goode> goodeList = new ArrayList<>();
-        List<Plan> planList = new ArrayList<>();
-        for (Integer id : itemSequence){
-            Item item = itemRepository.findById(Long.valueOf(id))
-                    .orElseThrow(() -> new ItemException(ExceptionMessage.ITEM_NOT_FOUND));
-            ItemFolder itemFolder = itemFolderRepository.findByItemId(Long.valueOf(id));
-            if (item.getType() == ItemType.GOODE){
-                Goode goode = new Goode(
-                        item.getId(),
-                        item.getTitle(),
-                        item.getImageUrl()==null ? item.getEmoji() : item.getImageUrl(),
-                        item.getAddress(),
-                        itemFolder.getIsMain()
-                );
-                goodeList.add(goode);
-            } else {
-                Plan plan = new Plan(
-                        item.getId(),
-                        item.getTitle(),
-                        item.getImageUrl()==null ? item.getEmoji() : item.getImageUrl(),
-                        item.getCreateDate().toLocalDate(),
-                        itemFolder.getIsFinished()
-                );
-                planList.add(plan);
-            }
-        }
-        log.info("[getItemList] {}번 폴더의 계획 목록 조회", folder.getId());
-        return new ItemListResponse(goodeList, planList);
+    public FolderResponse.ItemListResponse getItems(Folder folder) {
+        List<Integer> sequence = folder.getSequence();
+        List<FolderResponse.FolderItem> folderItems =
+                sequence.stream()
+                .map(s -> itemRepository.findById(Long.valueOf(s)).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND)))
+                .map(item -> new FolderResponse.FolderItem().of(item))
+                .toList();
+        return new FolderResponse.ItemListResponse(folderItems);
     }
+
 
     /*
     폴더 삭제

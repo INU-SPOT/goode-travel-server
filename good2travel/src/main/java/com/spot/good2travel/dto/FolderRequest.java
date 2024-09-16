@@ -1,7 +1,6 @@
 package com.spot.good2travel.dto;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -13,12 +12,8 @@ public class FolderRequest {
         private String title;
     }
     @Getter
-    public static class PlanListUpdateRequest {
-        private List<Integer> sequence;
-    }
-
-    @Getter
-    public static class FolderTitleUpdateRequest{
+    public static class FolderUpdateRequest {
         private String title;
+        private List<Integer> sequence;
     }
 }
