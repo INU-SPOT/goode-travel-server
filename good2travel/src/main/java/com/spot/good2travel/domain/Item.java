@@ -19,7 +19,7 @@ public class Item extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String type;
+    private ItemType type;
 
     @Column(nullable = false)
     private String title;

@@ -2,9 +2,7 @@ package com.spot.good2travel.domain;
 
 import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -29,4 +27,22 @@ public class Folder extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_goode_id")
+    private Item mainGoode;
+
+    @Builder
+    public Folder(String title, User user){
+        this.title = title;
+        this.user = user;
+    }
+
+    public void updateSequence(List<Integer> sequence){
+        this.sequence = sequence;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 }
