@@ -35,7 +35,6 @@ public class OAuth2Attributes {
         } else if ("google".equals(socialName)) {
             return ofGoogle("email", attributes);
         }
-
         return ofNaver("id", attributes);
     }
 

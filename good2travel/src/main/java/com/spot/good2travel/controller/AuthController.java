@@ -24,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value = "/v1/auth/reissue")
-    @Operation(summary = "토큰 재발급", description = "")
+    @Operation(summary = "토큰 재발급", description = "refreshToken을 사용해서 accessToken과 기한이 더 늘어난 RefreshToken을 재발급합니다. <br><br> - request: <br> RefreshToken(헤더에 넣어 주세요) <br><br> - response: <br> TokenResponse(Dto)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class))),
     })
