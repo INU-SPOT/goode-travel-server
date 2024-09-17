@@ -66,4 +66,13 @@ public class ItemController {
     public CommonResponse<?> updateItem(@PathVariable("itemId") Long itemId, @RequestBody ItemRequest.ItemUpdateRequest itemUpdateRequest){
         return CommonResponse.success("사용자의 굳이/계획 수정 완료", itemService.updateItem(itemId, itemUpdateRequest));
     }
+
+    @GetMapping("/v1/goodes/{itemId}")
+    @Operation(summary = "굳이의 상세 정보 제공",
+            description = "공식적인 굳이의 상제 정보들을 제공한다." +
+                    "<br><br> - request : itemId= item(DB) 상 pk" +
+                    "<br><br> - response : GoodeDetailsResponse")
+    public CommonResponse<?> getGoodeDetails(@PathVariable("itemId") Long itemId){
+        return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
+    }
 }
