@@ -31,6 +31,7 @@ public enum ExceptionMessage {
 
         //Item
         ITEM_FOLDER_NOT_FOUND("해당 Item이 포함된 폴더를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+        ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST),
 
         //Folder
         FOLDER_NOT_FOUND("Folder가 존재하지 않습니다.",0,HttpStatus.NOT_FOUND);
