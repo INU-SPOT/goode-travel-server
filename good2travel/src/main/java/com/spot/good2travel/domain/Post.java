@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,7 +37,8 @@ public class Post extends BaseEntity {
     private Integer report;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    private List<Long> sequence;
+    @OrderColumn(name = "order_index")
+    private List<Long> sequence = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<ItemPost> itemPosts;

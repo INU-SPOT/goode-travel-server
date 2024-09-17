@@ -5,6 +5,7 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.*;
+import com.spot.good2travel.dto.PostRequest;
 import com.spot.good2travel.dto.PostResponse;
 import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -60,22 +62,27 @@ public class PostService {
 
     public Long createItemPost(ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
         Long itemId = itemPostCreateUpdateRequest.getItemId();
-        Item item;
-        if (itemId != null) {
-            item = itemRepository.findById(itemId)
+
+        Item item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-        } else {
-            //item 만드는 로직이 아직 없습니다.
-            item = null;
-        }
+
         ItemPost itemPost = ItemPost.of(itemPostCreateUpdateRequest, item, post);
+
+        List<Long> sequence = itemPostCreateUpdateRequest.getImages().stream()
+                .map(image -> createItemPostImage(image, itemPost))
+                .toList();
+
+        itemPost.updateSequence(sequence);
         itemPostRepository.save(itemPost);
 
-        List<ItemPostImage> itemPostImages = itemPostCreateUpdateRequest.getImages().stream()
-                .map(itemPostImageRequest -> ItemPostImage.of(itemPostImageRequest, itemPost)).toList();
-        itemPostImageRepository.saveAll(itemPostImages);
-
         return itemPost.getId();
+    }
+
+    public Long createItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
+        ItemPostImage itemPostImage = ItemPostImage.of(itemPostImageRequest, itemPost);
+        itemPostImageRepository.save(itemPostImage);
+
+        return itemPostImage.getId();
     }
 
     public void createLikeAndVisit(Long postId, Integer visitNum, Integer likeNum) {
@@ -86,8 +93,55 @@ public class PostService {
     }
 
     @Transactional
-    public PostDetailResponse getPost(Long postId, UserDetails userDetails) {
+    public Long updateItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
+        Long itemId = itemPostCreateUpdateRequest.getItemId();
 
+        if (itemPostCreateUpdateRequest.getItemPostId() != null) {
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+            ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+
+            List<Long> beforeSequence = itemPost.getSequence();
+
+            List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
+                    .map(image -> updateItemPostImage(image, itemPost))
+                    .toList();
+            log.info(afterSequence.toString());
+
+            itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
+
+            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+            beforeSequence.stream()
+                    .filter(num -> !afterSequenceSet.contains(num))
+                    .forEach(this::deleteItemPostImage);
+
+            return itemPost.getId();
+        }
+
+        else {
+            return createItemPost(itemPostCreateUpdateRequest, post);
+        }
+    }
+
+
+    @Transactional
+    public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
+        if(itemPostImageRequest.getItemPostImageId() != null){
+            ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
+                    .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
+            itemPostImage.updateItemPostImage(itemPostImageRequest, itemPost);
+
+            return itemPostImage.getId();
+        }
+        else{
+            return createItemPostImage(itemPostImageRequest, itemPost);
+        }
+    }
+
+    @Transactional
+    public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
@@ -97,7 +151,7 @@ public class PostService {
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
 
         String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
-
+        log.info(post.getSequence().toString());
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
                     ItemPost itemPost = itemPostRepository.findById(num)
@@ -139,21 +193,33 @@ public class PostService {
     }
 
     @Transactional
-    public Long updatePost(Long postId, PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails){
+    public Long updatePost(Long postId, PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
         validateUserIsPostOwner(post, userDetails);
 
-        itemPostRepository.deleteAll(itemPostRepository.findItemPostsByPost(post));
-
-        List<Long> beforeSequence = postCreateUpdateRequest.getItemPosts().stream()
-                .map(itemPostUpdateRequest -> createItemPost(itemPostUpdateRequest, post))
+        List<Long> beforeSequence = post.getSequence();
+        List<Long> afterSequence = postCreateUpdateRequest.getItemPosts().stream()
+                .map(itemPostUpdateRequest -> updateItemPost(itemPostUpdateRequest, post))
                 .toList();
 
-        post.updatePost(postCreateUpdateRequest, beforeSequence);
+        post.updatePost(postCreateUpdateRequest, afterSequence);
+
+        Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+        beforeSequence.stream()
+                .filter(num -> !afterSequenceSet.contains(num))
+                .forEach(this::deleteItemPost);
 
         return postId;
+    }
+
+    public void deleteItemPost(Long itemPostId) {
+        itemPostRepository.deleteById(itemPostId);
+    }
+
+    public void deleteItemPostImage(Long itemPostImageId){
+        itemPostImageRepository.deleteById(itemPostImageId);
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
@@ -194,8 +260,8 @@ public class PostService {
         }
 
         Long userId = ((CustomUserDetails) userDetails).getId();
-        String userLikeKey = "user:" + userId + ":likes";
-        String postLikeNumKey = "postId:" + postId + ":likeNum";
+        String userLikeKey = "user:" + userId + "likes";
+        String postLikeNumKey = "postId:" + postId;
 
         Boolean hasLike = redisTemplate.opsForSet().isMember(userLikeKey, postId);
 
@@ -218,9 +284,9 @@ public class PostService {
 
 
     public Integer getLikeNum(Long postId) {
-        String postVisitNumKey = "postId:" + postId;
+        String postLikeNumKey = "postId:" + postId;
 
-        return (Integer) redisTemplate.opsForHash().get(postVisitNumKey, "likeNum");
+        return (Integer) redisTemplate.opsForHash().get(postLikeNumKey, "likeNum");
     }
 
     public Boolean getIsPushLike(Long postId, UserDetails userDetails){
@@ -256,8 +322,6 @@ public class PostService {
 
         return TopPostResponse.of(post, "like", likeCount, itemPostThumbnailResponses);
     }
-
-
 
     @Transactional
     public TopPostResponse getTopVisitPost() {
