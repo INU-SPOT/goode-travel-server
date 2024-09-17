@@ -80,16 +80,25 @@ public class PostController {
     })
     public CommonResponse<?> updatePost(@PathVariable Long postid, @RequestBody PostRequest.PostCreateUpdateRequest request,
                                         @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("게시글 내용 불러오기 성공", postService.updatePost(postid, request, userDetails));
+        return CommonResponse.success("게시글 수정하기 성공", postService.updatePost(postid, request, userDetails));
     }
 
-//    @GetMapping("/v1/posts/top-like")
-//    @Operation(summary = "좋아요가 가장 많은 글 불러오기", description = "")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "게시글 수정하기 성공", content = @Content(schema = @Schema(implementation = Long.class))),
-//    })
-//    public CommonResponse<?> getTopGoodPost() {
-//        return CommonResponse.success("좋아요가 가장 많은 게시글 불러오기 성공",);
-//    }
+    @GetMapping("/v1/posts/top-like")
+    @Operation(summary = "좋아요가 가장 많은 글 불러오기", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "좋아요가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+    })
+    public CommonResponse<?> getTopLikePost() {
+        return CommonResponse.success("좋아요가 가장 많은 게시글 불러오기 성공", postService.getTopLikePost());
+    }
+
+    @GetMapping("/v1/posts/top-visit")
+    @Operation(summary = "조회수가 가장 많은 글 불러오기", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+    })
+    public CommonResponse<?> getTopVisitPost() {
+        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getTopViewPost());
+    }
 
 }

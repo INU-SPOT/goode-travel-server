@@ -17,12 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.spot.good2travel.dto.PostRequest.ItemPostCreateUpdateRequest;
 import static com.spot.good2travel.dto.PostRequest.PostCreateUpdateRequest;
-import static com.spot.good2travel.dto.PostResponse.ItemPostThumbnailResponse;
-import static com.spot.good2travel.dto.PostResponse.PostDetailResponse;
+import static com.spot.good2travel.dto.PostResponse.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -105,8 +106,7 @@ public class PostService {
                             .toList();
 
                     return PostResponse.ItemPostResponse.of(itemPost, itemPostImageResponses);
-                })
-                .toList();
+                }).toList();
 
         return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, isPushLike, isOwner,itemPostResponses);
     }
@@ -160,7 +160,7 @@ public class PostService {
             return post.getUser().getId() == userId;
         }
 
-        return null;
+        return false;
     }
 
     // 특정 postId에 해당하는 likeNum과 visitNum을 업데이트하는 메서드
@@ -179,10 +179,11 @@ public class PostService {
 
                 redisTemplate.expire(userVisitKey, 24, TimeUnit.HOURS);
 
-                return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
             }
         }
-        return redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
+        Long updateVisitNum = redisTemplate.opsForHash().increment(postVisitNumKey, "visitNum", 1);
+        redisTemplate.opsForZSet().add("postVisits", postId, updateVisitNum);
+        return updateVisitNum;
     }
 
     public Long updateLikeNum(Long postId, UserDetails userDetails) {
@@ -230,16 +231,73 @@ public class PostService {
 
             return redisTemplate.opsForSet().isMember(userLikeKey, postId);
         }
-        return null;
+        return false;
     }
 
-//    public PostThumbnailResponse getTopLikePosts() {
-//        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postLikes", 0, 0);
-//
-//        Long postId = Long.valueOf(topPostIds.toString());
-//        Post post =postRepository.findById(postId).orElseThrow(()->new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
-//        return PostThumbnailResponse.of(post);
-//    }
+    @Transactional
+    public TopPostResponse getTopLikePost() {
+        // 좋아요가 많은 상위 1개의 게시글 ID 가져오기
+        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postLikes", 0, 0);
+
+        if (topPostIds == null || topPostIds.isEmpty()) {
+            throw new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND);
+        }
+
+        // Set에서 첫 번째 ID를 가져옴
+        Long postId = Long.valueOf(topPostIds.iterator().next().toString());
+
+        // 게시글 정보 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+
+        // Redis에서 해당 게시글의 좋아요 수 조회
+        Double likeCount = redisTemplate.opsForZSet().score("postLikes", postId);
+
+        if (likeCount == null) {
+            likeCount = 0.0; // 좋아요 수가 없을 때 0으로 설정
+        }
+
+        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getSequence().stream().map(num -> {
+            ItemPost itemPost = itemPostRepository.findById(num)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+            return ItemPostThumbnailResponse.of(itemPost);}).toList();
+
+        // 응답 반환
+        return TopPostResponse.of(post, "like", likeCount.longValue(), itemPostThumbnailResponses);
+    }
+
+    @Transactional
+    public TopPostResponse getTopViewPost() {
+        // 조회수가 많은 상위 1개의 게시글 ID 가져오기
+        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postVisits", 0, 0);
+
+        if (topPostIds == null || topPostIds.isEmpty()) {
+            throw new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND);
+        }
+
+        // Set에서 첫 번째 ID를 가져옴
+        Long postId = Long.valueOf(topPostIds.iterator().next().toString());
+
+        // 게시글 정보 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+
+        // Redis에서 해당 게시글의 조회수 조회
+        Double viewCount = redisTemplate.opsForZSet().score("postVisits", postId);
+
+        if (viewCount == null) {
+            viewCount = 0.0; // 조회수가 없을 때 0으로 설정
+        }
+
+        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getSequence().stream().map(num -> {
+            ItemPost itemPost = itemPostRepository.findById(num)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+            return ItemPostThumbnailResponse.of(itemPost);}).toList();
+
+        // 응답 반환
+        return TopPostResponse.of(post, "visit", viewCount.longValue(), itemPostThumbnailResponses);
+    }
+
 
 }
 
