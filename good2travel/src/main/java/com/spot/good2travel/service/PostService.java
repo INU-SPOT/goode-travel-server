@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -236,66 +237,57 @@ public class PostService {
 
     @Transactional
     public TopPostResponse getTopLikePost() {
-        // 좋아요가 많은 상위 1개의 게시글 ID 가져오기
-        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postLikes", 0, 0);
 
-        if (topPostIds == null || topPostIds.isEmpty()) {
+        Set<ZSetOperations.TypedTuple<Object>> topPostId = redisTemplate.opsForZSet()
+                .reverseRangeWithScores("postLikes", 0, 0);
+
+        if (topPostId == null || topPostId.isEmpty()) {
             throw new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND);
         }
 
-        // Set에서 첫 번째 ID를 가져옴
-        Long postId = Long.valueOf(topPostIds.iterator().next().toString());
+        // ZSetOperations.TypedTuple에서 value와 score 추출
+        ZSetOperations.TypedTuple<Object> topPost = topPostId.iterator().next();
+        Long postId = Long.valueOf(topPost.getValue().toString());  // getValue()로 게시글 ID 가져오기
+        Long likeCount = topPost.getScore().longValue();            // getScore()로 좋아요 수 가져오기
 
-        // 게시글 정보 조회
-        Post post = postRepository.findById(postId)
+        // JPQL로 게시글과 ItemPost를 한 번에 조회
+        Post post = postRepository.findPostWithItemsById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        // Redis에서 해당 게시글의 좋아요 수 조회
-        Double likeCount = redisTemplate.opsForZSet().score("postLikes", postId);
-
-        if (likeCount == null) {
-            likeCount = 0.0; // 좋아요 수가 없을 때 0으로 설정
-        }
-
-        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getSequence().stream().map(num -> {
-            ItemPost itemPost = itemPostRepository.findById(num)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-            return ItemPostThumbnailResponse.of(itemPost);}).toList();
+        // ItemPost 응답 생성
+        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getItemPosts().stream()
+                .map(ItemPostThumbnailResponse::of)
+                .toList();
 
         // 응답 반환
-        return TopPostResponse.of(post, "like", likeCount.longValue(), itemPostThumbnailResponses);
+        return TopPostResponse.of(post, "like", likeCount, itemPostThumbnailResponses);
     }
 
-    @Transactional
-    public TopPostResponse getTopViewPost() {
-        // 조회수가 많은 상위 1개의 게시글 ID 가져오기
-        Set<Object> topPostIds = redisTemplate.opsForZSet().reverseRange("postVisits", 0, 0);
 
-        if (topPostIds == null || topPostIds.isEmpty()) {
+
+    @Transactional
+    public TopPostResponse getTopVisitPost() {
+
+        Set<ZSetOperations.TypedTuple<Object>> topPostId = redisTemplate.opsForZSet()
+                .reverseRangeWithScores("postVisits", 0, 0);
+
+        if (topPostId == null || topPostId.isEmpty()) {
             throw new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND);
         }
 
-        // Set에서 첫 번째 ID를 가져옴
-        Long postId = Long.valueOf(topPostIds.iterator().next().toString());
+        ZSetOperations.TypedTuple<Object> topPost = topPostId.iterator().next();
+        Long postId = Long.valueOf(topPost.getValue().toString());
 
-        // 게시글 정보 조회
-        Post post = postRepository.findById(postId)
+        Long viewCount = topPost.getScore().longValue();
+
+        Post post = postRepository.findPostWithItemsById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        // Redis에서 해당 게시글의 조회수 조회
-        Double viewCount = redisTemplate.opsForZSet().score("postVisits", postId);
+        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getItemPosts().stream()
+                .map(ItemPostThumbnailResponse::of)
+                .toList();
 
-        if (viewCount == null) {
-            viewCount = 0.0; // 조회수가 없을 때 0으로 설정
-        }
-
-        List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getSequence().stream().map(num -> {
-            ItemPost itemPost = itemPostRepository.findById(num)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-            return ItemPostThumbnailResponse.of(itemPost);}).toList();
-
-        // 응답 반환
-        return TopPostResponse.of(post, "visit", viewCount.longValue(), itemPostThumbnailResponses);
+        return TopPostResponse.of(post, "visit", viewCount, itemPostThumbnailResponses);
     }
 
 

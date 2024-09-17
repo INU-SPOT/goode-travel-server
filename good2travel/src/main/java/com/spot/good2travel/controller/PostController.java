@@ -98,7 +98,7 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
     })
     public CommonResponse<?> getTopVisitPost() {
-        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getTopViewPost());
+        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getTopVisitPost());
     }
 
 }
