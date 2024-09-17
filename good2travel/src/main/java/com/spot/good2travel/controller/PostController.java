@@ -30,7 +30,7 @@ public class PostController {
     @PostMapping("/v1/posts")
     @Operation(summary = "게시글 등록 기능", description =
             "제 생각에는 여기서 실수가 제일 많이 나지 않을까 싶습니다...\n\n PostCreateUpdateRequest(post 테이블에 해당하는 부분): <br> 생성/수정의 요청에서 다른 점이 없습니다. \n\n ItemPostCreateUpdateRequest(ItemPost에 해당하는 부분. 현 dto에는 itemPosts 리스트로 명시되어 있음): <br> 게시글 생성: itemId, content, images가 필요합니다. <br> 게시글 수정: itemPostId, itemId, content, images가 필요합니다.\n\n itemPostId는 post를 수정 할 때만 필요한 값입니다. 게시글 생성할때는 null로 주시면 됩니다.\n\n만약 게시글을 수정할 때 유저가 게시글에 새로운 계획 박스를 생성했다면 itemPostId를 null로 주시길 바랍니다." +"\n\n ItemPostImageRequest(itemPost의 이미지테이블에 해당함. 현 Dto에는 images 리스트로 명시되어 있음.): <br> 게시글 생성: (사진이 있다면) imageName이 필요합니다. <br> 게시글 수정 imagePostImageId와 imageName이 필요합니다.\n\n" +
-            "해줘 프론트아저씨!\n\n 아 참고로 게시글 등록 api랑 게시글 수정 api는 별개입니다. 이해를 위해 한번에 설명합니다")
+            "해줘 프론트아저씨!\n\n 아 참고로 게시글 등록 api랑 게시글 수정 api는 별개입니다. 이해를 위해 한번에 설명합니다.\n\n 반환값: postId(pk)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
@@ -49,7 +49,7 @@ public class PostController {
     }
 
     @GetMapping("/v1/posts/{postid}")
-    @Operation(summary = "게시글 내용 조회하기", description = "게시글의 세부 내용을 조회합니다. <br><br> - request: <br> Long postId(pathparameter) <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: PostDetailResponse(Dto")
+    @Operation(summary = "게시글 내용 조회하기", description = "게시글의 세부 내용을 조회합니다. <br><br> - request: <br> Long postId <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: PostDetailResponse(Dto")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 내용 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostDetailResponse.class))),
     })
@@ -77,7 +77,7 @@ public class PostController {
 
     @PatchMapping("/v1/posts/{postid}")
     @Operation(summary = "게시글 수정하기", description = "PostCreateUpdateRequest(post 테이블에 해당하는 부분): <br> 생성/수정의 요청에서 다른 점이 없습니다. \n\n ItemPostCreateUpdateRequest(ItemPost에 해당하는 부분. 현 dto에는 itemPosts 리스트로 명시되어 있음): <br> 게시글 생성: itemId, content, images가 필요합니다. <br> 게시글 수정: itemPostId, itemId, content, images가 필요합니다.\n\n itemPostId는 post를 수정 할 때만 필요한 값입니다. 게시글 생성할때는 null로 주시면 됩니다.\n\n만약 게시글을 수정할 때 유저가 게시글에 새로운 계획 박스를 생성했다면 itemPostId를 null로 주시길 바랍니다.\n\n ItemPostImageRequest(itemPost의 이미지테이블에 해당함. 현 Dto에는 images 리스트로 명시되어 있음.): <br> 게시글 생성: (사진이 있다면) imageName이 필요합니다. <br> 게시글 수정 imagePostImageId와 imageName이 필요합니다.\n\n" +
-            "            \n\n 아 참고로 게시글 등록 api랑 게시글 수정 api는 별개입니다. 이해를 위해 한번에 설명합니다")
+            "            \n\n 아 참고로 게시글 등록 api랑 게시글 수정 api는 별개입니다. 이해를 위해 한번에 설명합니다 \n\n 반환값: postId(pk)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정하기 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -114,7 +115,7 @@ public class PostService {
 
     @Transactional
     public CommonPagingResponse<?> getPosts(Integer page, Integer size){
-        PageRequest pageable = PageRequest.of(page, size);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
@@ -126,6 +127,7 @@ public class PostService {
 
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
+
                     return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
                                 ItemPost itemPost = itemPostRepository.findById(num)
                                         .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
@@ -164,7 +166,6 @@ public class PostService {
         return false;
     }
 
-    // 특정 postId에 해당하는 likeNum과 visitNum을 업데이트하는 메서드
     public Long updateVisitNum(Long postId, UserDetails userDetails) {
         String postVisitNumKey = "postId:" + postId;
 
@@ -193,24 +194,21 @@ public class PostService {
         }
 
         Long userId = ((CustomUserDetails) userDetails).getId();
-        String userLikeKey = "user:" + userId + ":likes";  // 사용자 좋아요 키
-        String postLikeNumKey = "postId:" + postId + ":likeNum";  // 게시글 좋아요 수
+        String userLikeKey = "user:" + userId + ":likes";
+        String postLikeNumKey = "postId:" + postId + ":likeNum";
 
-        // 사용자가 해당 게시글을 좋아요 했는지 여부 확인
         Boolean hasLike = redisTemplate.opsForSet().isMember(userLikeKey, postId);
 
         if (Boolean.FALSE.equals(hasLike)) {
-            // 좋아요 추가
-            redisTemplate.opsForSet().add(userLikeKey, postId);  // 사용자 좋아요 목록에 추가
-            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", 1);  // 좋아요 수 증가
-            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);  // 정렬된 집합에 좋아요 수 반영
+            redisTemplate.opsForSet().add(userLikeKey, postId);
+            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", 1);
+            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);
 
             return updatedLikeNum;
         } else if (Boolean.TRUE.equals(hasLike)) {
-            // 좋아요 취소
-            redisTemplate.opsForSet().remove(userLikeKey, postId);  // 사용자 좋아요 목록에서 제거
-            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", -1);  // 좋아요 수 감소
-            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);  // 정렬된 집합에 좋아요 수 반영
+            redisTemplate.opsForSet().remove(userLikeKey, postId);
+            Long updatedLikeNum = redisTemplate.opsForHash().increment(postLikeNumKey, "likeNum", -1);
+            redisTemplate.opsForZSet().add("postLikes", postId, updatedLikeNum);
 
             return updatedLikeNum;
         }
@@ -245,21 +243,17 @@ public class PostService {
             throw new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND);
         }
 
-        // ZSetOperations.TypedTuple에서 value와 score 추출
         ZSetOperations.TypedTuple<Object> topPost = topPostId.iterator().next();
-        Long postId = Long.valueOf(topPost.getValue().toString());  // getValue()로 게시글 ID 가져오기
-        Long likeCount = topPost.getScore().longValue();            // getScore()로 좋아요 수 가져오기
+        Long postId = Long.valueOf(topPost.getValue().toString());
+        Long likeCount = topPost.getScore().longValue();
 
-        // JPQL로 게시글과 ItemPost를 한 번에 조회
         Post post = postRepository.findPostWithItemsById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        // ItemPost 응답 생성
         List<ItemPostThumbnailResponse> itemPostThumbnailResponses = post.getItemPosts().stream()
                 .map(ItemPostThumbnailResponse::of)
                 .toList();
 
-        // 응답 반환
         return TopPostResponse.of(post, "like", likeCount, itemPostThumbnailResponses);
     }
 
