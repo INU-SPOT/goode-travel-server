@@ -36,9 +36,8 @@ public class ItemPostImage {
                 .build();
     }
 
-    public ItemPostImage updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
+    public ItemPostImage updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest){
         this.imageUrl = itemPostImageRequest.getImageName();
-        this.itemPost = itemPost;
 
         return this;
     }

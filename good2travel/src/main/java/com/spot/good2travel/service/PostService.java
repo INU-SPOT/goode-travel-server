@@ -50,12 +50,13 @@ public class PostService {
 
         Post post = Post.of(postCreateUpdateRequest, user);
 
+        postRepository.save(post);
+
         List<Long> sequence = postCreateUpdateRequest.getItemPosts().stream()
                 .map(itemPostCreateUpdateRequest -> createItemPost(itemPostCreateUpdateRequest, post))
                 .toList();
 
         post.updatePostSequence(sequence);
-        postRepository.save(post);
         createLikeAndVisit(post.getId(), 0, 0);
         return post.getId();
     }
@@ -129,9 +130,10 @@ public class PostService {
     @Transactional
     public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
         if(itemPostImageRequest.getItemPostImageId() != null){
+            log.info("진입");
             ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
                     .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
-            itemPostImage.updateItemPostImage(itemPostImageRequest, itemPost);
+            itemPostImage.updateItemPostImage(itemPostImageRequest);
 
             return itemPostImage.getId();
         }
