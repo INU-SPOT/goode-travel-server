@@ -51,7 +51,7 @@ public class Item extends BaseEntity {
     private LocalGovernment localGovernment;
 
     @Builder
-    public Item(String type, String title, String imageUrl, String description, String address,
+    public Item(ItemType type, String title, String imageUrl, String description, String address,
                 Boolean isOfficial, String emoji, LocalGovernment localGovernment) {
         this.type = type;
         this.title = title;
@@ -63,8 +63,23 @@ public class Item extends BaseEntity {
         this.localGovernment = localGovernment;
     }
 
+    public Item(Item item){
+        this.type = item.getType();
+        this.title = item.getTitle();
+        this.imageUrl = item.getImageUrl();
+        this.description = item.getDescription();
+        this.address = item.getAddress();
+        this.isOfficial = item.getIsOfficial();
+        this.emoji = item.getEmoji();
+        this.localGovernment = item.getLocalGovernment();
+    }
 
-    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
+    public Item copy(){
+        return new Item(this);
+    }
+
+
+    public static Item of(ItemRequest.OfficialItemCreateRequest request, LocalGovernment localGovernment) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
@@ -72,6 +87,16 @@ public class Item extends BaseEntity {
                 .description(request.getDescription())
                 .address(request.getAddress())
                 .isOfficial(true)
+                .localGovernment(localGovernment)
+                .build();
+    }
+
+    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
+        return Item.builder()
+                .type(request.getType())
+                .title(request.getTitle())
+                .imageUrl(request.getImageUrl())
+                .isOfficial(false)
                 .emoji(request.getEmoji())
                 .localGovernment(localGovernment)
                 .build();
