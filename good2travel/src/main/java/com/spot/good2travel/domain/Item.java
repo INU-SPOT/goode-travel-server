@@ -80,7 +80,7 @@ public class Item extends BaseEntity {
     }
 
 
-    public static Item of(ItemRequest.OfficialItemCreateRequest request, LocalGovernment localGovernment) {
+    public static Item ofGoode(ItemRequest.OfficialItemCreateRequest request, LocalGovernment localGovernment) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
@@ -92,15 +92,29 @@ public class Item extends BaseEntity {
                 .build();
     }
 
-    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
+    public static Item ofPlan(ItemRequest.OfficialItemCreateRequest request) {
+        return Item.builder()
+                .type(request.getType())
+                .title(request.getTitle())
+                .address(request.getAddress())
+                .isOfficial(true)
+                .build();
+    }
+
+    public static Item of(ItemRequest.ItemCreateRequest request) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
                 .imageUrl(request.getImageUrl())
                 .isOfficial(false)
                 .emoji(request.getEmoji())
-                .localGovernment(localGovernment)
                 .build();
     }
 
+    public void updateItem(ItemRequest.ItemUpdateRequest itemUpdateRequest) {
+        this.type = itemUpdateRequest.getType();
+        this.emoji = itemUpdateRequest.getEmoji();
+        this.imageUrl = itemUpdateRequest.getImageUrl();
+        this.title = itemUpdateRequest.getTitle();
+    }
 }

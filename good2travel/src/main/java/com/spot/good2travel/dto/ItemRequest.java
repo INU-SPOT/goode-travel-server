@@ -42,19 +42,24 @@ public class ItemRequest {
     @Getter
     @Setter
     public static class ItemCreateRequest {
-        @Schema(example = "GOODE")
+        @Schema(example = "PLAN")
         private ItemType type;
 
-        @Schema(example = "굳이? 성심당 가서 망고시루 먹기")
+        @Schema(example = "남선 공원에서 산책하기")
         private String title;
 
         @Schema(example = "/image/~")
         private String imageUrl;
 
         private String emoji;
-
-        @Schema(example = "1")
-        private Long localGovernmentId;
     }
 
+    @Getter
+    @Setter
+    public static class ItemUpdateRequest{
+        private ItemType type;
+        private String title;
+        private String imageUrl;
+        private String emoji;
+    }
 }
