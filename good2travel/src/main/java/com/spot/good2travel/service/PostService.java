@@ -130,7 +130,7 @@ public class PostService {
     @Transactional
     public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
         if(itemPostImageRequest.getItemPostImageId() != null){
-            log.info("진입");
+
             ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
                     .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
             itemPostImage.updateItemPostImage(itemPostImageRequest);
