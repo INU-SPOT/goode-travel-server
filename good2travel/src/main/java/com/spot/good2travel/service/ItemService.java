@@ -1,7 +1,7 @@
 package com.spot.good2travel.service;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
-import com.spot.good2travel.common.exception.ItemUpdateException;
+import com.spot.good2travel.common.exception.ItemAccessException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemCategory;
@@ -71,7 +71,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getIsOfficial()){
-            throw new ItemUpdateException(ExceptionMessage.ITEM_UPDATE_BAD_REQUEST);
+            throw new ItemAccessException(ExceptionMessage.ITEM_UPDATE_BAD_REQUEST);
         } else {
             item.updateItem(itemUpdateRequest);
         }
@@ -86,7 +86,17 @@ public class ItemService {
             //todo 해당 지역의 날씨 가져오기
             return ItemResponse.GoodeDetailsResponse.of(item, item.getLocalGovernment().getName());
         } else {
-            throw new NotFoundElementException(ExceptionMessage.ITEM_DETAIL_INFO_NOT_FOUND);
+            throw new ItemAccessException(ExceptionMessage.ITEM_DETAIL_INFO_NOT_FOUND);
+        }
+    }
+
+    public void deleteItem(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+        if (item.getIsOfficial()){
+            throw new ItemAccessException(ExceptionMessage.ITEM_DELETE_BAD_REQUEST);
+        } else {
+            itemRepository.deleteById(itemId);
         }
     }
 }

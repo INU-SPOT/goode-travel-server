@@ -57,7 +57,6 @@ public class ItemRequest {
     @Getter
     @Setter
     public static class ItemUpdateRequest{
-        private ItemType type;
         private String title;
         private String imageUrl;
         private String emoji;
