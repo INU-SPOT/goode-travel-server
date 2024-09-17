@@ -8,6 +8,7 @@ import com.spot.good2travel.domain.ItemCategory;
 import com.spot.good2travel.domain.ItemType;
 import com.spot.good2travel.domain.LocalGovernment;
 import com.spot.good2travel.dto.ItemRequest;
+import com.spot.good2travel.dto.ItemResponse;
 import com.spot.good2travel.repository.CategoryRepository;
 import com.spot.good2travel.repository.ItemCategoryRepository;
 import com.spot.good2travel.repository.ItemRepository;
@@ -75,5 +76,17 @@ public class ItemService {
             item.updateItem(itemUpdateRequest);
         }
         return item.getId();
+    }
+
+    @Transactional
+    public ItemResponse.GoodeDetailsResponse getGoodeDetails(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+        if (item.getType() == ItemType.GOODE && item.getIsOfficial()){
+            //todo 해당 지역의 날씨 가져오기
+            return ItemResponse.GoodeDetailsResponse.of(item, item.getLocalGovernment().getName());
+        } else {
+            throw new NotFoundElementException(ExceptionMessage.ITEM_DETAIL_INFO_NOT_FOUND);
+        }
     }
 }
