@@ -29,4 +29,10 @@ public class ItemCategory {
         this.item = item;
     }
 
+    public static ItemCategory of(Category category, Item officialItem) {
+        return ItemCategory.builder()
+                .category(category)
+                .item(officialItem)
+                .build();
+    }
 }
