@@ -75,4 +75,17 @@ public class ItemController {
     public CommonResponse<?> getGoodeDetails(@PathVariable("itemId") Long itemId){
         return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
     }
+
+    @DeleteMapping("/v1/goodes/{itemId}")
+    @Operation(summary = "사용자의 굳이/계획 삭제",
+        description = "사용자의 굳이/계획을 삭제한다." +
+                "<br><br> - request : itemId = item(DB) 상 pk" +
+                "<br><br> - response : x"
+    )
+    public CommonResponse<?> deleteItem(@PathVariable("itemId") Long itemId){
+        itemService.deleteItem(itemId);
+        return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
+    }
+
+    //todo 굳이 관광코스 조회는 관광코스 설계 후 제작
 }
