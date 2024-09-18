@@ -1,8 +1,8 @@
 package com.spot.good2travel.domain;
 
-import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +24,27 @@ public class ItemFolder {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id")
     private Folder folder;
+
+    @Builder
+    public ItemFolder(Boolean isFinished, Item item, Folder folder) {
+        this.isFinished = isFinished;
+        this.item = item;
+        this.folder = folder;
+    }
+
+    public static ItemFolder of(Item item, Folder folder) {
+        if (item.getType()==ItemType.GOODE){
+            return ItemFolder.builder()
+                    .isFinished(null)
+                    .item(item)
+                    .folder(folder)
+                    .build();
+        } else {
+            return ItemFolder.builder()
+                    .isFinished(false)
+                    .item(item)
+                    .folder(folder)
+                    .build();
+        }
+    }
 }
