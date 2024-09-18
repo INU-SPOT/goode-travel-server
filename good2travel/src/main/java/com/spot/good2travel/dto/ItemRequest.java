@@ -54,6 +54,7 @@ public class ItemRequest {
         @Schema(example = "/image/~")
         private String imageUrl;
 
+        @Schema(example = "🐋")
         private String emoji;
     }
 
@@ -68,6 +69,8 @@ public class ItemRequest {
 
         @Schema(example = "/image/~")
         private String imageUrl;
+
+        @Schema(example = "🐋")
         private String emoji;
     }
 }
