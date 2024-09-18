@@ -350,6 +350,62 @@ public class PostService {
         return TopPostResponse.of(post, "visit", viewCount, itemPostThumbnailResponses);
     }
 
+    @Transactional
+    public CommonPagingResponse getUserPosts(Integer page, Integer size, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+
+        Page<Post> postPage = postRepository.findPostsByUserId(userId, pageable);
+
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
+                .map(post -> {
+
+                    Long commentNum = null; //아직 로직없음
+                    Integer likeNum = getLikeNum(post.getId());
+
+                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
+
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
+                        ItemPost itemPost = itemPostRepository.findById(num)
+                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+                        return ItemPostThumbnailResponse.of(itemPost);
+                    }).toList());
+                }).toList();
+
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
+    }
+
+    public List<PostThumbnailResponse> getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        String userLikeKey = "user:" + userId + "likes";
+
+        Set<Object> likePost = redisTemplate.opsForSet().members(userLikeKey);
+
+        List<Post> postPage = likePost.stream()
+                .map(id -> postRepository.findById(Long.parseLong(id.toString()))
+                        .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND)))  // id를 Long 타입으로 변환
+                .toList();
+
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
+                .map(post -> {
+
+                    Long commentNum = null; //아직 로직없음
+                    Integer likeNum = getLikeNum(post.getId());
+
+                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
+
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
+                        ItemPost itemPost = itemPostRepository.findById(num)
+                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+                        return ItemPostThumbnailResponse.of(itemPost);
+                    }).toList());
+                }).toList();
+
+        return postThumbnailResponses;
+    }
 
 }
 

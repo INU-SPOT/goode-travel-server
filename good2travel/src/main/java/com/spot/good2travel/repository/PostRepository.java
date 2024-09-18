@@ -18,4 +18,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p LEFT JOIN FETCH p.itemPosts WHERE p.id = :postId")
     Optional<Post> findPostWithItemsById(@Param("postId") Long postId);
 
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.user WHERE p.user.id = :userId")
+    Page<Post> findPostsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    Page<Post> findById(Long postId, Pageable pageable);
 }
