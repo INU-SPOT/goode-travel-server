@@ -27,11 +27,11 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
-        LocalGovernment localGovernment = localGovernmentRepository.findById(officialItemCreateRequest.getLocalGovernmentId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
-
         //굳이인 경우에는 카테고리까지 연결
         if (officialItemCreateRequest.getType()==ItemType.GOODE){
+            LocalGovernment localGovernment = localGovernmentRepository.findById(officialItemCreateRequest.getLocalGovernmentId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+
             Item officialGoode = Item.ofGoode(officialItemCreateRequest, localGovernment);
 
             officialItemCreateRequest.getCategories()
