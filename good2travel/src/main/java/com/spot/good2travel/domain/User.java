@@ -34,7 +34,7 @@ public class User extends BaseEntity {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<SmallComment> smallComments;
+    private List<ReplyComment> replyComments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;
