@@ -92,55 +92,6 @@ public class PostService {
     }
 
     @Transactional
-    public Long updateItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
-        Long itemId = itemPostCreateUpdateRequest.getItemId();
-
-        if (itemPostCreateUpdateRequest.getItemPostId() != null) {
-            Item item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-
-            ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-
-            List<Long> beforeSequence = itemPost.getSequence();
-
-            List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
-                    .map(image -> updateItemPostImage(image, itemPost))
-                    .toList();
-            log.info(afterSequence.toString());
-
-            itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
-
-            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
-            beforeSequence.stream()
-                    .filter(num -> !afterSequenceSet.contains(num))
-                    .forEach(this::deleteItemPostImage);
-
-            return itemPost.getId();
-        }
-
-        else {
-            return createItemPost(itemPostCreateUpdateRequest, post);
-        }
-    }
-
-
-    @Transactional
-    public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
-        if(itemPostImageRequest.getItemPostImageId() != null){
-
-            ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
-                    .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
-            itemPostImage.updateItemPostImage(itemPostImageRequest);
-
-            return itemPostImage.getId();
-        }
-        else{
-            return createItemPostImage(itemPostImageRequest, itemPost);
-        }
-    }
-
-    @Transactional
     public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
@@ -198,6 +149,54 @@ public class PostService {
                 .forEach(this::deleteItemPost);
 
         return postId;
+    }
+
+    @Transactional
+    public Long updateItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
+        Long itemId = itemPostCreateUpdateRequest.getItemId();
+
+        if (itemPostCreateUpdateRequest.getItemPostId() != null) {
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+            ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+
+            List<Long> beforeSequence = itemPost.getSequence();
+
+            List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
+                    .map(image -> updateItemPostImage(image, itemPost))
+                    .toList();
+            log.info(afterSequence.toString());
+
+            itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
+
+            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+            beforeSequence.stream()
+                    .filter(num -> !afterSequenceSet.contains(num))
+                    .forEach(this::deleteItemPostImage);
+
+            return itemPost.getId();
+        }
+
+        else {
+            return createItemPost(itemPostCreateUpdateRequest, post);
+        }
+    }
+
+    @Transactional
+    public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
+        if(itemPostImageRequest.getItemPostImageId() != null){
+
+            ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
+                    .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
+            itemPostImage.updateItemPostImage(itemPostImageRequest);
+
+            return itemPostImage.getId();
+        }
+        else{
+            return createItemPostImage(itemPostImageRequest, itemPost);
+        }
     }
 
     public void deleteItemPost(Long itemPostId) {
