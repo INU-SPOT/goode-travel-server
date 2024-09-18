@@ -19,9 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.spot.good2travel.dto.PostRequest.ItemPostCreateUpdateRequest;
@@ -175,21 +173,7 @@ public class PostService {
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
-        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
-                .map(post -> {
-
-                    Long commentNum = null; //아직 로직없음
-                    Integer likeNum = getLikeNum(post.getId());
-
-                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
-
-                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
-                                ItemPost itemPost = itemPostRepository.findById(num)
-                                        .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-                                return ItemPostThumbnailResponse.of(itemPost);
-                    }).toList());
-                }).toList();
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
 
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
     }
@@ -225,10 +209,9 @@ public class PostService {
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
-
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            return post.getUser().getId() == userId;
+            return Objects.equals(post.getUser().getId(), userId);
         }
 
         return false;
@@ -242,7 +225,7 @@ public class PostService {
             String userVisitKey = "user:" + userId + "visits";
 
             Boolean hasVisited = redisTemplate.opsForSet().isMember(userVisitKey, postId);
-            log.info(hasVisited.toString());
+            log.info(Objects.requireNonNull(hasVisited).toString());
             if (Boolean.FALSE.equals(hasVisited)) {
 
                 redisTemplate.opsForSet().add(userVisitKey, postId);
@@ -358,39 +341,33 @@ public class PostService {
 
         Page<Post> postPage = postRepository.findPostsByUserId(userId, pageable);
 
-        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
-                .map(post -> {
-
-                    Long commentNum = null; //아직 로직없음
-                    Integer likeNum = getLikeNum(post.getId());
-
-                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
-
-                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
-                        ItemPost itemPost = itemPostRepository.findById(num)
-                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-                        return ItemPostThumbnailResponse.of(itemPost);
-                    }).toList());
-                }).toList();
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
 
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
     }
 
     public List<PostThumbnailResponse> getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
         String userLikeKey = "user:" + userId + "likes";
 
-        Set<Object> likePost = redisTemplate.opsForSet().members(userLikeKey);
+        Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
 
-        List<Post> postPage = likePost.stream()
-                .map(id -> postRepository.findById(Long.parseLong(id.toString()))
-                        .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND)))  // id를 Long 타입으로 변환
+        if (likePosts == null || likePosts.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Long> likePostsNum = likePosts.stream()
+                .map(id -> Long.parseLong(id.toString()))
                 .toList();
 
-        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
-                .map(post -> {
+        Page<Post> postPage = postRepository.findAllByIdIn(likePostsNum, pageable);
+        return getPostThumbnails(postPage);
+    }
 
+    public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){
+        return posts.stream()
+                .map(post -> {
                     Long commentNum = null; //아직 로직없음
                     Integer likeNum = getLikeNum(post.getId());
 
@@ -403,8 +380,6 @@ public class PostService {
                         return ItemPostThumbnailResponse.of(itemPost);
                     }).toList());
                 }).toList();
-
-        return postThumbnailResponses;
     }
 
 }

@@ -39,7 +39,7 @@ public class PostController {
     }
 
     @GetMapping("/v1/posts")
-    @Operation(summary = "게시글 목록(썸네일) 불러오기 기능", description = "게시글 목록을 불러옵니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br><br> - response: PostThumbnailResponse")
+    @Operation(summary = "게시글 목록(썸네일) 불러오기 기능 **페이징**", description = "게시글 목록을 불러옵니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br><br> - response: PostThumbnailResponse")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
@@ -104,4 +104,25 @@ public class PostController {
         return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getTopVisitPost());
     }
 
+    @GetMapping("/v1/users/posts")
+    @Operation(summary = "유저가 쓴 글 불러오기 **페이징**", description = "유저가 쓴 글들을 불러옵니다. <br><br> - request: <br> accessToken을 주오... <br><br> - response: <br> List<PostThumbnailResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+    })
+    public CommonResponse<?> getUserPosts(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                          @RequestParam(defaultValue = "7", required = false) Integer size,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getUserPosts(page, size, userDetails));
+    }
+
+    @GetMapping("/v1/users/posts/like")
+    @Operation(summary = "유저가 좋아요 누른 글 불러오기 **페이징**", description = "유저가 조하요~ 한 글들을 불러옵니다. <br><br> - request: <br> accessToken을 주오... <br><br> - response: <br> List<PostThumbnailResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+    })
+    public CommonResponse<?> getUserLikePosts(@RequestParam(defaultValue = "0", required = false) Integer page,
+                                          @RequestParam(defaultValue = "7", required = false) Integer size,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
+    }
 }
