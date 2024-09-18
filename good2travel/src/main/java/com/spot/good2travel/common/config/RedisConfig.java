@@ -35,7 +35,12 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
+
         redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -47,12 +52,5 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean
-    public RedisTemplate<String, byte[]> redisImageTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, byte[]> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        return template;
-    }
 
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,12 +34,11 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    private Integer good;
-
     private Integer report;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    private List<Long> sequence;
+    @OrderColumn(name = "order_index")
+    private List<Long> sequence = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<ItemPost> itemPosts;
@@ -52,13 +52,12 @@ public class Post extends BaseEntity {
 
     @Builder
     private Post(String title, String firstContent, String lastContent, LocalDate startDate, LocalDate endDate,
-                 Integer good, Integer report, List<Long> sequence,List<ItemPost> itemPosts, List<Comment> comments, User user){
+                 Integer report, List<Long> sequence,List<ItemPost> itemPosts, List<Comment> comments, User user){
         this.title = title;
         this.firstContent = firstContent;
         this.lastContent = lastContent;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.good = good;
         this.report = report;
         this.comments = comments;
         this.sequence = sequence;
@@ -73,7 +72,6 @@ public class Post extends BaseEntity {
                 .lastContent(request.getLastContent())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .good(0)
                 .report(0)
                 .user(user)
                 .build();
