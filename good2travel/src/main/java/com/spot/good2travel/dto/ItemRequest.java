@@ -43,11 +43,14 @@ public class ItemRequest {
     @Setter
     public static class ItemCreateRequest {
         @Schema(example = "PLAN")
+        @NotBlank
         private ItemType type;
 
+        @NotBlank
         @Schema(example = "남선 공원에서 산책하기")
         private String title;
 
+        @NotBlank
         @Schema(example = "/image/~")
         private String imageUrl;
 
@@ -57,7 +60,13 @@ public class ItemRequest {
     @Getter
     @Setter
     public static class ItemUpdateRequest{
+        @Schema(example = "PLAN")
+        private ItemType type;
+
+        @Schema(example = "남선 공원에서 산책하기")
         private String title;
+
+        @Schema(example = "/image/~")
         private String imageUrl;
         private String emoji;
     }

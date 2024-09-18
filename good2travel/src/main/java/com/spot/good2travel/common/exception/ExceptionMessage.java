@@ -1,6 +1,5 @@
 package com.spot.good2travel.common.exception;
 
-import com.google.api.Http;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
