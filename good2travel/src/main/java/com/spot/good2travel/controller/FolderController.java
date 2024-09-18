@@ -2,8 +2,14 @@ package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.FolderRequest;
+import com.spot.good2travel.dto.FolderResponse;
 import com.spot.good2travel.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,21 +27,26 @@ public class FolderController {
             summary = "새 폴더 생성",
             description = "사용자의 계획을 저장할 새 폴더 생성 " +
                     "<br><br> - request : FolderCreateRequest, 헤더에 accessToken 추가" +
-                    "<br><br> - response : null"
+                    "<br><br> - response : 생성된 폴더 이름"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "새 폴더 생성 완료", content = @Content(schema = @Schema(implementation = String.class))),
+    })
     public CommonResponse<?> createFolder(@RequestBody FolderRequest.FolderCreateRequest folderRequest, @AuthenticationPrincipal UserDetails userDetails){
-        folderService.create(folderRequest, userDetails);
         return CommonResponse.success("새 폴더 생성 완료",
-                null);
+                folderService.create(folderRequest , userDetails));
     }
 
     @PutMapping("/v1/plans/{folderId}")
     @Operation(
-            summary = "폴더 안의 계획 제목 및 순서 수정",
-            description = "사용자의 폴더 안에 있는 계획들을 Type에 따라 수정" +
+            summary = "폴더 제목 수정 및 폴더 안의 계획들 생성 및 순서 수정",
+            description = "폴더 제목을 수정하거나 폴더 안의 계획들을 생성하고 수정한다." +
                     "<br><br> - request : itemId = folder DB상의 pk, FolderUpdateRequest, 헤더에 accessToken 추가"+
                     "<br><br> - response : FolderUpdateResponse"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "폴더 수정 완료", content = @Content(schema = @Schema(implementation = FolderResponse.FolderUpdateResponse.class))),
+    })
     public CommonResponse<?> updatePlanList(@PathVariable("folderId") Long folderId, @RequestBody FolderRequest.FolderUpdateRequest planUpdateRequest) {
         return CommonResponse.success("폴더 수정 완료", folderService.updatePlanList(planUpdateRequest, folderId));
     }
@@ -47,6 +58,9 @@ public class FolderController {
                     "<br><br> - request : X" +
                     "<br><br> - response : FolderListResponse"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "폴더 목록 반환 성공", content = @Content(schema = @Schema(implementation = FolderResponse.FolderListResponse.class))),
+    })
     public CommonResponse<?> getFolderList(@AuthenticationPrincipal UserDetails userDetails){
         return CommonResponse.success("폴더 목록 반환 성공",
                 folderService.getFolderList(userDetails));
@@ -59,6 +73,9 @@ public class FolderController {
                     "<br><br> - request : folderId - Folder DB 상의 PK" +
                     "<br><br> - response : ItemListResponse"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "폴더 안의 계획 리스트 반환 성공", content = @Content(schema = @Schema(implementation = FolderResponse.ItemResponse.class))),
+    })
     public CommonResponse<?> getFolderItemList(@PathVariable("folderId") Long folderId){
         return CommonResponse.success("폴더 안의 계획 리스트 반환 성공"
                     ,folderService.getItemList(folderId));
@@ -72,6 +89,9 @@ public class FolderController {
                     "<br><br> - request : folderId - Folder DB 상의 PK" +
                     "<br><br> - response : X"
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "폴더 삭제 성공", content = @Content(schema = @Schema(implementation = Null.class))),
+    })
     public CommonResponse<?> deleteFolder(@PathVariable("folderId") Long folderId){
         folderService.deleteFolder(folderId);
         return CommonResponse.success("폴더 삭제 성공", null);
