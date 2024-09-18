@@ -7,10 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemFolderRepository extends JpaRepository<ItemFolder, Long> {
-    ItemFolder findByItemId(Long itemId);
+    Optional<ItemFolder> findByItemIdAndFolderId(Long itemId, Long folderId);
 
     @Query("SELECT i FROM ItemFolder if " +
             "JOIN Item i ON i.id = if.item.id " +
