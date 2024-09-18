@@ -4,6 +4,7 @@ import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.CommentRequest;
 import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.service.CommentService;
+import com.spot.good2travel.service.ReplyCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final ReplyCommentService replyCommentService;
 
     @GetMapping("/v1/posts/{postid}/comments")
     @Operation(summary = "게시글 댓글 가져오기", description = "게시글에서 댓글을 가져옵니다.스웨거 예시에 있는 dto를 List로 응답합니다. 멍청이슈 조심. <br><br> - request: postId <br><br> - response: List<CommentDetailsResponse>")
@@ -48,7 +50,7 @@ public class CommentController {
     })
     public CommonResponse<?> addReplyComment(@RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
-        commentService.addReplyComment(request, userDetails);
+        replyCommentService.addReplyComment(request, userDetails);
         return CommonResponse.success("댓글에 답글달기 성공", null);
     }
 
@@ -68,7 +70,7 @@ public class CommentController {
             @ApiResponse(responseCode = "200", description = "답글 신고하기 성공"),
     })
     public CommonResponse<?> reportReplyComment(Long replyCommentId, @AuthenticationPrincipal UserDetails userDetails) {
-        commentService.reportReplyComment(replyCommentId, userDetails);
+        replyCommentService.reportReplyComment(replyCommentId, userDetails);
         return CommonResponse.success("답글 신고하기 성공", null);
     }
 
@@ -92,7 +94,7 @@ public class CommentController {
     public CommonResponse<?> updateReplyComment(@PathVariable Long replycommentid,
                                                 @RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
-        commentService.updateReplyComment(replycommentid, request, userDetails);
+        replyCommentService.updateReplyComment(replycommentid, request, userDetails);
         return CommonResponse.success("답글 수정 성공", null);
     }
 
@@ -114,7 +116,7 @@ public class CommentController {
     })
     public CommonResponse<?> deleteReplyComment(@PathVariable Long replycommentid,
                                            @AuthenticationPrincipal UserDetails userDetails) {
-        commentService.deleteReplyComment(replycommentid, userDetails);
+        replyCommentService.deleteReplyComment(replycommentid, userDetails);
         return CommonResponse.success("답글 삭제 성공", null);
     }
 
