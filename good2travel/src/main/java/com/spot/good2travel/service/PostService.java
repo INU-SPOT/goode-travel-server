@@ -39,10 +39,10 @@ public class PostService {
     private final ItemPostRepository itemPostRepository;
     private final ItemRepository itemRepository;
     private final ItemPostImageRepository itemPostImageRepository;
-    private final ImageService imageService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
+    private final ImageService imageService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -115,7 +115,7 @@ public class PostService {
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
 
                     List<PostResponse.ItemPostImageResponse> itemPostImageResponses = itemPost.getItemPostImages().stream()
-                            .map( image -> PostResponse.ItemPostImageResponse.of(image.getId(), imageService.getImageUrl(image.getImageUrl())))
+                            .map( image -> PostResponse.ItemPostImageResponse.of(image.getId(), image.getImageName()))
                             .toList();
 
                     return PostResponse.ItemPostResponse.of(itemPost, itemPostImageResponses);

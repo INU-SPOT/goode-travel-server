@@ -36,6 +36,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ImageService imageService;
 
 
     @Transactional

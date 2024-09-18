@@ -156,12 +156,12 @@ public class PostResponse {
         @Schema(example = "13")
         private final Long itemPostImageId;
 
-        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
-        private final String imageUrl;
+        @Schema(example = "frog.jpeg")
+        private final String imageName;
 
-        public ItemPostImageResponse(Long itemPostImageId, String imageUrl){
+        public ItemPostImageResponse(Long itemPostImageId, String imageName){
             this.itemPostImageId = itemPostImageId;
-            this.imageUrl = imageUrl;
+            this.imageName = imageName;
         }
 
         public static ItemPostImageResponse of(Long itemPostImageId, String imageUrl){
@@ -182,7 +182,7 @@ public class PostResponse {
         @Schema(example = "환기리의 꿀잼 인천여행")
         private final String title;
 
-        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
+        @Schema(example = "https://image-server.squidjiny.com/files/profile/https://example.com/image.jpg")
         private final String imageUrl;
 
         private final List<ItemPostThumbnailResponse> items;
