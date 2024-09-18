@@ -2,6 +2,7 @@ package com.spot.good2travel.dto;
 
 import com.spot.good2travel.domain.Item;
 import com.spot.good2travel.domain.ItemType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,46 +35,42 @@ public class FolderResponse {
         }
     }
 
-    @Getter
-    @Setter
-    public static class ItemListResponse {
-        List<FolderItem> folderItemList;
-
-        public ItemListResponse(List<FolderItem> folderItems) {
-            this.folderItemList = folderItems;
-        }
-    }
-
     @Setter
     @Getter
-    public static class FolderItem {
+    public static class ItemResponse {
         private Long id;
         private ItemType type;
         private String title;
-        private String imageUrl;
+        private String image;
         private String address;
         private LocalDate createDate;
         private Boolean isFinished;
 
-        public FolderItem of(Item item){
-            this.id = item.getId();
-            this.type = item.getType();
-            this.title = item.getTitle();
-            if (item.getType() == ItemType.GOODE){
-                this.imageUrl = item.getImageUrl()==null? item.getEmoji() : item.getImageUrl();
-                this.address = item.getAddress();
-                this.createDate = item.getCreateDate().toLocalDate();
-                this.isFinished = null;
+        @Builder
+        public ItemResponse(Long id, ItemType type, String title, String image, String address, LocalDate createDate, Boolean isFinished) {
+            this.id = id;
+            this.type = type;
+            this.title = title;
+            this.image = image;
+            this.address = address;
+            this.createDate = createDate;
+            this.isFinished = isFinished;
+        }
 
-            } else if (item.getType() == ItemType.PLAN) {
-                this.imageUrl = item.getEmoji();
-                this.address = item.getAddress();
-                this.createDate = item.getCreateDate().toLocalDate();
-                this.isFinished = false;
-            }
+        public static ItemResponse of(Item item, Boolean isFinished) {
+            String image = (item.getType() == ItemType.PLAN && item.getImageUrl() == null)
+                    ? item.getEmoji()
+                    : item.getImageUrl();
 
-            return this;
+            return ItemResponse.builder()
+                    .id(item.getId())
+                    .title(item.getTitle())
+                    .type(item.getType())
+                    .image(image)
+                    .address(item.getAddress())
+                    .createDate(item.getCreateDate().toLocalDate())
+                    .isFinished(isFinished)
+                    .build();
         }
     }
-
 }
