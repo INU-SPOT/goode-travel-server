@@ -108,7 +108,7 @@ public class PostService {
         Long commentNum = getTotalComments(postId);
 
         String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
-        log.info(post.getSequence().toString());
+
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
                     ItemPost itemPost = itemPostRepository.findById(num)
@@ -181,7 +181,6 @@ public class PostService {
             List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
                     .map(image -> updateItemPostImage(image, itemPost))
                     .toList();
-            log.info(afterSequence.toString());
 
             itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
 
@@ -238,7 +237,7 @@ public class PostService {
             String userVisitKey = "user:" + userId + "visits";
 
             Boolean hasVisited = redisTemplate.opsForSet().isMember(userVisitKey, postId);
-            log.info(Objects.requireNonNull(hasVisited).toString());
+
             if (Boolean.FALSE.equals(hasVisited)) {
 
                 redisTemplate.opsForSet().add(userVisitKey, postId);
@@ -347,7 +346,7 @@ public class PostService {
     }
 
     @Transactional
-    public CommonPagingResponse getUserPosts(Integer page, Integer size, UserDetails userDetails){
+    public CommonPagingResponse<?> getUserPosts(Integer page, Integer size, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -360,7 +359,7 @@ public class PostService {
     }
 
     @Transactional
-    public CommonPagingResponse getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
+    public CommonPagingResponse<?> getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
         String userLikeKey = "user:" + userId + "likes";
@@ -375,6 +374,7 @@ public class PostService {
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 
+    @Transactional
     public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){
         return posts.stream()
                 .map(post -> {

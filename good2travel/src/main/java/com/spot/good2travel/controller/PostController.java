@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +36,9 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> createPost(@RequestBody PostRequest.PostCreateUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("게시글 등록 성공", postService.createPost(request, userDetails));
+    public ResponseEntity<CommonResponse<?>> createPost(@RequestBody PostRequest.PostCreateUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CommonResponse.success("게시글 등록 성공", postService.createPost(request, userDetails)));
     }
 
     @GetMapping("/v1/posts")

@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -35,23 +37,23 @@ public class CommentController {
     @PostMapping("/v1/posts/comments")
     @Operation(summary = "게시글에 댓글달기", description = "게시글에 댓글을 달겁니다. <br><br> - request: CommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글에 댓글 달기 성공"),
+            @ApiResponse(responseCode = "201", description = "게시글에 댓글 달기 성공"),
     })
-    public CommonResponse<?> addComment(@RequestBody CommentRequest.CommentCreateUpdateRequest request,
-                                        @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CommonResponse<?>> addComment(@RequestBody CommentRequest.CommentCreateUpdateRequest request,
+                                                       @AuthenticationPrincipal UserDetails userDetails) {
         commentService.addComment(request, userDetails);
-        return CommonResponse.success("게시글에 댓글 달기 성공", null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("게시글에 댓글 달기 성공", null));
     }
 
     @PostMapping("/v1/posts/replycomments")
     @Operation(summary = "댓글에 답글달기", description = "댓글에 답글을 달겁니다. <br><br> - request: ReplyCommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "댓글에 답글달기 성공"),
+            @ApiResponse(responseCode = "201", description = "댓글에 답글달기 성공"),
     })
-    public CommonResponse<?> addReplyComment(@RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         replyCommentService.addReplyComment(request, userDetails);
-        return CommonResponse.success("댓글에 답글달기 성공", null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
     }
 
     @PatchMapping("/v1/posts/report/comments")

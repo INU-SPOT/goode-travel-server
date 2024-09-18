@@ -85,7 +85,7 @@ public class ReplyCommentService {
 
         replyCommentRepository.delete(comment);
     }
-    
+
     @Transactional
     public void updateReplyComment(Long replyCommentId, CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails){
         if(userDetails == null){
