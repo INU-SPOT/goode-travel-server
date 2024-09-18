@@ -40,7 +40,7 @@ public class FolderController {
     @PutMapping("/v1/plans/{folderId}")
     @Operation(
             summary = "폴더 제목 수정 및 폴더 안의 계획들 생성 및 순서 수정",
-            description = "폴더 제목을 수정하거나 폴더 안의 계획들을 생성하고 수정한다." +
+            description = "폴더 제목을 수정하거나 폴더 안의 계획들을 생성 또는 수정한다." +
                     "<br><br> - request : itemId = folder DB상의 pk, FolderUpdateRequest, 헤더에 accessToken 추가"+
                     "<br><br> - response : FolderUpdateResponse"
     )
@@ -71,7 +71,7 @@ public class FolderController {
             summary = "폴더 안의 계획 목록 제공",
             description = "폴더 안의 계획 목록을 제공한다." +
                     "<br><br> - request : folderId - Folder DB 상의 PK" +
-                    "<br><br> - response : ItemListResponse"
+                    "<br><br> - response : List<FolderResponse.ItemResponse>"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "폴더 안의 계획 리스트 반환 성공", content = @Content(schema = @Schema(implementation = FolderResponse.ItemResponse.class))),
