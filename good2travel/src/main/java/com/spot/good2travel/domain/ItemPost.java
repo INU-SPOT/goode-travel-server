@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,10 @@ public class ItemPost {
 
     private String content;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @OrderColumn(name = "order_index")
+    private List<Long> sequence = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
@@ -32,10 +37,11 @@ public class ItemPost {
     private List<ItemPostImage> itemPostImages;
 
     @Builder
-    public ItemPost(String content, Item item, Post post, List<ItemPostImage> itemPostImages){
+    public ItemPost(String content, Item item, Post post, List<Long> sequence, List<ItemPostImage> itemPostImages){
         this.content = content;
         this.item = item;
         this.post = post;
+        this.sequence = sequence;
         this.itemPostImages = itemPostImages;
     }
 
@@ -46,10 +52,17 @@ public class ItemPost {
                 .post(post).build();
     }
 
-    public ItemPost updateItemPost(PostRequest.ItemPostCreateUpdateRequest request){
+    public ItemPost updateItemPost(PostRequest.ItemPostCreateUpdateRequest request, List<Long> sequence, Item item, Post post){
         this.content = request.getContent();
+        this.sequence = sequence;
         this.item = item;
         this.post = post;
+
+        return this;
+    }
+
+    public ItemPost updateSequence(List<Long> sequence){
+        this.sequence = sequence;
 
         return this;
     }
