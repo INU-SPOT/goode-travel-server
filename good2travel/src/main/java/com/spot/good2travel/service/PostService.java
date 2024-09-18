@@ -19,7 +19,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.spot.good2travel.dto.PostRequest.ItemPostCreateUpdateRequest;
@@ -356,23 +359,20 @@ public class PostService {
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
     }
 
-    public List<PostThumbnailResponse> getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
+    @Transactional
+    public CommonPagingResponse getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
         String userLikeKey = "user:" + userId + "likes";
 
         Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
 
-        if (likePosts == null || likePosts.isEmpty()) {
-            return new ArrayList<>();
-        }
-
         List<Long> likePostsNum = likePosts.stream()
                 .map(id -> Long.parseLong(id.toString()))
                 .toList();
 
         Page<Post> postPage = postRepository.findAllByIdIn(likePostsNum, pageable);
-        return getPostThumbnails(postPage);
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 
     public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){

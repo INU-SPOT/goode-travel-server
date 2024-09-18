@@ -107,22 +107,22 @@ public class PostController {
     @GetMapping("/v1/users/posts")
     @Operation(summary = "유저가 쓴 글 불러오기 **페이징**", description = "유저가 쓴 글들을 불러옵니다. <br><br> - request: <br> accessToken을 주오... <br><br> - response: <br> List<PostThumbnailResponse>")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+            @ApiResponse(responseCode = "200", description = "유저가 쓴 글 불러오기 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
     })
     public CommonResponse<?> getUserPosts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                           @RequestParam(defaultValue = "7", required = false) Integer size,
                                           @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getUserPosts(page, size, userDetails));
+        return CommonResponse.success("유저가 쓴 글 불러오기 성공",postService.getUserPosts(page, size, userDetails));
     }
 
     @GetMapping("/v1/users/posts/like")
     @Operation(summary = "유저가 좋아요 누른 글 불러오기 **페이징**", description = "유저가 조하요~ 한 글들을 불러옵니다. <br><br> - request: <br> accessToken을 주오... <br><br> - response: <br> List<PostThumbnailResponse>")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "조회수가 가장 많은 게시글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
+            @ApiResponse(responseCode = "200", description = "유저가 좋아요 누른 글 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.TopPostResponse.class))),
     })
     public CommonResponse<?> getUserLikePosts(@RequestParam(defaultValue = "0", required = false) Integer page,
                                           @RequestParam(defaultValue = "7", required = false) Integer size,
                                           @AuthenticationPrincipal UserDetails userDetails) {
-        return CommonResponse.success("조회수가 가장 많은 게시글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
+        return CommonResponse.success("유저가 좋아요 누른 글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
     }
 }
