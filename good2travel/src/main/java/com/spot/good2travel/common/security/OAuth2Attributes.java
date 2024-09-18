@@ -11,12 +11,12 @@ import java.util.Map;
 @ToString
 @Slf4j
 public class OAuth2Attributes {
-    private Map<String, Object> attributes;     // OAuth2 반환하는 유저 정보
-    private String nameAttributesKey;
-    private String name;
-    private String email;
-    private String profileImageUrl;
-    private String provider;
+    private final Map<String, Object> attributes;     // OAuth2 반환하는 유저 정보
+    private final String nameAttributesKey;
+    private final String name;
+    private final String email;
+    private final String profileImageUrl;
+    private final String provider;
 
     @Builder
     public OAuth2Attributes(Map<String, Object> attributes, String nameAttributesKey,
@@ -35,7 +35,6 @@ public class OAuth2Attributes {
         } else if ("google".equals(socialName)) {
             return ofGoogle("email", attributes);
         }
-        log.info(socialName);
         return ofNaver("id", attributes);
     }
 
@@ -67,7 +66,7 @@ public class OAuth2Attributes {
 
     private static OAuth2Attributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        log.info(response.toString());
+
         return OAuth2Attributes.builder()
                 .name(String.valueOf(response.get("name")))
                 .email(String.valueOf(response.get("id")))
