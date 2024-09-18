@@ -49,6 +49,9 @@ public class PostResponse {
         @Schema(example = "4")
         private final Integer likeNum;
 
+        @Schema(example = "5")
+        private final Long commentNum;
+
         @Schema(example = "true")
         private final Boolean isPushLike;
 
@@ -59,7 +62,7 @@ public class PostResponse {
 
         @Builder(access = AccessLevel.PRIVATE)
         public PostDetailResponse(Long writerId, String writerNickname, String writerImageUrl, Long postId, String title, String firstContent, String lastContent,
-                                  LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
+                                  LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Long commentNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             this.writerId = writerId;
             this.writerNickname = writerNickname;
             this.writerImageUrl = writerImageUrl;
@@ -71,13 +74,14 @@ public class PostResponse {
             this.endDate = endDate;
             this.visitNum = visitNum;
             this.likeNum = likeNum;
+            this.commentNum = commentNum;
             this.isPushLike = isPushLike;
             this.isOwner = isOwner;
             this.itemPosts = itemPosts;
         }
 
         public static PostDetailResponse of(Post post, Long visitNum, String writerImageUrl,
-                                            Integer likeNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
+                                            Integer likeNum, Long commentNum,Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             return PostDetailResponse.builder()
                     .writerId(post.getUser().getId())
                     .writerNickname(post.getUser().getNickname())
@@ -90,6 +94,7 @@ public class PostResponse {
                     .endDate(post.getEndDate())
                     .visitNum(visitNum)
                     .likeNum(likeNum)
+                    .commentNum(commentNum)
                     .isPushLike(isPushLike)
                     .isOwner(isOwner)
                     .itemPosts(itemPosts)

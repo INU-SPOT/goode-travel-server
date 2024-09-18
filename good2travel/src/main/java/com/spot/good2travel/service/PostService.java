@@ -38,6 +38,8 @@ public class PostService {
     private final ItemPostImageRepository itemPostImageRepository;
     private final ImageService imageService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CommentRepository commentRepository;
+    private final ReplyCommentRepository replyCommentRepository;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -100,6 +102,7 @@ public class PostService {
         Integer likeNum = getLikeNum(postId);
         Boolean isPushLike = getIsPushLike(postId, userDetails);
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
+        Long commentNum = getTotalComments(postId);
 
         String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
         log.info(post.getSequence().toString());
@@ -115,7 +118,7 @@ public class PostService {
                     return PostResponse.ItemPostResponse.of(itemPost, itemPostImageResponses);
                 }).toList();
 
-        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, isPushLike, isOwner,itemPostResponses);
+        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, commentNum, isPushLike, isOwner,itemPostResponses);
     }
 
     @Transactional
@@ -127,6 +130,14 @@ public class PostService {
         List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
 
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
+    }
+
+    @Transactional
+    public Long getTotalComments(Long postId) {
+        Long commentCount = commentRepository.countCommentsByPostId(postId);
+        Long replyCount = replyCommentRepository.countRepliesByPostId(postId);
+
+        return commentCount + replyCount;
     }
 
     @Transactional
@@ -367,7 +378,7 @@ public class PostService {
     public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){
         return posts.stream()
                 .map(post -> {
-                    Long commentNum = null; //아직 로직없음
+                    Long commentNum = getTotalComments(post.getId());
                     Integer likeNum = getLikeNum(post.getId());
 
                     String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
