@@ -34,10 +34,10 @@ public class ReplyCommentService {
 
     @Transactional
     public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails){
+        if(userDetails == null){
+            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+        }
         Long userId = ((CustomUserDetails) userDetails).getId();
-
-        postRepository //게시글이 없는데 댓글을 어떻게 쓰나요!
-                .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));

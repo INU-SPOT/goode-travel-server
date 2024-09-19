@@ -11,7 +11,6 @@ import com.spot.good2travel.domain.User;
 import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.repository.CommentRepository;
 import com.spot.good2travel.repository.PostRepository;
-import com.spot.good2travel.repository.ReplyCommentRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,12 +31,14 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
 
     @Transactional
     public void addComment(CommentCreateUpdateRequest request, UserDetails userDetails){
+        if(userDetails == null){
+            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+        }
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository
@@ -89,6 +90,9 @@ public class CommentService {
 
     @Transactional
     public void reportComment(Long commentId, UserDetails userDetails){
+        if(userDetails == null){
+            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+        }
         Long userId = ((CustomUserDetails) userDetails).getId();
         String commentReportKey = "commentId:" + commentId;
         Comment comment = commentRepository.findById(commentId)
