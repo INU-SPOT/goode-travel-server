@@ -114,7 +114,7 @@ public class FolderService {
     public List<FolderResponse.ItemResponse> getItems(Folder folder) {
         List<ItemFolder> itemFolders = folder.getItemFolders();
         return itemFolders.stream()
-                .map(itemFolder -> FolderResponse.ItemResponse.of(itemFolder.getItem(), itemFolder.getIsFinished()))
+                .map(itemFolder -> FolderResponse.ItemResponse.of(itemFolder.getItem(), itemFolder.getIsFinished(), itemFolder.getEmoji()))
                 .toList();
     }
 
