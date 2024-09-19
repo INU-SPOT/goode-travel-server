@@ -42,6 +42,7 @@ public class PostService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
+    private final ImageService imageService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -106,7 +107,7 @@ public class PostService {
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
         Long commentNum = getTotalComments(postId);
 
-        String writerImageName = post.getUser().getProfileImageName();
+        String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
@@ -120,7 +121,7 @@ public class PostService {
                     return PostResponse.ItemPostResponse.of(itemPost, itemPostImageResponses);
                 }).toList();
 
-        return PostDetailResponse.of(post, visitNum, writerImageName, likeNum, commentNum, isPushLike, isOwner,itemPostResponses);
+        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, commentNum, isPushLike, isOwner,itemPostResponses);
     }
 
     @Transactional
@@ -380,10 +381,10 @@ public class PostService {
                     Long commentNum = getTotalComments(post.getId());
                     Integer likeNum = getLikeNum(post.getId());
 
-                    String imageName = itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItemPostImages().get(0).getImageName();
+                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
 
-                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageName, post.getSequence().stream().map(num -> {
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
                         ItemPost itemPost = itemPostRepository.findById(num)
                                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
                         return ItemPostThumbnailResponse.of(itemPost);
