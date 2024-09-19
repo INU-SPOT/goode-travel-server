@@ -29,19 +29,17 @@ public class ItemService {
 
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
+        LocalGovernment localGovernment = localGovernmentRepository.findById(officialItemCreateRequest.getLocalGovernmentId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+
         //굳이인 경우에는 카테고리까지 연결
         if (officialItemCreateRequest.getType()==ItemType.GOODE){
-            LocalGovernment localGovernment = localGovernmentRepository.findById(officialItemCreateRequest.getLocalGovernmentId())
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
-
             Item officialGoode = Item.ofGoode(officialItemCreateRequest, localGovernment);
             itemRepository.save(officialGoode);
-
             createItemCategory(officialItemCreateRequest, officialGoode);
-
             return officialGoode.getType();
         } else {
-            Item officialPlan = Item.ofPlan(officialItemCreateRequest);
+            Item officialPlan = Item.ofPlan(officialItemCreateRequest, localGovernment);
             itemRepository.save(officialPlan);
             return officialPlan.getType();
         }
@@ -80,13 +78,15 @@ public class ItemService {
     }
 
     @Transactional
-    public Long updateItem(Long itemId, ItemRequest.ItemUpdateRequest itemUpdateRequest) {
+    public Long updateItem(Long itemId, ItemRequest.ItemUpdateRequest itemUpdateRequest) {        
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getIsOfficial()){
             throw new ItemAccessException(ExceptionMessage.ITEM_UPDATE_BAD_REQUEST);
         } else {
-            item.updateItem(itemUpdateRequest);
+            LocalGovernment localGovernment = localGovernmentRepository.findById(itemUpdateRequest.getLocalGovernmentId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+            item.updateItem(itemUpdateRequest, localGovernment);
         }
         return item.getId();
     }
