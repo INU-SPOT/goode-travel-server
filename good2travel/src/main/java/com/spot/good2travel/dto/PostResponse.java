@@ -22,8 +22,8 @@ public class PostResponse {
         @Schema(example = "깨구링")
         private final String writerNickname;
 
-        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
-        private final String writerImageUrl;
+        @Schema(example = "frog.jpeg")
+        private final String writerImageName;
 
         @Schema(example = "3")
         private final Long postId;
@@ -61,11 +61,11 @@ public class PostResponse {
         private final List<ItemPostResponse> itemPosts;
 
         @Builder(access = AccessLevel.PRIVATE)
-        public PostDetailResponse(Long writerId, String writerNickname, String writerImageUrl, Long postId, String title, String firstContent, String lastContent,
+        public PostDetailResponse(Long writerId, String writerNickname, String writerImageName, Long postId, String title, String firstContent, String lastContent,
                                   LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Long commentNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             this.writerId = writerId;
             this.writerNickname = writerNickname;
-            this.writerImageUrl = writerImageUrl;
+            this.writerImageName = writerImageName;
             this.postId = postId;
             this.title = title;
             this.firstContent = firstContent;
@@ -80,12 +80,12 @@ public class PostResponse {
             this.itemPosts = itemPosts;
         }
 
-        public static PostDetailResponse of(Post post, Long visitNum, String writerImageUrl,
+        public static PostDetailResponse of(Post post, Long visitNum, String writerImageName,
                                             Integer likeNum, Long commentNum,Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             return PostDetailResponse.builder()
                     .writerId(post.getUser().getId())
                     .writerNickname(post.getUser().getNickname())
-                    .writerImageUrl(writerImageUrl)
+                    .writerImageName(writerImageName)
                     .postId(post.getId())
                     .title(post.getTitle())
                     .firstContent(post.getFirstContent())
@@ -164,8 +164,8 @@ public class PostResponse {
             this.imageName = imageName;
         }
 
-        public static ItemPostImageResponse of(Long itemPostImageId, String imageUrl){
-            return new ItemPostImageResponse(itemPostImageId, imageUrl);
+        public static ItemPostImageResponse of(Long itemPostImageId, String imageName){
+            return new ItemPostImageResponse(itemPostImageId, imageName);
         }
 
     }
@@ -183,7 +183,7 @@ public class PostResponse {
         private final String title;
 
         @Schema(example = "https://image-server.squidjiny.com/files/profile/https://example.com/image.jpg")
-        private final String imageUrl;
+        private final String imageName;
 
         private final List<ItemPostThumbnailResponse> items;
 
@@ -194,23 +194,23 @@ public class PostResponse {
         private final Integer likeNum;
 
         @Builder(access = AccessLevel.PRIVATE)
-        public PostThumbnailResponse(String writerNickname, Long postId, String title, String imageUrl
+        public PostThumbnailResponse(String writerNickname, Long postId, String title, String imageName
                 , List<ItemPostThumbnailResponse> items, Long commentNum, Integer likeNum){
             this.writerNickname = writerNickname;
             this.postId = postId;
             this.title = title;
-            this.imageUrl = imageUrl;
+            this.imageName = imageName;
             this.items = items;
             this.commentNum = commentNum;
             this.likeNum = likeNum;
         }
 
-        public static PostThumbnailResponse of(Post post, Integer likeNum, Long commentNum, String imageUrl, List<ItemPostThumbnailResponse> items){
+        public static PostThumbnailResponse of(Post post, Integer likeNum, Long commentNum, String imageName, List<ItemPostThumbnailResponse> items){
             return PostThumbnailResponse.builder()
                     .writerNickname(post.getUser().getNickname())
                     .postId(post.getId())
                     .title(post.getTitle())
-                    .imageUrl(imageUrl)
+                    .imageName(imageName)
                     .items(items)
                     .commentNum(commentNum)
                     .likeNum(likeNum)
