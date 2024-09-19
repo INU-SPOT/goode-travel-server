@@ -57,9 +57,9 @@ public class FolderResponse {
             this.isFinished = isFinished;
         }
 
-        public static ItemResponse of(Item item, Boolean isFinished) {
+        public static ItemResponse of(Item item, Boolean isFinished, String emoji) {
             String image = (item.getType() == ItemType.PLAN && item.getImageUrl() == null)
-                    ? item.getEmoji()
+                    ? emoji
                     : item.getImageUrl();
 
             return ItemResponse.builder()
