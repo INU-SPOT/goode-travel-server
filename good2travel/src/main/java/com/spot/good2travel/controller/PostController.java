@@ -128,4 +128,15 @@ public class PostController {
                                           @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("유저가 좋아요 누른 글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
     }
+
+//    @GetMapping("/v1/posts/search")
+//    public ResponseEntity<Page<Post>> searchPosts(
+//            @RequestParam(required = false) List<String> regions,
+//            @RequestParam(required = false) List<String> categories,
+//            @RequestParam(required = false) String keyword,
+//            @PageableDefault(size = 10) Pageable pageable) {
+//
+//        Page<Post> posts = postService.searchPosts(regions, categories, keyword, pageable);
+//        return ResponseEntity.ok(posts);
+//    }
 }

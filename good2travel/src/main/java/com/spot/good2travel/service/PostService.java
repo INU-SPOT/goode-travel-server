@@ -392,6 +392,21 @@ public class PostService {
                 }).toList();
     }
 
+    //item 추가하면 개발
+//    public Page<Post> searchPosts(List<String> regions, List<String> categories, String keyword, Pageable pageable) {
+//        if (regions == null || regions.isEmpty()) {
+//            log.info("1");
+//            regions = new ArrayList<>();
+//        }
+//        if (categories == null || categories.isEmpty()) {
+//            categories = new ArrayList<>();
+//        }
+//        if (keyword == null || keyword.trim().isEmpty()) {
+//            keyword = "";
+//        }
+//        return postRepository.searchPostsByCriteria(regions, categories, keyword, pageable);
+//    }
+
 }
 
 
