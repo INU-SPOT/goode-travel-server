@@ -36,8 +36,6 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private Boolean isOfficial;
 
-    private String emoji;
-
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemCategory> itemCategories = new ArrayList<>();
 
@@ -53,14 +51,13 @@ public class Item extends BaseEntity {
 
     @Builder
     public Item(ItemType type, String title, String imageUrl, String description, String address,
-                Boolean isOfficial, String emoji, LocalGovernment localGovernment) {
+                Boolean isOfficial, LocalGovernment localGovernment) {
         this.type = type;
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description;
         this.address = address;
         this.isOfficial = isOfficial;
-        this.emoji = emoji;
         this.localGovernment = localGovernment;
     }
 
@@ -71,7 +68,6 @@ public class Item extends BaseEntity {
         this.description = item.getDescription();
         this.address = item.getAddress();
         this.isOfficial = item.getIsOfficial();
-        this.emoji = item.getEmoji();
         this.localGovernment = item.getLocalGovernment();
     }
 
@@ -107,14 +103,13 @@ public class Item extends BaseEntity {
                 .title(request.getTitle())
                 .imageUrl(request.getImageUrl())
                 .isOfficial(false)
-                .emoji(request.getEmoji())
                 .build();
     }
 
-    public void updateItem(ItemRequest.ItemUpdateRequest itemUpdateRequest) {
+    public void updateItem(ItemRequest.ItemUpdateRequest itemUpdateRequest, LocalGovernment localGovernment) {
         this.type = itemUpdateRequest.getType();
-        this.emoji = itemUpdateRequest.getEmoji();
         this.imageUrl = itemUpdateRequest.getImageUrl();
         this.title = itemUpdateRequest.getTitle();
+        this.localGovernment = localGovernment;
     }
 }

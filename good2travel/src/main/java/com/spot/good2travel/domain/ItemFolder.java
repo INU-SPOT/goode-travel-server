@@ -17,6 +17,8 @@ public class ItemFolder {
 
     private Boolean isFinished;
 
+    private String emoji;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
