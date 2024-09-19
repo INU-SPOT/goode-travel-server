@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "게시글 등록 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public ResponseEntity<CommonResponse<?>> createPost(@RequestBody PostRequest.PostCreateUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CommonResponse<?>> createPost(@RequestBody @Valid PostRequest.PostCreateUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.success("게시글 등록 성공", postService.createPost(request, userDetails)));
     }
@@ -84,7 +85,7 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정하기 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> updatePost(@PathVariable Long postid, @RequestBody PostRequest.PostCreateUpdateRequest request,
+    public CommonResponse<?> updatePost(@PathVariable Long postid, @RequestBody @Valid PostRequest.PostCreateUpdateRequest request,
                                         @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("게시글 수정하기 성공", postService.updatePost(postid, request, userDetails));
     }

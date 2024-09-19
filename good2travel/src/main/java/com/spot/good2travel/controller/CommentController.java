@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class CommentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "게시글에 댓글 달기 성공"),
     })
-    public ResponseEntity<CommonResponse<?>> addComment(@RequestBody CommentRequest.CommentCreateUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> addComment(@RequestBody @Valid CommentRequest.CommentCreateUpdateRequest request,
                                                        @AuthenticationPrincipal UserDetails userDetails) {
         commentService.addComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("게시글에 댓글 달기 성공", null));
@@ -50,7 +51,7 @@ public class CommentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글에 답글달기 성공"),
     })
-    public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody @Valid CommentRequest.ReplyCommentCreateUpdateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         replyCommentService.addReplyComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
@@ -82,7 +83,7 @@ public class CommentController {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
     })
     public CommonResponse<?> updateComment(@PathVariable Long commentid,
-                                             @RequestBody CommentRequest.CommentCreateUpdateRequest request,
+                                             @RequestBody @Valid CommentRequest.CommentCreateUpdateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         commentService.updateComment(commentid, request, userDetails);
         return CommonResponse.success("댓글 수정 성공", null);
@@ -94,7 +95,7 @@ public class CommentController {
             @ApiResponse(responseCode = "200", description = "답글 수정 성공"),
     })
     public CommonResponse<?> updateReplyComment(@PathVariable Long replycommentid,
-                                                @RequestBody CommentRequest.ReplyCommentCreateUpdateRequest request,
+                                                @RequestBody @Valid CommentRequest.ReplyCommentCreateUpdateRequest request,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
         replyCommentService.updateReplyComment(replycommentid, request, userDetails);
         return CommonResponse.success("답글 수정 성공", null);
