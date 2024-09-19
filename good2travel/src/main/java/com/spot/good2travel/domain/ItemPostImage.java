@@ -17,27 +17,27 @@ public class ItemPostImage {
     private Long id;
 
     @Column(nullable = false)
-    private String imageUrl;
+    private String imageName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_post_id")
     private ItemPost itemPost;
 
     @Builder
-    public ItemPostImage(String imageUrl, ItemPost itemPost){
-        this.imageUrl = imageUrl;
+    public ItemPostImage(String imageName, ItemPost itemPost){
+        this.imageName = imageName;
         this.itemPost = itemPost;
     }
 
     public static ItemPostImage of(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
         return ItemPostImage.builder()
-                .imageUrl(itemPostImageRequest.getImageName())
+                .imageName(itemPostImageRequest.getImageName())
                 .itemPost(itemPost)
                 .build();
     }
 
     public ItemPostImage updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest){
-        this.imageUrl = itemPostImageRequest.getImageName();
+        this.imageName = itemPostImageRequest.getImageName();
 
         return this;
     }

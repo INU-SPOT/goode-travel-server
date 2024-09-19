@@ -7,13 +7,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public class ReplyComment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,37 +23,34 @@ public class Comment extends BaseEntity {
 
     private Boolean isModified;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private final List<ReplyComment> replyComments = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "big_comment_id")
+    private Comment comment;
 
-    private Comment(String content, Integer report, Boolean isModified, User user, Post post){
+    private ReplyComment(String content, Integer report, Boolean isModified, User user, Comment comment){
         this.content = content;
         this.report = report;
-        this.user = user;
-        this.post = post;
         this.isModified = isModified;
+        this.user = user;
+        this.comment = comment;
     }
 
-    public static Comment of(CommentRequest.CommentCreateUpdateRequest request, User user, Post post){
-        return new Comment(request.getContent(), 0, false, user, post);
+    public static ReplyComment of(CommentRequest.ReplyCommentCreateUpdateRequest request, User user, Comment comment){
+        return new ReplyComment(request.getContent(), 0,false, user, comment);
     }
 
-    public Comment updateComment(CommentRequest.CommentCreateUpdateRequest request){
+    public ReplyComment updateReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request){
         this.content = request.getContent();
         this.isModified = true;
 
         return this;
     }
 
-    public Comment updateCommentReport(Integer reportNum){
+    public ReplyComment updateReplyCommentReport(Integer reportNum){
         this.report = reportNum;
         return this;
     }

@@ -26,12 +26,15 @@ public class PostRequest {
         private String lastContent;
 
         @Schema(example = "2019-03-01")
+        @NotNull(message = "여행 시작 날짜를 입력해주세요.")
         private LocalDate startDate;
 
         @Schema(example = "2024-09-12")
+        @NotNull(message = "여행이 끝난 날짜를 입력해주세요.")
         private LocalDate endDate;
 
         @Valid
+        @NotNull(message = "게시글에 굳이/계획이 하나도 없습니다.")
         private List<ItemPostCreateUpdateRequest> itemPosts;
 
     }
@@ -43,6 +46,7 @@ public class PostRequest {
         private Long itemPostId;
 
         @Schema(example = "1")
+        @NotNull(message = "itemId 입력은 필수입니다.")
         private Long itemId;
 
         @Schema(example = "사진을 찍었는데 저작권에 걸려서 제가 좋아하는 개구리 사진으로 대체하겠습니다ㅠㅠ")

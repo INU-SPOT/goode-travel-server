@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -38,8 +39,10 @@ public class PostService {
     private final ItemPostRepository itemPostRepository;
     private final ItemRepository itemRepository;
     private final ItemPostImageRepository itemPostImageRepository;
-    private final ImageService imageService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final CommentRepository commentRepository;
+    private final ReplyCommentRepository replyCommentRepository;
+    private final ImageService imageService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -94,55 +97,6 @@ public class PostService {
     }
 
     @Transactional
-    public Long updateItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
-        Long itemId = itemPostCreateUpdateRequest.getItemId();
-
-        if (itemPostCreateUpdateRequest.getItemPostId() != null) {
-            Item item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-
-            ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-
-            List<Long> beforeSequence = itemPost.getSequence();
-
-            List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
-                    .map(image -> updateItemPostImage(image, itemPost))
-                    .toList();
-            log.info(afterSequence.toString());
-
-            itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
-
-            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
-            beforeSequence.stream()
-                    .filter(num -> !afterSequenceSet.contains(num))
-                    .forEach(this::deleteItemPostImage);
-
-            return itemPost.getId();
-        }
-
-        else {
-            return createItemPost(itemPostCreateUpdateRequest, post);
-        }
-    }
-
-
-    @Transactional
-    public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
-        if(itemPostImageRequest.getItemPostImageId() != null){
-
-            ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
-                    .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
-            itemPostImage.updateItemPostImage(itemPostImageRequest);
-
-            return itemPostImage.getId();
-        }
-        else{
-            return createItemPostImage(itemPostImageRequest, itemPost);
-        }
-    }
-
-    @Transactional
     public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
@@ -151,22 +105,23 @@ public class PostService {
         Integer likeNum = getLikeNum(postId);
         Boolean isPushLike = getIsPushLike(postId, userDetails);
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
+        Long commentNum = getTotalComments(postId);
 
         String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
-        log.info(post.getSequence().toString());
+
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
                     ItemPost itemPost = itemPostRepository.findById(num)
                             .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
 
                     List<PostResponse.ItemPostImageResponse> itemPostImageResponses = itemPost.getItemPostImages().stream()
-                            .map( image -> PostResponse.ItemPostImageResponse.of(image.getId(), imageService.getImageUrl(image.getImageUrl())))
+                            .map( image -> PostResponse.ItemPostImageResponse.of(image.getId(), image.getImageName()))
                             .toList();
 
                     return PostResponse.ItemPostResponse.of(itemPost, itemPostImageResponses);
                 }).toList();
 
-        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, isPushLike, isOwner,itemPostResponses);
+        return PostDetailResponse.of(post, visitNum, writerImageUrl, likeNum, commentNum, isPushLike, isOwner,itemPostResponses);
     }
 
     @Transactional
@@ -175,23 +130,17 @@ public class PostService {
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
-        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = postPage.stream()
-                .map(post -> {
-
-                    Long commentNum = null; //아직 로직없음
-                    Integer likeNum = getLikeNum(post.getId());
-
-                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
-
-                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
-                                ItemPost itemPost = itemPostRepository.findById(num)
-                                        .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-                                return ItemPostThumbnailResponse.of(itemPost);
-                    }).toList());
-                }).toList();
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
 
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
+    }
+
+    @Transactional
+    public Long getTotalComments(Long postId) {
+        Long commentCount = commentRepository.countCommentsByPostId(postId);
+        Long replyCount = replyCommentRepository.countRepliesByPostId(postId);
+
+        return commentCount + replyCount;
     }
 
     @Transactional
@@ -216,6 +165,53 @@ public class PostService {
         return postId;
     }
 
+    @Transactional
+    public Long updateItemPost(PostRequest.ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
+        Long itemId = itemPostCreateUpdateRequest.getItemId();
+
+        if (itemPostCreateUpdateRequest.getItemPostId() != null) {
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+            ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+
+            List<Long> beforeSequence = itemPost.getSequence();
+
+            List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
+                    .map(image -> updateItemPostImage(image, itemPost))
+                    .toList();
+
+            itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
+
+            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+            beforeSequence.stream()
+                    .filter(num -> !afterSequenceSet.contains(num))
+                    .forEach(this::deleteItemPostImage);
+
+            return itemPost.getId();
+        }
+
+        else {
+            return createItemPost(itemPostCreateUpdateRequest, post);
+        }
+    }
+
+    @Transactional
+    public Long updateItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
+        if(itemPostImageRequest.getItemPostImageId() != null){
+
+            ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
+                    .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
+            itemPostImage.updateItemPostImage(itemPostImageRequest);
+
+            return itemPostImage.getId();
+        }
+        else{
+            return createItemPostImage(itemPostImageRequest, itemPost);
+        }
+    }
+
     public void deleteItemPost(Long itemPostId) {
         itemPostRepository.deleteById(itemPostId);
     }
@@ -225,10 +221,9 @@ public class PostService {
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
-
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
-            return post.getUser().getId() == userId;
+            return Objects.equals(post.getUser().getId(), userId);
         }
 
         return false;
@@ -242,7 +237,7 @@ public class PostService {
             String userVisitKey = "user:" + userId + "visits";
 
             Boolean hasVisited = redisTemplate.opsForSet().isMember(userVisitKey, postId);
-            log.info(hasVisited.toString());
+
             if (Boolean.FALSE.equals(hasVisited)) {
 
                 redisTemplate.opsForSet().add(userVisitKey, postId);
@@ -350,6 +345,67 @@ public class PostService {
         return TopPostResponse.of(post, "visit", viewCount, itemPostThumbnailResponses);
     }
 
+    @Transactional
+    public CommonPagingResponse<?> getUserPosts(Integer page, Integer size, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+
+        Page<Post> postPage = postRepository.findPostsByUserId(userId, pageable);
+
+        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
+
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
+    }
+
+    @Transactional
+    public CommonPagingResponse<?> getUserLikePosts(Integer page, Integer size, UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+        String userLikeKey = "user:" + userId + "likes";
+
+        Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
+
+        List<Long> likePostsNum = likePosts.stream()
+                .map(id -> Long.parseLong(id.toString()))
+                .toList();
+
+        Page<Post> postPage = postRepository.findAllByIdIn(likePostsNum, pageable);
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
+    }
+
+    @Transactional
+    public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){
+        return posts.stream()
+                .map(post -> {
+                    Long commentNum = getTotalComments(post.getId());
+                    Integer likeNum = getLikeNum(post.getId());
+
+                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
+                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
+
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
+                        ItemPost itemPost = itemPostRepository.findById(num)
+                                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+                        return ItemPostThumbnailResponse.of(itemPost);
+                    }).toList());
+                }).toList();
+    }
+
+    //item 추가하면 개발
+//    public Page<Post> searchPosts(List<String> regions, List<String> categories, String keyword, Pageable pageable) {
+//        if (regions == null || regions.isEmpty()) {
+//            log.info("1");
+//            regions = new ArrayList<>();
+//        }
+//        if (categories == null || categories.isEmpty()) {
+//            categories = new ArrayList<>();
+//        }
+//        if (keyword == null || keyword.trim().isEmpty()) {
+//            keyword = "";
+//        }
+//        return postRepository.searchPostsByCriteria(regions, categories, keyword, pageable);
+//    }
 
 }
 
