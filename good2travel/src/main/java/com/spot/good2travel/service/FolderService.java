@@ -3,9 +3,7 @@ package com.spot.good2travel.service;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.security.CustomUserDetails;
-import com.spot.good2travel.domain.Folder;
-import com.spot.good2travel.domain.Item;
-import com.spot.good2travel.domain.User;
+import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.FolderResponse;
 import com.spot.good2travel.repository.FolderRepository;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class FolderService {
     /*
     새 폴더 만들기
      */
-    public void create(FolderRequest.FolderCreateRequest folderRequest, UserDetails userDetails) {
+    public String create(FolderRequest.FolderCreateRequest folderRequest, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
@@ -43,20 +42,43 @@ public class FolderService {
                 .build();
         folderRepository.save(newFolder);
         log.info("[createFolder] 새 폴더 생성");
+        return newFolder.getTitle();
     }
 
     /*
-    폴더 수정
+    폴더 수정 및 계획 생성
      */
     @Transactional
     public FolderResponse.FolderUpdateResponse updatePlanList(FolderRequest.FolderUpdateRequest folderUpdateRequest, Long folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
-        folder.updateSequence(folderUpdateRequest.getSequence());
-        folder.updateTitle(folderUpdateRequest.getTitle());
-        return new FolderResponse.FolderUpdateResponse(
-                folder.getTitle(), folder.getSequence()
-        );
+
+        List<Item> items = createItemFolder(folderUpdateRequest, folderId, folder);
+        findMainGoode(items, folder); //메인 굳이 찾기
+        return new FolderResponse.FolderUpdateResponse(folder.getTitle(), folder.getSequence());
+    }
+
+    private static void findMainGoode(List<Item> items, Folder folder) {
+        Optional<Item> goode = items.stream()
+                .filter(item -> item.getType()== ItemType.GOODE)
+                .findFirst();
+        goode.ifPresent(folder::updateMainGoode);
+    }
+
+    private List<Item> createItemFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, Long folderId, Folder folder) {
+        List<Item> items = folderUpdateRequest.getSequence().stream()
+                .map(itemId -> itemRepository.findById(Long.valueOf(itemId))
+                        .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND)))
+                .toList();
+
+        List<ItemFolder> itemFolders = items.stream()
+                .map(item -> itemFolderRepository.findByItemIdAndFolderId(item.getId(), folderId)
+                        .orElseGet(() -> ItemFolder.of(item, folder)))
+                .toList();
+
+        itemFolderRepository.saveAll(itemFolders);
+        folder.updateFolder(folderUpdateRequest);
+        return items;
     }
 
     /*
@@ -83,20 +105,17 @@ public class FolderService {
     폴더 안 계획 조회
      */
     @Transactional
-    public FolderResponse.ItemListResponse getItemList(Long folderId) {
+    public List<FolderResponse.ItemResponse> getItemList(Long folderId) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
         return getItems(folder);
     }
 
-    public FolderResponse.ItemListResponse getItems(Folder folder) {
-        List<Integer> sequence = folder.getSequence();
-        List<FolderResponse.FolderItem> folderItems =
-                sequence.stream()
-                .map(s -> itemRepository.findById(Long.valueOf(s)).orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND)))
-                .map(item -> new FolderResponse.FolderItem().of(item))
+    public List<FolderResponse.ItemResponse> getItems(Folder folder) {
+        List<ItemFolder> itemFolders = folder.getItemFolders();
+        return itemFolders.stream()
+                .map(itemFolder -> FolderResponse.ItemResponse.of(itemFolder.getItem(), itemFolder.getIsFinished()))
                 .toList();
-        return new FolderResponse.ItemListResponse(folderItems);
     }
 
 

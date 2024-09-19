@@ -1,6 +1,7 @@
 package com.spot.good2travel.domain;
 
 import com.spot.good2travel.common.entity.BaseEntity;
+import com.spot.good2travel.dto.FolderRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,11 +39,12 @@ public class Folder extends BaseEntity {
         this.user = user;
     }
 
-    public void updateSequence(List<Integer> sequence){
-        this.sequence = sequence;
+    public void updateFolder(FolderRequest .FolderUpdateRequest folderUpdateRequest){
+        this.sequence = folderUpdateRequest.getSequence();
+        this.title = folderUpdateRequest.getTitle();
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public void updateMainGoode(Item item) {
+        this.mainGoode = item;
     }
 }
