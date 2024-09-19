@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,10 +33,11 @@ public class ItemController {
                     "<br><br> - response : 추가한 Item의 ItemType(GOODE , PLAN)"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "관리자용 굳이/계획 추가 완료", content = @Content(schema = @Schema(implementation = ItemType.class)))
+            @ApiResponse(responseCode = "201", description = "관리자용 굳이/계획 추가 완료", content = @Content(schema = @Schema(implementation = ItemType.class)))
     })
-    public CommonResponse<?> createOfficialItem(@RequestBody ItemRequest.OfficialItemCreateRequest officialItemCreateRequest){
-        return CommonResponse.success("관리자용 굳이/계획 추가 완료", itemService.createOfficialItem(officialItemCreateRequest));
+    public ResponseEntity<CommonResponse<?>> createOfficialItem(@RequestBody ItemRequest.OfficialItemCreateRequest officialItemCreateRequest){
+        return ResponseEntity.status(HttpStatus.CREATED
+        ).body(CommonResponse.success("관리자용 굳이/계획 추가 완료", itemService.createOfficialItem(officialItemCreateRequest)));
     }
 
     @PostMapping("/v1/items")
