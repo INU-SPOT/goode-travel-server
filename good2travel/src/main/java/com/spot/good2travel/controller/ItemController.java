@@ -21,28 +21,23 @@ public class ItemController {
     private final ItemService itemService;
 
 
-    @PostMapping("/v1/goode")
+    @PostMapping("/v1/item")
     @Operation(
             summary = "시스템 상 굳이 리스트에 굳이/계획 추가(관리자용)",
             description = "공식적인 굳이/계획들을 추가한다." +
                     "<br><br> - request : accessToken 헤더 추가, OfficialItemCreateRequest" +
                     "<br> 굳이의 경우 -> type=GOODE, title, imageUrl, description, address, categories, localGovernmentId 필요" +
-                    "<br> 계획의 경우 -> type=PLAN, title, address 필요" +
+                    "<br> 계획의 경우 -> type=PLAN, title, address, localGovernmentId 필요" +
                     "<br><br> - response : 추가한 Item의 ItemType(GOODE , PLAN)"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "관리자용 굳이/계획 추가 완료", content = @Content(schema = @Schema(implementation = ItemType.class)))
     })
     public CommonResponse<?> createOfficialItem(@RequestBody ItemRequest.OfficialItemCreateRequest officialItemCreateRequest){
-        ItemType itemType = itemService.createOfficialItem(officialItemCreateRequest);
-        if (itemType == ItemType.GOODE){
-            return CommonResponse.success("관리자용 굳이 추가 완료", itemType);
-        } else {
-            return CommonResponse.success("관리자용 계획 추가 완료", itemType);
-        }
+        return CommonResponse.success("관리자용 굳이/계획 추가 완료", itemService.createOfficialItem(officialItemCreateRequest));
     }
 
-    @PostMapping("/v1/goodes")
+    @PostMapping("/v1/items")
     @Operation(
             summary = "사용자가 새로운 계획을 추가한다.",
             description = "사용자가 계획을 짤 때, 커뮤니티에 글을 올릴 때 새로운 사용자의 굳이/계획을 추가." +
@@ -57,7 +52,7 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 추가 완료", itemService.createItem(itemCreateRequest));
     }
 
-    @PostMapping(value = "/v1/goodes/move", params = "itemId")
+    @PostMapping(value = "/v1/items/move", params = "itemId")
     @Operation(
             summary = "코스 -> 폴더 및 폴더 -> 게시글로 굳이/계획을 가져온다.",
             description = "굳이/계획의 공식적 여부를 확인하여 공식적이라면 pk 그대로, " +
@@ -72,7 +67,7 @@ public class ItemController {
             return CommonResponse.success("굳이/계획 가져오기 완료", itemService.moveItem(itemId));
     }
 
-    @PutMapping("/v1/goodes/{itemId}")
+    @PutMapping("/v1/items/{itemId}")
     @Operation(summary = "사용자 굳이/계획 수정",
             description = "사용자의 굳이/계획을 수정한다." +
                     "<br><br> - request : accessToken 헤더 추가, Item(DB) 상의 pk, " +
@@ -86,7 +81,7 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 수정 완료", itemService.updateItem(itemId, itemUpdateRequest));
     }
 
-    @GetMapping("/v1/goodes/{itemId}")
+    @GetMapping("/v1/items/{itemId}")
     @Operation(summary = "굳이의 상세 정보 제공",
             description = "공식적인 굳이의 상제 정보들을 제공한다." +
                     "<br><br> - request : itemId= item(DB) 상 pk" +
@@ -99,7 +94,7 @@ public class ItemController {
         return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
     }
 
-    @DeleteMapping("/v1/goodes/{itemId}")
+    @DeleteMapping("/v1/items/{itemId}")
     @Operation(summary = "사용자의 굳이/계획 삭제",
         description = "사용자의 굳이/계획을 삭제한다." +
                 "<br><br> - request : itemId = item(DB) 상 pk" +
