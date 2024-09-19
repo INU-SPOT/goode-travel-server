@@ -13,16 +13,16 @@ public class UserResponse {
         @Schema(description = "유저가 사는 광역시/도의 이름", example = "경상북도")
         private final String metropolitanGovernmentName;
         @Schema(description = "유저의 프로필 이미지", nullable = true, example = "https://image-server.squidjiny.com/files/profile/frog.jpeg")
-        private final String profileImageUrl;
+        private final String profileImageName;
 
-        private UserInfoResponse(String nickName, String metropolitanGovernmentName,String profileImageUrl) {
+        private UserInfoResponse(String nickName, String metropolitanGovernmentName,String profileImageName) {
             this.nickName = nickName;
             this.metropolitanGovernmentName = metropolitanGovernmentName;
-            this.profileImageUrl = profileImageUrl;
+            this.profileImageName = profileImageName;
         }
 
-        public static UserInfoResponse of(String nickName, String metropolitanGovernmentName,String profileImageUrl) {
-            return new UserInfoResponse(nickName, metropolitanGovernmentName, profileImageUrl);
+        public static UserInfoResponse of(String nickName, String metropolitanGovernmentName,String profileImageName) {
+            return new UserInfoResponse(nickName, metropolitanGovernmentName, profileImageName);
         }
     }
 

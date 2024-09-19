@@ -381,10 +381,14 @@ public class PostService {
                     Long commentNum = getTotalComments(post.getId());
                     Integer likeNum = getLikeNum(post.getId());
 
-                    String imageUrl = imageService.getImageUrl(itemPostRepository.findById(post.getSequence().get(0))
-                            .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND)).getItem().getImageUrl());
+                    String imageName = post.getItemPosts().stream()
+                            .flatMap(itemPost -> itemPost.getItemPostImages().stream())
+                            .map(ItemPostImage::getImageName) 
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElse(null);
 
-                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageUrl, post.getSequence().stream().map(num -> {
+                    return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageName, post.getSequence().stream().map(num -> {
                         ItemPost itemPost = itemPostRepository.findById(num)
                                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
                         return ItemPostThumbnailResponse.of(itemPost);
