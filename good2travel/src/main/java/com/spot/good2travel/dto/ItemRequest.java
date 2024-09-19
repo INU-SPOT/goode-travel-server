@@ -56,6 +56,10 @@ public class ItemRequest {
 
         @Schema(example = "🐋")
         private String emoji;
+
+        @NotBlank
+        @Schema(example = "1")
+        private Long localGovernmentId;
     }
 
     @Getter
@@ -72,5 +76,9 @@ public class ItemRequest {
 
         @Schema(example = "🐋")
         private String emoji;
+
+        @NotBlank
+        @Schema(example = "1")
+        private Long localGovernmentId;
     }
 }

@@ -88,11 +88,12 @@ public class Item extends BaseEntity {
                 .build();
     }
 
-    public static Item ofPlan(ItemRequest.OfficialItemCreateRequest request) {
+    public static Item ofPlan(ItemRequest.OfficialItemCreateRequest request, LocalGovernment localGovernment) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
                 .address(request.getAddress())
+                .localGovernment(localGovernment)
                 .isOfficial(true)
                 .build();
     }
