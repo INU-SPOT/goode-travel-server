@@ -72,7 +72,7 @@ public class PostController {
     @PostMapping(value = "/v1/posts/{postid}/good")
     @Operation(summary = "조하요~ 누르기", description = "게시글에 좋아요 누르기/해제하기 <br><br> - request: <br> Long postid <br> AccessToken(헤더에 넣어 주세요) <br><br> - response: <br> 해당 기능 수행 후 좋아요 수 <br> 토큰이 없으면 예외가 떠요~")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "좋아요 누르기/해제하기 성공", content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "200", description = "좋아요 누르기/해제하기 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
     public CommonResponse<?> updateGood(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
         return CommonResponse.success("좋아요 누르기/해제하기 성공", postService.updateLikeNum(postid, userDetails));
