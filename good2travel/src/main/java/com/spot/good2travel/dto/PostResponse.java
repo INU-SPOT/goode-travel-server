@@ -22,7 +22,7 @@ public class PostResponse {
         @Schema(example = "깨구링")
         private final String writerNickname;
 
-        @Schema(example = "frog.jpeg")
+        @Schema(example = "https://image-server.squidjiny.com/frog.jpeg")
         private final String writerImageName;
 
         @Schema(example = "3")

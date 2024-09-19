@@ -12,7 +12,7 @@ public class UserResponse {
         private final String nickName;
         @Schema(description = "유저가 사는 광역시/도의 이름", example = "경상북도")
         private final String metropolitanGovernmentName;
-        @Schema(description = "유저의 프로필 이미지", example = "frog.jpeg")
+        @Schema(description = "유저의 프로필 이미지", nullable = true, example = "https://image-server.squidjiny.com/files/profile/frog.jpeg")
         private final String profileImageName;
 
         private UserInfoResponse(String nickName, String metropolitanGovernmentName,String profileImageName) {

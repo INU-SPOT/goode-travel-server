@@ -74,4 +74,12 @@ public class ImageService {
                 .bodyToMono(String.class)
                 .block();
     }
+
+    public String getImageUrl(String imageName){
+        if(imageName == null || imageName.isEmpty()){
+            return null;
+        }
+
+        return imageGetUrl + "/" + imageName;
+    }
 }
