@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ExceptionMessage {
+        
         //토큰 관련 메시지
         TOKEN_EXPIRED("토큰이 만료되었습니다.", 0, HttpStatus.UNAUTHORIZED),
         TOKEN_NOT_AUTHORIZED("권한이 없습니다", 0, HttpStatus.FORBIDDEN),
@@ -51,7 +52,10 @@ public enum ExceptionMessage {
         REPLY_COMMENT_NOT_FOUND("답글이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
         COMMENT_NOT_USERS("댓글 소유자가 아니여서 지울 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
         ALREADY_REPORTED("이미 신고한 댓글입니다.", 0, HttpStatus.BAD_REQUEST),
-        ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST);
+        ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST),
+        
+        //fcm 관련 메시지
+        FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND);
 
 
 private final String message;
