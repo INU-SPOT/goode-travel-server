@@ -1,81 +1,55 @@
 package com.spot.good2travel.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.spot.good2travel.repository.FcmRepository;
-import com.spot.good2travel.common.fcm.dto.FcmMessage;
+import com.google.firebase.messaging.*;
+import com.spot.good2travel.common.exception.ExceptionMessage;
+import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.fcm.dto.FcmRequest;
+import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Fcm;
+import com.spot.good2travel.domain.User;
+import com.spot.good2travel.repository.FcmRepository;
+import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
-import org.apache.http.HttpHeaders;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class FcmService {
 
-
-    @Value("${spring.fcm.url}")
-    private String FCM_URL;
-    private final ObjectMapper objectMapper;
     private final FcmRepository fcmRepository;
+    private final UserRepository userRepository;
 
-    public String sendMessageTo(FcmRequest fcmRequest) throws IOException{
-        String message = makeMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody(), fcmRequest.isValidateOnly());
-
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(FCM_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
+    public String sendMessage(String token, String title, String body) throws FirebaseMessagingException {
+        Message message = Message.builder()
+                .setToken(token)
+                .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
+                        .setNotification(new WebpushNotification(title, body))
+                        //.setFcmOptions()) url 정해지면 생각
+                        .build())
                 .build();
-        Response response = client.newCall(request).execute();
 
-        return response.body().string();
-    }
-
-    private String makeMessage(String fcmToken, String title, String message, boolean validateOnly) throws JsonProcessingException {
-        FcmMessage fcmMessage = FcmMessage.builder()
-                        .message(FcmMessage.Message.builder()
-                                .token(fcmToken)
-                                .notification(FcmMessage.Notification.builder()
-                                        .title(title)
-                                        .body(message)
-                                        .build())
-                                .build()).validateOnly(validateOnly).build();
-
-        log.info("[makeMessage] fcmToken : {}, title : {} , message : {}", fcmToken, title, message);
-        return objectMapper.writeValueAsString(fcmMessage);
-    }
-
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "fcm.json";
-
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
+        return FirebaseMessaging.getInstance().send(message);
     }
 
     @Transactional
-    public String updateToken(FcmRequest.FcmUpdateDto fcmUpdateDto){
-        //todo 유저 정보 가져오기
-       Fcm fcm = fcmRepository.findFcmByUserId(1L);
-       fcm.toUpdate(fcmUpdateDto.getFcmToken());
-       return fcm.getFcmToken();
+    public void updateToken(FcmRequest.FcmUpdateDto fcmUpdateDto, UserDetails userDetails){
+        Long id = ((CustomUserDetails) userDetails).getId();
+        Optional<Fcm> fcm = fcmRepository.findByUserId(1L);
+        if (fcm.isPresent()) {
+            fcm.get().toUpdate(fcmUpdateDto.getFcmToken());
+        } else {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+            fcmRepository.save(Fcm.builder()
+                    .fcmToken(fcmUpdateDto.getFcmToken())
+                    .user(user)
+                    .build());
+        }
     }
 }
