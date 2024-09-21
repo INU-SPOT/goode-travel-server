@@ -125,7 +125,7 @@ public class PostService {
 
     @Transactional
     public CommonPagingResponse<?> getPosts(Integer page, Integer size){
-        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "finishDate"));
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
 
         Page<Post> postPage = postRepository.findAll(pageable);
 
@@ -396,19 +396,12 @@ public class PostService {
     }
 
     //item 추가하면 개발
-//    public Page<Post> searchPosts(List<String> regions, List<String> categories, String keyword, Pageable pageable) {
-//        if (regions == null || regions.isEmpty()) {
-//            log.info("1");
-//            regions = new ArrayList<>();
-//        }
-//        if (categories == null || categories.isEmpty()) {
-//            categories = new ArrayList<>();
-//        }
-//        if (keyword == null || keyword.trim().isEmpty()) {
-//            keyword = "";
-//        }
-//        return postRepository.searchPostsByCriteria(regions, categories, keyword, pageable);
-//    }
+    @Transactional
+    public CommonPagingResponse<?> searchPosts(List<String> regions, List<String> categories, String keyword, Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+        Page<Post> postPage = postRepository.searchPostsByCriteria(regions, categories, keyword, pageable);
+        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
+    }
 
 }
 

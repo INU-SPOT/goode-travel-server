@@ -24,17 +24,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByIdIn(List<Long> postId, Pageable pageable);
 
-//    @Query("SELECT p FROM Post p " +
-//            "JOIN p.itemPosts ip " +
-//            "JOIN ip.item i " +
-//            "JOIN i.itemCategories ic " +
-//            "JOIN ic.category c " +
-//            "WHERE (i.localGovernment.name IN :localGovernments " +
-//            "OR c.name IN :categories " +
-//            "OR i.title LIKE %:keyword%) ")
-//    Page<Post> searchPostsByCriteria(@Param("localGovernments") List<String> localGovernments,
-//                                     @Param("categories") List<String> categories,
-//                                     @Param("keyword") String keyword,
-//                                     Pageable pageable);
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN p.itemPosts ip " +
+            "LEFT JOIN ip.item i " +
+            "LEFT JOIN i.localGovernment lg " +
+            "LEFT JOIN i.itemCategories ic " +
+            "LEFT JOIN ic.category c " +
+            "WHERE (:localGovernments IS NULL OR lg.name IN :localGovernments) " +
+            "AND (:categories IS NULL OR c.name IN :categories) " +
+            "AND (:keyword IS NULL OR " +
+            "     LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "     LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Post> searchPostsByCriteria(
+            @Param("localGovernments") List<String> localGovernments,
+            @Param("categories") List<String> categories,
+            @Param("keyword") String keyword,
+            Pageable pageable);
+
 
 }
