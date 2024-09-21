@@ -58,7 +58,7 @@ public class CommentService {
         Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
-        String body = "\""+request.getContent()+"\"";
+        String body = request.getContent();
         fcmService.sendMessage(fcm.getFcmToken(),title, body);
         alarmRepository.save(Alarm.of(title, body, localDateTime, user));
     }
