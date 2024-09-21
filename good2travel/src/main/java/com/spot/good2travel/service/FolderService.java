@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -63,10 +64,10 @@ public class FolderService {
     @Transactional
     public String findListImage(List<ItemFolder> itemFolders) {
         return itemFolders.stream()
-                .map(itemFolder -> {
-                    Item item = itemFolder.getItem();
-                    return item.getType().equals(ItemType.GOODE) ? item.getImageUrl() : itemFolder.getEmoji();
-                })
+                .map(ItemFolder::getItem)
+                .filter(item -> item.getType().equals(ItemType.GOODE))
+                .map(Item::getImageUrl)
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
     }
@@ -77,7 +78,7 @@ public class FolderService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
 
         Folder folder = folderRepository.findById(request.getFolderId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
 
         validIsOwner(folder.getUser(), userDetails);
         String emoji = request.getEmoji();

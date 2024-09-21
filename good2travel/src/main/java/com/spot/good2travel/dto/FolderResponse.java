@@ -21,13 +21,13 @@ public class FolderResponse {
         private Long folderId;
         @Schema(example = "나의 대전 여행기")
         private String title;
-        @Schema(example = "\uD83E\uDEE1")
-        private String imageUrl; //해당 폴더에서 제일 처음 저장된 굳이의 사진 링크 (없을 경우 null)
+        @Schema(example = "https://~")
+        private String image;
 
-        public FolderListResponse(Long folderId, String title, String imageUrl) {
+        public FolderListResponse(Long folderId, String title, String image) {
             this.folderId = folderId;
             this.title = title;
-            this.imageUrl = imageUrl;
+            this.image = image;
         }
     }
 
@@ -58,11 +58,13 @@ public class FolderResponse {
         private Long itemId;
         @Schema(example = "1")
         private Long itemFolderId;
+        @Schema(example = "false")
+        private Boolean isOfficial;
         @Schema(example = "PLAN")
-        private ItemType type;
+        private ItemType itemType;
         @Schema(example = "민규형이랑 피시방가기")
         private String title;
-
+        @Schema(example = "🌟")
         private String image;
         @Schema(example = "인천광역시 부평구 뭐시기...")
         private String address;
@@ -72,11 +74,12 @@ public class FolderResponse {
         private Boolean isFinished;
 
         @Builder
-        public ItemFolderResponse(Long itemId, Long itemFolderId, ItemType type, String title, String image,
+        public ItemFolderResponse(Long itemId, Long itemFolderId, ItemType itemType, Boolean isOfficial, String title, String image,
                                   String address, LocalDate finishDate, Boolean isFinished) {
             this.itemId = itemId;
             this.itemFolderId = itemFolderId;
-            this.type = type;
+            this.isOfficial = isOfficial;
+            this.itemType = itemType;
             this.title = title;
             this.image = image;
             this.address = address;
@@ -91,7 +94,8 @@ public class FolderResponse {
                     .itemId(item.getId())
                     .itemFolderId(itemFolder.getId())
                     .title(item.getTitle())
-                    .type(item.getType())
+                    .isOfficial(item.getIsOfficial())
+                    .itemType(item.getType())
                     .image(image)
                     .address(item.getAddress())
                     .finishDate(isFinished ? itemFolder.getFinishDate() : null)
