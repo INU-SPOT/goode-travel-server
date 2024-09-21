@@ -132,4 +132,19 @@ public class FolderController {
                                           @AuthenticationPrincipal UserDetails userDetails){
         return CommonResponse.success("폴더 삭제 성공", folderService.deleteItemFolder(folderId, itemPostId, userDetails));
     }
+
+    @PutMapping("/v1/folders/plan/{itempostid}")
+    @Operation(
+            summary = "계획이 끝난 여부 변환하기",
+            description = "계획이 끝난 여부를 변환합니다." +
+                    "<br><br> - request : itemFolderId - itemFolder DB 상의 PK" +
+                    "<br><br> - response : 변환된 후의 계획이 끝난 여부(Boolean)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계획 완료여부 변환 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
+    })
+    public CommonResponse<?> switchPlanFinished(@PathVariable("itempostid") Long itemPostId){
+        return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemPostId));
+    }
+
 }

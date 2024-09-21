@@ -80,7 +80,7 @@ public class FolderResponse {
                     .type(item.getType())
                     .image(image)
                     .address(item.getAddress())
-                    .finishDate(isFinished ? itemFolder.getFinishTime() : null)
+                    .finishDate(isFinished ? itemFolder.getFinishDate() : null)
                     .isFinished(isFinished)
                     .build();
         }

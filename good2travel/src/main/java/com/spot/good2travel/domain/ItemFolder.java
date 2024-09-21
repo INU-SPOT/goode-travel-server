@@ -19,7 +19,7 @@ public class ItemFolder {
 
     private Boolean isFinished;
 
-    private LocalDate finishTime;
+    private LocalDate finishDate;
 
     private String emoji;
 
@@ -32,7 +32,7 @@ public class ItemFolder {
     private Folder folder;
 
     @Builder
-    public ItemFolder(Boolean isFinished,String emoji,Item item, Folder folder) {
+    public ItemFolder(Boolean isFinished, LocalDate finishDate, String emoji, Item item, Folder folder) {
         this.isFinished = isFinished;
         this.emoji = emoji;
         this.item = item;
@@ -47,5 +47,12 @@ public class ItemFolder {
                 .folder(folder)
                 .build();
     }
+
+    public ItemFolder switchIsFinished() {
+        this.isFinished = !this.isFinished;  // isFinished 상태를 반전
+        this.finishDate = this.isFinished ? LocalDate.now() : null;  // 완료 시 시간 설정, 취소 시 null
+        return this;
+    }
+
 
 }

@@ -176,4 +176,13 @@ public class FolderService {
             throw new NotAuthorizedUserException(ExceptionMessage.MEMBER_UNAUTHENTICATED);
         }
     }
+
+    @Transactional
+    public Boolean switchIsFinished(Long itemFolderId){
+        ItemFolder itemFolder = itemFolderRepository.findById(itemFolderId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+        itemFolder.switchIsFinished();
+
+        return itemFolder.getIsFinished();
+    }
 }
