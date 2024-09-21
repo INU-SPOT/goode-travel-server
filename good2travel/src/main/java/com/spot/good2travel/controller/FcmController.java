@@ -2,7 +2,7 @@ package com.spot.good2travel.controller;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.dto.CommonResponse;
-import com.spot.good2travel.common.fcm.dto.FcmRequest;
+import com.spot.good2travel.common.fcm.FcmRequest;
 import com.spot.good2travel.service.FcmService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

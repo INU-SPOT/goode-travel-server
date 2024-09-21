@@ -1,4 +1,4 @@
-package com.spot.good2travel.common.fcm.dto;
+package com.spot.good2travel.common.fcm;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

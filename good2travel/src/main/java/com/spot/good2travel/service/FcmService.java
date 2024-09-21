@@ -3,7 +3,7 @@ package com.spot.good2travel.service;
 import com.google.firebase.messaging.*;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
-import com.spot.good2travel.common.fcm.dto.FcmRequest;
+import com.spot.good2travel.common.fcm.FcmRequest;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Fcm;
 import com.spot.good2travel.domain.User;
