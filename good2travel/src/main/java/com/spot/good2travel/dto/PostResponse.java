@@ -37,6 +37,9 @@ public class PostResponse {
         @Schema(example = "이상입니다! 다녀오신 분들 후기 남겨주세요🌟🌟🌟🌟🌟🌟")
         private final String lastContent;
 
+        @Schema(example = "2024-09-22")
+        private final LocalDate createDate;
+
         @Schema(example = "2019-03-01")
         private final LocalDate startDate;
 
@@ -62,7 +65,7 @@ public class PostResponse {
 
         @Builder(access = AccessLevel.PRIVATE)
         public PostDetailResponse(Long writerId, String writerNickname, String writerImageName, Long postId, String title, String firstContent, String lastContent,
-                                  LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Long commentNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
+                                  LocalDate createDate, LocalDate startDate, LocalDate endDate, Long visitNum, Integer likeNum, Long commentNum, Boolean isPushLike, Boolean isOwner, List<ItemPostResponse> itemPosts){
             this.writerId = writerId;
             this.writerNickname = writerNickname;
             this.writerImageName = writerImageName;
@@ -70,6 +73,7 @@ public class PostResponse {
             this.title = title;
             this.firstContent = firstContent;
             this.lastContent = lastContent;
+            this.createDate = createDate;
             this.startDate = startDate;
             this.endDate = endDate;
             this.visitNum = visitNum;
@@ -90,6 +94,7 @@ public class PostResponse {
                     .title(post.getTitle())
                     .firstContent(post.getFirstContent())
                     .lastContent(post.getLastContent())
+                    .createDate(post.getCreateDate().toLocalDate())
                     .startDate(post.getStartDate())
                     .endDate(post.getEndDate())
                     .visitNum(visitNum)
