@@ -48,7 +48,7 @@ public class PostService {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
         Post post = Post.of(postCreateUpdateRequest, user);
 

@@ -36,7 +36,7 @@ public class FolderService {
     public Long create(FolderRequest.FolderCreateRequest folderRequest, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         //전부 of를 썼기때문에 일관성으로 여기도 of를 추가합니다.
         Folder newFolder = Folder.of(folderRequest, user);
         folderRepository.save(newFolder);
@@ -173,7 +173,7 @@ public class FolderService {
         }
         Long userId = ((CustomUserDetails) userDetails).getId();
         if(!user.getId().equals(userId)){
-            throw new NotAuthorizedUserException(ExceptionMessage.MEMBER_UNAUTHENTICATED);
+            throw new NotAuthorizedUserException(ExceptionMessage.USER_UNAUTHENTICATED);
         }
     }
 
