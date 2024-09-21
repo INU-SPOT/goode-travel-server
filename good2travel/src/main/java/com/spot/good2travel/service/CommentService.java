@@ -6,21 +6,16 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
-import com.spot.good2travel.domain.Comment;
-import com.spot.good2travel.domain.Fcm;
-import com.spot.good2travel.domain.Post;
-import com.spot.good2travel.domain.User;
+import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.CommentResponse;
-import com.spot.good2travel.repository.CommentRepository;
-import com.spot.good2travel.repository.FcmRepository;
-import com.spot.good2travel.repository.PostRepository;
-import com.spot.good2travel.repository.UserRepository;
+import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +32,7 @@ public class CommentService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final FcmService fcmService;
     private final FcmRepository fcmRepository;
+    private final AlarmRepository alarmRepository;
 
 
     @Transactional
@@ -51,16 +47,20 @@ public class CommentService {
         Post post  = postRepository
                 .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        sendMessageForComment(user, post, request);
-        commentRepository.save(Comment.of(request, user, post));
+        Comment comment = Comment.of(request, user, post);
+        commentRepository.save(comment);
+        if (!userId.equals(user.getId())){
+            sendMessageForComment(user, post, request, comment.getCreateDate());
+        }
     }
 
-    private void sendMessageForComment(User user, Post post, CommentCreateUpdateRequest request) throws FirebaseMessagingException {
+    private void sendMessageForComment(User user, Post post, CommentCreateUpdateRequest request, LocalDateTime localDateTime) throws FirebaseMessagingException {
         Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
         String body = "\""+request.getContent()+"\"";
         fcmService.sendMessage(fcm.getFcmToken(),title, body);
+        alarmRepository.save(Alarm.of(title, body, localDateTime, user));
     }
 
     @Transactional

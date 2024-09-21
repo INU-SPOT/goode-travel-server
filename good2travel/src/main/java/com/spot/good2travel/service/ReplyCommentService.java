@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
@@ -23,12 +24,12 @@ public class ReplyCommentService {
 
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final FcmService fcmService;
     private final FcmRepository fcmRepository;
+    private final AlarmRepository alarmRepository;
 
     @Transactional
     public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
@@ -42,16 +43,20 @@ public class ReplyCommentService {
         Comment comment = commentRepository.findById(request.getCommentId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
 
-        sendMessageForReplyComment(user, comment.getPost(), request);
-        replyCommentRepository.save(ReplyComment.of(request, user, comment));
+        ReplyComment replyComment = ReplyComment.of(request, user, comment);
+        replyCommentRepository.save(replyComment);
+        if (!userId.equals(user.getId())) {
+            sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
+        }
     }
 
-    private void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request) throws FirebaseMessagingException {
+    private void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request, LocalDateTime localDateTime) throws FirebaseMessagingException {
         Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
-        String title = user.getNickname() + "님이 " + "내 댓글에 대댓글을 달았어요.";
+        String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
         String body = "\""+request.getContent()+"\"";
         fcmService.sendMessage(fcm.getFcmToken(),title, body);
+        alarmRepository.save(Alarm.of(title, body, localDateTime, user));
     }
 
     @Transactional
