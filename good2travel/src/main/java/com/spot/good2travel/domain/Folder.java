@@ -3,8 +3,12 @@ package com.spot.good2travel.domain;
 import com.spot.good2travel.common.entity.BaseEntity;
 import com.spot.good2travel.dto.FolderRequest;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,31 +24,44 @@ public class Folder extends BaseEntity {
     private String title;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    private List<Integer> sequence;
+    @OrderColumn(name = "order_index")
+    private List<Long> sequence = new ArrayList<>();
 
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
-    private List<ItemFolder> itemFolders;
+    private List<ItemFolder> itemFolders = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "main_goode_id")
-    private Item mainGoode;
-
     @Builder
-    public Folder(String title, User user){
+    public Folder(String title, List<ItemFolder> itemFolders,User user){
         this.title = title;
         this.user = user;
+        this.itemFolders = itemFolders;
     }
 
-    public void updateFolder(FolderRequest .FolderUpdateRequest folderUpdateRequest){
-        this.sequence = folderUpdateRequest.getSequence();
-        this.title = folderUpdateRequest.getTitle();
+    public Folder updateFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, List<Long> sequence) {
+        if (folderUpdateRequest.getTitle() != null) {
+            this.title = folderUpdateRequest.getTitle();
+        }
+
+        if (sequence != null && !sequence.isEmpty()) {
+            this.sequence = sequence;
+        }
+
+        return this;
     }
 
-    public void updateMainGoode(Item item) {
-        this.mainGoode = item;
+    public static Folder of(FolderRequest.FolderCreateRequest request, User user){
+        return Folder.builder()
+                .title(request.getTitle())
+                .user(user).build();
+    }
+
+    public Folder updateFolderSequence(List<Long> sequence){
+        this.sequence = sequence;
+
+        return this;
     }
 }

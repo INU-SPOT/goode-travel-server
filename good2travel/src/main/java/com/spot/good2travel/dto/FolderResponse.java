@@ -1,6 +1,8 @@
 package com.spot.good2travel.dto;
 
+import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
+import com.spot.good2travel.domain.ItemFolder;
 import com.spot.good2travel.domain.ItemType;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +16,12 @@ public class FolderResponse {
     @Getter
     @Setter
     public static class FolderListResponse{
+        private Long folderId;
         private String title;
         private String imageUrl; //해당 폴더에서 제일 처음 저장된 굳이의 사진 링크 (없을 경우 null)
 
-        public FolderListResponse(String title, String imageUrl) {
+        public FolderListResponse(Long folderId, String title, String imageUrl) {
+            this.folderId = folderId;
             this.title = title;
             this.imageUrl = imageUrl;
         }
@@ -25,50 +29,58 @@ public class FolderResponse {
 
     @Getter
     @Setter
-    public static class FolderUpdateResponse{
+    public static class FolderDetailResponse{
+        private Long folderId;
         private String title;
-        private List<Integer> sequence;
+        private List<ItemFolderResponse> itemFolders;
 
-        public FolderUpdateResponse(String title, List<Integer> sequence) {
+        public FolderDetailResponse(Long folderId, String title, List<ItemFolderResponse> itemFolders) {
+            this.folderId = folderId;
             this.title = title;
-            this.sequence = sequence;
+            this.itemFolders = itemFolders;
+        }
+
+        public static FolderDetailResponse of(Folder folder, List<ItemFolderResponse> itemFolders){
+            return new FolderDetailResponse(folder.getId(), folder.getTitle(), itemFolders);
         }
     }
 
     @Setter
     @Getter
-    public static class ItemResponse {
-        private Long id;
+    public static class ItemFolderResponse {
+        private Long itemId;
+        private Long itemFolderId;
         private ItemType type;
         private String title;
         private String image;
         private String address;
-        private LocalDate createDate;
+        private LocalDate finishDate;
         private Boolean isFinished;
 
         @Builder
-        public ItemResponse(Long id, ItemType type, String title, String image, String address, LocalDate createDate, Boolean isFinished) {
-            this.id = id;
+        public ItemFolderResponse(Long itemId, Long itemFolderId, ItemType type, String title, String image,
+                                  String address, LocalDate finishDate, Boolean isFinished) {
+            this.itemId = itemId;
+            this.itemFolderId = itemFolderId;
             this.type = type;
             this.title = title;
             this.image = image;
             this.address = address;
-            this.createDate = createDate;
+            this.finishDate = finishDate;
             this.isFinished = isFinished;
         }
 
-        public static ItemResponse of(Item item, Boolean isFinished, String emoji) {
-            String image = (item.getType() == ItemType.PLAN && item.getImageUrl() == null)
-                    ? emoji
-                    : item.getImageUrl();
+        public static ItemFolderResponse of(Item item, ItemFolder itemFolder, Boolean isFinished, String emoji) {
+            String image = (item.getType() == ItemType.PLAN && item.getImageUrl() == null) ? emoji : item.getImageUrl();
 
-            return ItemResponse.builder()
-                    .id(item.getId())
+            return ItemFolderResponse.builder()
+                    .itemId(item.getId())
+                    .itemFolderId(itemFolder.getId())
                     .title(item.getTitle())
                     .type(item.getType())
                     .image(image)
                     .address(item.getAddress())
-                    .createDate(item.getCreateDate().toLocalDate())
+                    .finishDate(isFinished ? itemFolder.getFinishTime() : null)
                     .isFinished(isFinished)
                     .build();
         }

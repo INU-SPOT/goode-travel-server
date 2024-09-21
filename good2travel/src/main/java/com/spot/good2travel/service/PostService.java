@@ -125,7 +125,7 @@ public class PostService {
 
     @Transactional
     public CommonPagingResponse<?> getPosts(Integer page, Integer size){
-        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "finishDate"));
 
         Page<Post> postPage = postRepository.findAll(pageable);
 

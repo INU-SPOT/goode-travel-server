@@ -77,6 +77,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
 
+    @ExceptionHandler(value = NotAuthorizedUserException.class)
+    public ResponseEntity<CommonResponse<?>> handleNotFoundGoodeInFolderException(NotAuthorizedUserException ex){
+        log.error("[handleNotFoundGoodeInFolderException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
     @ExceptionHandler(value = UserNotAuthorizedException.class)
     public ResponseEntity<CommonResponse<?>> handleUserNotAuthorizedException(UserNotAuthorizedException ex){
         log.error("[handleUserNotAuthorizedException] {}", ex.getMessage());
