@@ -124,17 +124,6 @@ public class PostService {
     }
 
     @Transactional
-    public CommonPagingResponse<?> getPosts(Integer page, Integer size){
-        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
-
-        Page<Post> postPage = postRepository.findAll(pageable);
-
-        List<PostResponse.PostThumbnailResponse> postThumbnailResponses = getPostThumbnails(postPage);
-
-        return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), postThumbnailResponses);
-    }
-
-    @Transactional
     public Long getTotalComments(Long postId) {
         Long commentCount = commentRepository.countCommentsByPostId(postId);
         Long replyCount = replyCommentRepository.countRepliesByPostId(postId);
@@ -397,9 +386,9 @@ public class PostService {
 
     //item 추가하면 개발
     @Transactional
-    public CommonPagingResponse<?> searchPosts(List<String> regions, List<String> categories, String keyword, Integer page, Integer size) {
+    public CommonPagingResponse<?> searchPosts(List<String> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<Post> postPage = postRepository.searchPostsByCriteria(regions, categories, keyword, pageable);
+        Page<Post> postPage = postRepository.searchPostsByCriteria(localGovernments, categories, keyword, pageable);
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 

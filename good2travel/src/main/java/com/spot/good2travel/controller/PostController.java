@@ -45,13 +45,16 @@ public class PostController {
     }
 
     @GetMapping("/v1/posts")
-    @Operation(summary = "게시글 목록(썸네일) 불러오기 기능 **페이징**", description = "게시글 목록을 불러옵니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br><br> - response: PostThumbnailResponse")
+    @Operation(summary = "게시글 목록(썸네일) 불러오기 + 전체 게시글 검색 기능 **페이징**", description = "게시글 목록을 불러옵니다. + 검색어에 따라 게시글을 필터링합니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br><br> - response: PostThumbnailResponse")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
-    public CommonResponse<?> getPosts(@RequestParam(defaultValue = "0", required = false) Integer page,
+    public CommonResponse<?> getPosts(@RequestParam(required = false) List<String> localGovernments,
+                                      @RequestParam(required = false) List<String> categories,
+                                      @RequestParam(required = false) String keyword,
+                                      @RequestParam(defaultValue = "0", required = false) Integer page,
                                       @RequestParam(defaultValue = "7", required = false) Integer size) {
-        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.getPosts(page, size));
+        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.searchPosts(localGovernments, categories, keyword, page, size));
     }
 
     @GetMapping("/v1/posts/{postid}")
@@ -132,14 +135,4 @@ public class PostController {
         return CommonResponse.success("유저가 좋아요 누른 글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
     }
 
-    @GetMapping("/v1/posts/search")
-    public CommonResponse<?> searchPosts(
-            @RequestParam(required = false) List<String> regions,
-            @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0", required = false) Integer page,
-            @RequestParam(defaultValue = "7", required = false) Integer size) {
-
-        return CommonResponse.success("검색어 불러오기 성공",postService.searchPosts(regions, categories, keyword, page, size));
-    }
 }

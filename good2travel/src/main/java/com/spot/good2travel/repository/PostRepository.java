@@ -27,14 +27,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN p.itemPosts ip " +
             "LEFT JOIN ip.item i " +
-            "LEFT JOIN i.localGovernment lg " +
-            "LEFT JOIN i.itemCategories ic " +
-            "LEFT JOIN ic.category c " +
-            "WHERE (:localGovernments IS NULL OR lg.name IN :localGovernments) " +
-            "AND (:categories IS NULL OR c.name IN :categories) " +
-            "AND (:keyword IS NULL OR " +
-            "     LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "     LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+            "WHERE (:keyword IS NULL OR " +
+            "       LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "       (i IS NOT NULL AND LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')))) " +
+            "AND ( " +
+            "   (:categories IS NULL AND :localGovernments IS NULL) OR " +
+            "   EXISTS ( " +
+            "       SELECT 1 FROM ItemPost ip2 " +
+            "       JOIN ip2.item i2 " +
+            "       LEFT JOIN i2.localGovernment lg2 " +
+            "       LEFT JOIN i2.itemCategories ic2 " +
+            "       LEFT JOIN ic2.category c2 " +
+            "       WHERE ip2.post = p " +
+            "       AND (:categories IS NULL OR c2.name IN :categories) " +
+            "       AND (:localGovernments IS NULL OR lg2.name IN :localGovernments) " +
+            "   ) " +
+            ")")
     Page<Post> searchPostsByCriteria(
             @Param("localGovernments") List<String> localGovernments,
             @Param("categories") List<String> categories,

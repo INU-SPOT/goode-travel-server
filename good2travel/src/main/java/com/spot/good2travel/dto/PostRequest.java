@@ -67,4 +67,5 @@ public class PostRequest {
         private String imageName;
 
     }
+
 }
