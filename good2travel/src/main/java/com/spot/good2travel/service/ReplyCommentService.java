@@ -1,17 +1,13 @@
 package com.spot.good2travel.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
-import com.spot.good2travel.domain.Comment;
-import com.spot.good2travel.domain.ReplyComment;
-import com.spot.good2travel.domain.User;
+import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.CommentRequest;
-import com.spot.good2travel.repository.CommentRepository;
-import com.spot.good2travel.repository.PostRepository;
-import com.spot.good2travel.repository.ReplyCommentRepository;
-import com.spot.good2travel.repository.UserRepository;
+import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,9 +27,11 @@ public class ReplyCommentService {
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FcmService fcmService;
+    private final FcmRepository fcmRepository;
 
     @Transactional
-    public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails){
+    public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -44,7 +42,16 @@ public class ReplyCommentService {
         Comment comment = commentRepository.findById(request.getCommentId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
 
+        sendMessageForReplyComment(user, comment.getPost(), request);
         replyCommentRepository.save(ReplyComment.of(request, user, comment));
+    }
+
+    private void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 " + "내 댓글에 대댓글을 달았어요.";
+        String body = "\""+request.getContent()+"\"";
+        fcmService.sendMessage(fcm.getFcmToken(),title, body);
     }
 
     @Transactional

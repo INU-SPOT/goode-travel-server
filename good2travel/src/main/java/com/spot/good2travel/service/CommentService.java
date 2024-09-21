@@ -1,15 +1,18 @@
 package com.spot.good2travel.service;
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Comment;
+import com.spot.good2travel.domain.Fcm;
 import com.spot.good2travel.domain.Post;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.repository.CommentRepository;
+import com.spot.good2travel.repository.FcmRepository;
 import com.spot.good2travel.repository.PostRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +35,12 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FcmService fcmService;
+    private final FcmRepository fcmRepository;
 
 
     @Transactional
-    public void addComment(CommentCreateUpdateRequest request, UserDetails userDetails){
+    public void addComment(CommentCreateUpdateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -46,7 +51,16 @@ public class CommentService {
         Post post  = postRepository
                 .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
+        sendMessageForComment(user, post, request);
         commentRepository.save(Comment.of(request, user, post));
+    }
+
+    private void sendMessageForComment(User user, Post post, CommentCreateUpdateRequest request) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
+        String body = "\""+request.getContent()+"\"";
+        fcmService.sendMessage(fcm.getFcmToken(),title, body);
     }
 
     @Transactional
