@@ -54,7 +54,7 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-        String imageUrl = imageService.getImageUrl(user.getProfileImageName());
+        String imageName = user.getProfileImageName();
 
         UserInfoResponse response = UserResponse.UserInfoResponse
                 .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageName);
