@@ -45,7 +45,7 @@ public class PostController {
     }
 
     @GetMapping("/v1/posts")
-    @Operation(summary = "게시글 목록(썸네일) 불러오기 + 전체 게시글 검색 기능 **페이징**", description = "게시글 목록을 불러옵니다. + 검색어에 따라 게시글을 필터링합니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br><br> - response: PostThumbnailResponse")
+    @Operation(summary = "게시글 목록(썸네일) 불러오기 + 전체 게시글 검색 기능 **페이징**", description = "게시글 목록을 불러옵니다. + 검색어에 따라 게시글을 필터링합니다. <br><br> - request: <br> 페이징 인수는 디폴트값이 설정되어 있어서 page를 넘길때만 page값을 넘겨주시면 될 것 같습니다. <br> List String localGovernments : 지역구 이름 (ex. 구로구. 서울특별시안됨ㅡㅡ 무조건 구 시 군만)<br> List String categories : 카테고리 이름(ex. 먹거리) <br> String keyword : 검색어 <br><br> - response: PostThumbnailResponse")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
