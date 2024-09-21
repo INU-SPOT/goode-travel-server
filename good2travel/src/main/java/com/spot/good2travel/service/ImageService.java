@@ -75,11 +75,4 @@ public class ImageService {
                 .block();
     }
 
-    public String getImageUrl(String imageName){
-        if(imageName == null || imageName.isEmpty()){
-            return null;
-        }
-
-        return imageGetUrl + "/" + imageName;
-    }
 }

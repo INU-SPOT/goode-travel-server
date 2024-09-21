@@ -42,7 +42,6 @@ public class PostService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
-    private final ImageService imageService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -107,7 +106,7 @@ public class PostService {
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
         Long commentNum = getTotalComments(postId);
 
-        String writerImageUrl = imageService.getImageUrl(post.getUser().getProfileImageName());
+        String writerImageUrl = post.getUser().getProfileImageName();
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {

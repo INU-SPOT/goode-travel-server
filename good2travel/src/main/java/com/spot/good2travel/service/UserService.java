@@ -24,7 +24,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MetropolitanGovernmentRepository metropolitanGovernmentRepository;
-    private final ImageService imageService;
 
     public Boolean isRegistered(UserDetails userDetails){
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -55,10 +54,10 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
-        String imageUrl = imageService.getImageUrl(user.getProfileImageName());
+        String imageName = user.getProfileImageName();
 
         UserInfoResponse response = UserResponse.UserInfoResponse
-                .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageUrl);
+                .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageName);
 
         return response;
     }
