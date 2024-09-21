@@ -60,9 +60,10 @@ public class ItemService {
     }
 
     public Long createItem(ItemRequest.ItemCreateRequest itemCreateRequest) {
-        Item officialItem = Item.of(itemCreateRequest);
-        itemRepository.save(officialItem);
-        return officialItem.getId();
+        Item item = Item.of(itemCreateRequest);
+        itemRepository.save(item);
+
+        return item.getId();
     }
 
     public Long moveItem(Long itemId) {
@@ -96,7 +97,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getType() == ItemType.GOODE && item.getIsOfficial()){
-            //todo 해당 지역의 날씨 가져오기
+
             return ItemResponse.GoodeDetailsResponse.of(item, item.getLocalGovernment().getName());
         } else {
             throw new ItemAccessException(ExceptionMessage.ITEM_DETAIL_INFO_NOT_FOUND);

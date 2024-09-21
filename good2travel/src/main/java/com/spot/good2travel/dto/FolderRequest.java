@@ -16,20 +16,24 @@ public class FolderRequest {
 
     @Getter
     public static class ItemFolderCreateRequest{
+        @Schema(example = "1")
         private Long folderId;
+        @Schema(example = "1")
         private Long itemId;
-        private String title;
+        @Schema(example = "\\uD83E\\uDEE1")
         private String emoji;
     }
 
     @Getter
     public static class FolderUpdateRequest {
+        @Schema(example = "나의 여름 대전 여행")
         private String title;
         private List<Long> sequence;
     }
 
     @Getter
     public static class ItemFolderDeleteRequest{
+        @Schema(example = "1")
         private Long itemPostId;
     }
 }

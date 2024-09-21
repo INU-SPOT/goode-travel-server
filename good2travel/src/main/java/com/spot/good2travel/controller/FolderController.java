@@ -54,8 +54,8 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "새 계획 생성 완료", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public ResponseEntity<CommonResponse<?>> createFolderPlan(@RequestBody FolderRequest.ItemFolderCreateRequest request
-            , @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<CommonResponse<?>> createFolderPlan(@RequestBody FolderRequest.ItemFolderCreateRequest request,
+                                                              @AuthenticationPrincipal UserDetails userDetails){
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("새 계획 생성 완료",
                 folderService.createItemFolder(request , userDetails)));
     }
