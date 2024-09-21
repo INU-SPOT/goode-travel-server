@@ -43,7 +43,7 @@ public class FcmController {
 
     @PostMapping("/v1/fcm/send")
     @Operation(
-            summary = "fcm 전송 (테스트 용)",
+            summary = "fcm 전송 (테스트 용, 실제 사용은 하지 않는다)",
             description = "fcm을 전송합니다." +
                     "<br><br> - request : FcmMessageDto" +
                     "<br><br> - response : projects/goode2travel-fcm/messages/**"
