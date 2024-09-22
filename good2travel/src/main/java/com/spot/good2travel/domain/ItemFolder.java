@@ -54,5 +54,11 @@ public class ItemFolder {
         return this;
     }
 
+    public ItemFolder updateEmoji(String emoji){
+        this.emoji = emoji;
+
+        return this;
+    }
+
 
 }

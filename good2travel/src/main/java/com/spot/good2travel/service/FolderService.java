@@ -1,17 +1,11 @@
 package com.spot.good2travel.service;
 
-import com.spot.good2travel.common.exception.ExceptionMessage;
-import com.spot.good2travel.common.exception.JwtEmptyException;
-import com.spot.good2travel.common.exception.NotAuthorizedUserException;
-import com.spot.good2travel.common.exception.NotFoundElementException;
+import com.spot.good2travel.common.exception.*;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.FolderResponse;
-import com.spot.good2travel.repository.FolderRepository;
-import com.spot.good2travel.repository.ItemFolderRepository;
-import com.spot.good2travel.repository.ItemRepository;
-import com.spot.good2travel.repository.UserRepository;
+import com.spot.good2travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +24,7 @@ public class FolderService {
     private final ItemRepository itemRepository;
     private final ItemFolderRepository itemFolderRepository;
     private final UserRepository userRepository;
-
+    private final LocalGovernmentRepository localGovernmentRepository;
     /*
     새 폴더 만들기
      */
@@ -132,8 +126,13 @@ public class FolderService {
                 .map(num -> {
                     ItemFolder itemFolder = itemFolderRepository.findById(num)
                             .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+                    Item item = itemFolder.getItem();
+                    if(item.getType().equals(ItemType.GOODE)){
+                        return FolderResponse.ItemFolderResponse
+                                .of(itemFolder.getItem(), itemFolder, itemFolder.getIsFinished(), item.getImageUrl());
+                    }
                     return FolderResponse.ItemFolderResponse
-                            .of(itemFolder.getItem(), itemFolder, itemFolder.getIsFinished(), itemFolder.getEmoji());
+                                .of(itemFolder.getItem(), itemFolder, itemFolder.getIsFinished(), itemFolder.getEmoji());
                 }).toList();
     }
 
@@ -185,5 +184,26 @@ public class FolderService {
         itemFolder.switchIsFinished();
 
         return itemFolder.getIsFinished();
+    }
+
+    @Transactional
+    public Long updateItemFolder(FolderRequest.ItemFolderUpdateRequest request) {
+        ItemFolder itemFolder = itemFolderRepository.findById(request.getItemFolderId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+
+        if (itemFolder.getItem().getIsOfficial()){
+            if(itemFolder.getItem().getType().equals(ItemType.GOODE)){
+                throw new ItemAccessException(ExceptionMessage.ITEM_UPDATE_BAD_REQUEST);
+            }
+            else{
+                itemFolder.updateEmoji(request.getEmoji());
+            }
+        } else {
+            LocalGovernment localGovernment = localGovernmentRepository.findById(request.getLocalGovernmentId())
+                    .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+            itemFolder.updateEmoji(request.getEmoji());
+            itemFolder.getItem().updateUserItem(request, localGovernment);
+        }
+        return itemFolder.getFolder().getId();
     }
 }
