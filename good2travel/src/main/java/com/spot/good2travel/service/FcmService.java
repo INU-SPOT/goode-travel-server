@@ -45,7 +45,7 @@ public class FcmService {
             fcm.get().toUpdate(fcmUpdateDto.getFcmToken());
         } else {
             User user = userRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
             fcmRepository.save(Fcm.builder()
                     .fcmToken(fcmUpdateDto.getFcmToken())
                     .user(user)

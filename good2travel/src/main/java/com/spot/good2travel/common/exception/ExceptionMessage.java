@@ -24,8 +24,8 @@ public enum ExceptionMessage {
         IMAGE_READ_ERROR("이미지를 읽을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
 
         //지역구 관련 메시지
-        METROPOLITANGOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
-        LOCALGOVERNMENT_NOT_FOUND("존재하지 않는 지역 시/구 입니다.",0,HttpStatus.NOT_FOUND),
+        METROPOLITAN_GOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
+        LOCAL_GOVERNMENT_NOT_FOUND("존재하지 않는 지역 시/구 입니다.",0,HttpStatus.NOT_FOUND),
 
         //카테고리 관련 메시지
         CATEGORY_NOT_FOUND("존재하지 않는 굳이 카테고리 입니다.", 0, HttpStatus.NOT_FOUND),

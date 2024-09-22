@@ -208,7 +208,7 @@ public class FolderService {
             }
         } else {
             LocalGovernment localGovernment = localGovernmentRepository.findById(request.getLocalGovernmentId())
-                    .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+                    .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
             itemFolder.updateEmoji(request.getEmoji());
             itemFolder.getItem().updateUserItem(request, localGovernment);
         }
