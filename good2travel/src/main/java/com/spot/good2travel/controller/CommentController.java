@@ -57,7 +57,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
     }
 
-    @PatchMapping("/v1/posts/report/comments")
+    @PostMapping("/v1/posts/report/comments")
     @Operation(summary = "댓글신고하기", description = "댓글을 신고할겁니다. <br><br> - request: Long commentId <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 신고하기 성공"),
@@ -67,7 +67,7 @@ public class CommentController {
         return CommonResponse.success("댓글 신고하기 성공", null);
     }
 
-    @PatchMapping("/v1/posts/report/replycomments")
+    @PostMapping("/v1/posts/report/replycomments")
     @Operation(summary = "답글신고하기", description = "답글을 신고할겁니다. <br><br> - request: Long replyCommentId <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답글 신고하기 성공"),
@@ -77,7 +77,7 @@ public class CommentController {
         return CommonResponse.success("답글 신고하기 성공", null);
     }
 
-    @PatchMapping("/v1/posts/comments/{commentid}")
+    @PutMapping("/v1/posts/comments/{commentid}")
     @Operation(summary = "댓글 수정하기", description = "댓글을 수정할거에요. <br><br> - request: CommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
@@ -89,8 +89,8 @@ public class CommentController {
         return CommonResponse.success("댓글 수정 성공", null);
     }
 
-    @PatchMapping("/v1/posts/replycomments/{replycommentid}")
-    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요. <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @PutMapping("/v1/posts/replycomments/{replycommentid}")
+    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요 <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답글 수정 성공"),
     })

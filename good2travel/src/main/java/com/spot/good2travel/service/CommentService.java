@@ -71,7 +71,7 @@ public class CommentService {
 
         List<CommentResponse.CommentDetailResponse> response = comments.stream().map(
                 comment -> CommentResponse.CommentDetailResponse.of(comment, comment.getUser().equals(user), comment.getReplyComments().stream()
-                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, comment.getUser().equals(user)))
+                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, replyComment.getUser().equals(user)))
                         .toList()
                 )).toList();
 
