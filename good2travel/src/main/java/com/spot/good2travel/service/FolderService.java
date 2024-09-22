@@ -144,6 +144,12 @@ public class FolderService {
 
         ItemFolder itemFolder = itemFolderRepository.findById(itemFolderId)
                 .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+
+        Item item = itemFolder.getItem();
+        if(!item.getIsOfficial()){
+            itemRepository.delete(item);
+        }
+
         folder.getSequence().removeIf(num -> num.equals(itemFolder.getId()));
 
         itemFolderRepository.delete(itemFolder);
@@ -187,9 +193,11 @@ public class FolderService {
     }
 
     @Transactional
-    public Long updateItemFolder(FolderRequest.ItemFolderUpdateRequest request) {
+    public Long updateItemFolder(FolderRequest.ItemFolderUpdateRequest request, UserDetails userDetails) {
         ItemFolder itemFolder = itemFolderRepository.findById(request.getItemFolderId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+
+        validIsOwner(itemFolder.getFolder().getUser(), userDetails);
 
         if (itemFolder.getItem().getIsOfficial()){
             if(itemFolder.getItem().getType().equals(ItemType.GOODE)){

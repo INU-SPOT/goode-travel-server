@@ -157,8 +157,8 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "계획 수정 완료", content = @Content(schema = @Schema(implementation = Boolean.class))),
     })
-    public CommonResponse<?> updateUserPlan(@RequestBody FolderRequest.ItemFolderUpdateRequest request){
-        return CommonResponse.success("계획 수정 완료", folderService.updateItemFolder(request));
+    public CommonResponse<?> updateUserPlan(@RequestBody FolderRequest.ItemFolderUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails){
+        return CommonResponse.success("계획 수정 완료", folderService.updateItemFolder(request, userDetails));
     }
 
 }
