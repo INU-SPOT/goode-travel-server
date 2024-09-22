@@ -42,6 +42,7 @@ public class PostService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
+    private final ItemService itemService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -148,7 +149,10 @@ public class PostService {
         Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
         beforeSequence.stream()
                 .filter(num -> !afterSequenceSet.contains(num))
-                .forEach(this::deleteItemPost);
+                .forEach(num -> {
+                    itemService.deleteUserItem(num);
+                    deleteItemPost(num);
+                });
 
         return postId;
     }
@@ -164,18 +168,11 @@ public class PostService {
             ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
 
-            List<Long> beforeSequence = itemPost.getSequence();
-
             List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
                     .map(image -> updateItemPostImage(image, itemPost))
                     .toList();
 
             itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
-
-            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
-            beforeSequence.stream()
-                    .filter(num -> !afterSequenceSet.contains(num))
-                    .forEach(this::deleteItemPostImage);
 
             return itemPost.getId();
         }
