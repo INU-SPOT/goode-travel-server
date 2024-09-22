@@ -40,7 +40,7 @@ public class Post extends BaseEntity {
     @OrderColumn(name = "order_index")
     private List<Long> sequence = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPost> itemPosts;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

@@ -389,6 +389,15 @@ public class PostService {
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 
+    @Transactional
+    public void deletePost(Long postId, UserDetails userDetails) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+
+        validateUserIsPostOwner(post, userDetails);
+        postRepository.delete(post);
+    }
+
 }
 
 
