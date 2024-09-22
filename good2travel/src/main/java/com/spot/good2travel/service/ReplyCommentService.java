@@ -7,9 +7,9 @@ import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Comment;
 import com.spot.good2travel.domain.ReplyComment;
 import com.spot.good2travel.domain.User;
-import com.spot.good2travel.dto.CommentRequest;
+import com.spot.good2travel.dto.CommentRequest.CommentUpdateRequest;
+import com.spot.good2travel.dto.CommentRequest.ReplyCommentCreateRequest;
 import com.spot.good2travel.repository.CommentRepository;
-import com.spot.good2travel.repository.PostRepository;
 import com.spot.good2travel.repository.ReplyCommentRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +19,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
-
-
 @Service
 @RequiredArgsConstructor
 public class ReplyCommentService {
 
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
-    public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails){
+    public void addReplyComment(ReplyCommentCreateRequest request, UserDetails userDetails){
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -87,7 +84,7 @@ public class ReplyCommentService {
     }
 
     @Transactional
-    public void updateReplyComment(Long replyCommentId, CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails){
+    public void updateReplyComment(Long replyCommentId, CommentUpdateRequest request, UserDetails userDetails){
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }

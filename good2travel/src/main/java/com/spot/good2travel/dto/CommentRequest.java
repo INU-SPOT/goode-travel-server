@@ -9,7 +9,7 @@ import lombok.Getter;
 public class CommentRequest {
 
     @Getter
-    public static class CommentCreateUpdateRequest{
+    public static class CommentCreateRequest {
 
         @Schema(example = "1")
         @NotNull(message = "댓글을 작성할 post의 id를 입력해주세요.")
@@ -21,11 +21,19 @@ public class CommentRequest {
     }
 
     @Getter
-    public static class ReplyCommentCreateUpdateRequest {
+    public static class ReplyCommentCreateRequest {
 
         @Schema(example = "1")
         @NotNull(message = "답글을 작성할 comment의 id를 입력해주세요.")
         private Long commentId;
+
+        @Schema(example = "신고함 ㅅㄱ")
+        @NotBlank(message = "답글의 내용을 작성해주세요.")
+        private String content;
+    }
+
+    @Getter
+    public static class CommentUpdateRequest{
 
         @Schema(example = "신고함 ㅅㄱ")
         @NotBlank(message = "답글의 내용을 작성해주세요.")
