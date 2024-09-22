@@ -1,6 +1,7 @@
 package com.spot.good2travel.common.fcm;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class FcmRequest {
     @Setter
     public static class FcmUpdateDto {
         @Schema(example = "eMogIDKaPnLC6jUJtNeIfn:APA91bGP3G6gUng1cvA-YvMLtPIw90Eqlb30fP9vYYO22wfPQMKKigEXcKGFIVEuPPln23xPSZOqs8WaYWik6PWuOxOLrvUTV5E32jdpLyVS4G5YDpg_2bZf5ITKmpiWmHhfZk6phxxN")
+        @NotBlank(message = "발급받은 fcm 토큰을 입력해주세요.")
         private String fcmToken;
     }
 }
