@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements OAuth2User, UserDetails {
-    private Long id;
-    private String email;
-    private List<? extends GrantedAuthority> authorities;
+    private final Long id;
+    private final String email;
+    private final List<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
     private CustomUserDetails(Long id, String email, List<? extends GrantedAuthority> authorities) {
@@ -85,7 +85,7 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
 
     @Override
     public String toString() {
-        return "{" + "id = " + id + ", email = " + email + ", authorities: " + authorities + "}";
+        return "{" + "itemId = " + id + ", email = " + email + ", authorities: " + authorities + "}";
     }
 
 }

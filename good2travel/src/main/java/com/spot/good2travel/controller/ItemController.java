@@ -28,8 +28,8 @@ public class ItemController {
             summary = "시스템 상 굳이 리스트에 굳이/계획 추가(관리자용)",
             description = "공식적인 굳이/계획들을 추가한다." +
                     "<br><br> - request : accessToken 헤더 추가, OfficialItemCreateRequest" +
-                    "<br> 굳이의 경우 -> type=GOODE, title, imageUrl, description, address, categories, localGovernmentId 필요" +
-                    "<br> 계획의 경우 -> type=PLAN, title, address, localGovernmentId 필요" +
+                    "<br> 굳이의 경우 -> itemType=GOODE, title, image, description, address, categories, localGovernmentId 필요" +
+                    "<br> 계획의 경우 -> itemType=PLAN, title, address, localGovernmentId 필요" +
                     "<br><br> - response : 추가한 Item의 ItemType(GOODE , PLAN)"
     )
     @ApiResponses(value = {
@@ -45,7 +45,7 @@ public class ItemController {
             summary = "사용자가 새로운 계획을 추가한다.",
             description = "사용자가 계획을 짤 때, 커뮤니티에 글을 올릴 때 새로운 사용자의 굳이/계획을 추가." +
                     "<br><br> - request : accessToken 헤더 추가, " +
-                    "ItemCreateRequest - 폴더에서 추가하면 emoji, 커뮤니티에서 추가하면 imageUrl 첨부" +
+                    "ItemCreateRequest - 폴더에서 추가하면 emoji, 커뮤니티에서 추가하면 image 첨부" +
                     "<br><br> - response : 추가한 굳이/계획의 DB 상 pk"
     )
     @ApiResponses(value = {
@@ -74,7 +74,7 @@ public class ItemController {
     @Operation(summary = "사용자 굳이/계획 수정",
             description = "사용자의 굳이/계획을 수정한다." +
                     "<br><br> - request : accessToken 헤더 추가, Item(DB) 상의 pk, " +
-                    "ItemUpdateRequest - 폴더에서 수정하면 emoji, 커뮤니티에서 수정하면 imageUrl 첨부" +
+                    "ItemUpdateRequest - 폴더에서 수정하면 emoji, 커뮤니티에서 수정하면 image 첨부" +
                     "<br><br> - response : 수정된 굳이/계획의 Item(DB) 상의 pk"
     )
     @ApiResponses(value = {

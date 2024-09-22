@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,6 +18,8 @@ public class ItemFolder {
     private Long id;
 
     private Boolean isFinished;
+
+    private LocalDate finishDate;
 
     private String emoji;
 
@@ -28,25 +32,27 @@ public class ItemFolder {
     private Folder folder;
 
     @Builder
-    public ItemFolder(Boolean isFinished, Item item, Folder folder) {
+    public ItemFolder(Boolean isFinished, LocalDate finishDate, String emoji, Item item, Folder folder) {
         this.isFinished = isFinished;
+        this.emoji = emoji;
         this.item = item;
         this.folder = folder;
     }
 
-    public static ItemFolder of(Item item, Folder folder) {
-        if (item.getType()==ItemType.GOODE){
-            return ItemFolder.builder()
-                    .isFinished(null)
-                    .item(item)
-                    .folder(folder)
-                    .build();
-        } else {
-            return ItemFolder.builder()
-                    .isFinished(false)
-                    .item(item)
-                    .folder(folder)
-                    .build();
-        }
+    public static ItemFolder of(String emoji, Item item, Folder folder) {
+        return ItemFolder.builder()
+                .emoji(emoji)
+                .isFinished(Boolean.FALSE)
+                .item(item)
+                .folder(folder)
+                .build();
     }
+
+    public ItemFolder switchIsFinished() {
+        this.isFinished = !this.isFinished;  // isFinished 상태를 반전
+        this.finishDate = this.isFinished ? LocalDate.now() : null;  // 완료 시 시간 설정, 취소 시 null
+        return this;
+    }
+
+
 }
