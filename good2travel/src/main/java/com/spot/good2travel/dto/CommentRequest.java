@@ -24,10 +24,6 @@ public class CommentRequest {
     public static class ReplyCommentCreateUpdateRequest {
 
         @Schema(example = "1")
-        @NotNull(message = "답글을 작성할 post의 id를 입력해주세요.")
-        private Long postId;
-
-        @Schema(example = "1")
         @NotNull(message = "답글을 작성할 comment의 id를 입력해주세요.")
         private Long commentId;
 
