@@ -1,7 +1,11 @@
 package com.spot.good2travel.dto;
 
+import com.spot.good2travel.domain.Folder;
 import com.spot.good2travel.domain.Item;
+import com.spot.good2travel.domain.ItemFolder;
 import com.spot.good2travel.domain.ItemType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,67 +17,89 @@ public class FolderResponse {
     @Getter
     @Setter
     public static class FolderListResponse{
+        @Schema(example = "1")
+        private Long folderId;
+        @Schema(example = "나의 대전 여행기")
         private String title;
-        private String imageUrl; //해당 폴더에서 제일 처음 저장된 굳이의 사진 링크 (없을 경우 null)
+        @Schema(example = "https://~")
+        private String image;
 
-        public FolderListResponse(String title, String imageUrl) {
+        public FolderListResponse(Long folderId, String title, String image) {
+            this.folderId = folderId;
             this.title = title;
-            this.imageUrl = imageUrl;
+            this.image = image;
         }
     }
 
     @Getter
     @Setter
-    public static class FolderUpdateResponse{
+    public static class FolderDetailResponse{
+        @Schema(example = "1")
+        private Long folderId;
+        @Schema(example = "나의 대전 여행기")
         private String title;
-        private List<Integer> sequence;
+        private List<ItemFolderResponse> itemFolders;
 
-        public FolderUpdateResponse(String title, List<Integer> sequence) {
+        public FolderDetailResponse(Long folderId, String title, List<ItemFolderResponse> itemFolders) {
+            this.folderId = folderId;
             this.title = title;
-            this.sequence = sequence;
+            this.itemFolders = itemFolders;
         }
-    }
 
-    @Getter
-    @Setter
-    public static class ItemListResponse {
-        List<FolderItem> folderItemList;
-
-        public ItemListResponse(List<FolderItem> folderItems) {
-            this.folderItemList = folderItems;
+        public static FolderDetailResponse of(Folder folder, List<ItemFolderResponse> itemFolders){
+            return new FolderDetailResponse(folder.getId(), folder.getTitle(), itemFolders);
         }
     }
 
     @Setter
     @Getter
-    public static class FolderItem {
-        private Long id;
-        private ItemType type;
+    public static class ItemFolderResponse {
+        @Schema(example = "1")
+        private Long itemId;
+        @Schema(example = "1")
+        private Long itemFolderId;
+        @Schema(example = "false")
+        private Boolean isOfficial;
+        @Schema(example = "PLAN")
+        private ItemType itemType;
+        @Schema(example = "민규형이랑 피시방가기")
         private String title;
-        private String imageUrl;
+        @Schema(example = "🌟")
+        private String image;
+        @Schema(example = "인천광역시 부평구 뭐시기...")
         private String address;
-        private LocalDate createDate;
+        @Schema(example = "2024-12-19")
+        private LocalDate finishDate;
+        @Schema(example = "true")
         private Boolean isFinished;
 
-        public FolderItem of(Item item){
-            this.id = item.getId();
-            this.type = item.getType();
-            this.title = item.getTitle();
-            if (item.getType() == ItemType.GOODE){
-                this.imageUrl = item.getImageUrl()==null? item.getEmoji() : item.getImageUrl();
-                this.address = item.getAddress();
-                this.createDate = item.getCreateDate().toLocalDate();
-                this.isFinished = null;
+        @Builder
+        public ItemFolderResponse(Long itemId, Long itemFolderId, ItemType itemType, Boolean isOfficial, String title, String image,
+                                  String address, LocalDate finishDate, Boolean isFinished) {
+            this.itemId = itemId;
+            this.itemFolderId = itemFolderId;
+            this.isOfficial = isOfficial;
+            this.itemType = itemType;
+            this.title = title;
+            this.image = image;
+            this.address = address;
+            this.finishDate = finishDate;
+            this.isFinished = isFinished;
+        }
 
-            } else if (item.getType() == ItemType.PLAN) {
-                this.imageUrl = item.getEmoji();
-                this.address = item.getAddress();
-                this.createDate = item.getCreateDate().toLocalDate();
-                this.isFinished = false;
-            }
+        public static ItemFolderResponse of(Item item, ItemFolder itemFolder, Boolean isFinished, String image) {
 
-            return this;
+            return ItemFolderResponse.builder()
+                    .itemId(item.getId())
+                    .itemFolderId(itemFolder.getId())
+                    .title(item.getTitle())
+                    .isOfficial(item.getIsOfficial())
+                    .itemType(item.getType())
+                    .image(image)
+                    .address(item.getAddress())
+                    .finishDate(isFinished ? itemFolder.getFinishDate() : null)
+                    .isFinished(isFinished)
+                    .build();
         }
     }
-
 }

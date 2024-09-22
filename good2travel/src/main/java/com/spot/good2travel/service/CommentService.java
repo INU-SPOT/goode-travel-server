@@ -42,7 +42,7 @@ public class CommentService {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository
-                .findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         Post post  = postRepository
                 .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
@@ -57,7 +57,7 @@ public class CommentService {
             Long userId = ((CustomUserDetails) userDetails).getId();
 
             User user = userRepository
-                    .findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                    .findById(userId).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
             return getCommentsForLogin(comments, user);
         }
 

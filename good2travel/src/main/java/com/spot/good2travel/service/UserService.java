@@ -29,7 +29,7 @@ public class UserService {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
         return user.getNickname() != null;
     }
@@ -38,7 +38,7 @@ public class UserService {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         MetropolitanGovernment metropolitanGovernment = metropolitanGovernmentRepository.findById(request.getMetropolitanGovernmentId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.METROPOLITANGOVERNMENT_NOT_FOUND));
 
@@ -53,7 +53,7 @@ public class UserService {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         String imageName = user.getProfileImageName();
 
         UserInfoResponse response = UserResponse.UserInfoResponse

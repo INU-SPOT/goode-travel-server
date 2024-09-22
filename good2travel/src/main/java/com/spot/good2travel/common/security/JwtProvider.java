@@ -137,7 +137,7 @@ public class JwtProvider {
         String token = request.getHeader("Authorization");
 
         if (token == null) {
-            throw new JwtEmptyException(ExceptionMessage.TOKEN_NOT_FOUND.getMessage());
+            throw new JwtEmptyException(ExceptionMessage.TOKEN_NOT_FOUND);
         } else {
             return token.substring(7);
         }

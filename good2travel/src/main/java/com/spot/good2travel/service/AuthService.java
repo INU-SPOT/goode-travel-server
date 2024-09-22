@@ -33,7 +33,7 @@ public class AuthService {
         Long userId = jwtProvider.getMemberId(token);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
 
         RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId);
 
