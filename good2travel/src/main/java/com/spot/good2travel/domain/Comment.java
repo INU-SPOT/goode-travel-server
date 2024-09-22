@@ -45,11 +45,11 @@ public class Comment extends BaseEntity {
         this.isModified = isModified;
     }
 
-    public static Comment of(CommentRequest.CommentCreateUpdateRequest request, User user, Post post){
+    public static Comment of(CommentRequest.CommentCreateRequest request, User user, Post post){
         return new Comment(request.getContent(), 0, false, user, post);
     }
 
-    public Comment updateComment(CommentRequest.CommentCreateUpdateRequest request){
+    public Comment updateComment(CommentRequest.CommentUpdateRequest request){
         this.content = request.getContent();
         this.isModified = true;
 
