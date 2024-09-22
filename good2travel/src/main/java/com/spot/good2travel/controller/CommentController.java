@@ -90,7 +90,7 @@ public class CommentController {
     }
 
     @PutMapping("/v1/posts/replycomments/{replycommentid}")
-    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요. <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요 <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답글 수정 성공"),
     })
