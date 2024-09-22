@@ -97,11 +97,25 @@ public class ItemController {
         return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
     }
 
-    @DeleteMapping("/v1/items/{itemId}")
+    @DeleteMapping("/v1/users/items/{itemId}")
     @Operation(summary = "사용자의 굳이/계획 삭제",
         description = "사용자의 굳이/계획을 삭제한다." +
                 "<br><br> - request : itemId = item(DB) 상 pk" +
                 "<br><br> - response : x"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자의 굳이/계획 삭제 완료", content = @Content(schema = @Schema(implementation = Null.class)))
+    })
+    public CommonResponse<?> deleteUserItem(@PathVariable("itemId") Long itemId){
+        itemService.deleteUserItem(itemId);
+        return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
+    }
+
+    @DeleteMapping("/v1/items/{itemId}")
+    @Operation(summary = "공식/비공식 굳이/계획 삭제(관리자용)",
+            description = "사용자의 굳이/계획을 삭제한다.(관리자용)" +
+                    "<br><br> - request : itemId = item(DB) 상 pk" +
+                    "<br><br> - response : x"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자의 굳이/계획 삭제 완료", content = @Content(schema = @Schema(implementation = Null.class)))
