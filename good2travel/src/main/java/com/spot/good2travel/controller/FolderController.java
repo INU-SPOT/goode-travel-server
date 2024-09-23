@@ -128,9 +128,9 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "계획 삭제 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> deleteFolder(@PathVariable("folderId") Long folderId, @PathVariable("itempostid") Long itemPostId,
+    public CommonResponse<?> deleteItemFolder(@PathVariable("folderId") Long folderId, @PathVariable("itempostid") Long itemPostId,
                                           @AuthenticationPrincipal UserDetails userDetails){
-        return CommonResponse.success("폴더 삭제 성공", folderService.deleteItemFolder(folderId, itemPostId, userDetails));
+        return CommonResponse.success("계획 삭제 성공", folderService.deleteItemFolder(folderId, itemPostId, userDetails));
     }
 
     @PutMapping("/v1/folders/plan/{itempostid}")
