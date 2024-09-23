@@ -99,11 +99,12 @@ public class Item extends BaseEntity {
                 .build();
     }
 
-    public static Item of(ItemRequest.ItemCreateRequest request) {
+    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
                 .imageUrl(request.getImageUrl())
+                .localGovernment(localGovernment)
                 .isOfficial(false)
                 .build();
     }
