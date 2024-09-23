@@ -23,7 +23,7 @@ public class NotificationService {
         List<Notification> alarms = notificationRepository.findByUserId(userId);
         return alarms.stream()
                 .map(NotificationResponse::of)
-                        .sorted(Comparator.comparing(NotificationResponse::getLocalDateTime).reversed())
+                        .sorted(Comparator.comparing(NotificationResponse::getNotificationTime).reversed())
                 .toList();
     }
 }

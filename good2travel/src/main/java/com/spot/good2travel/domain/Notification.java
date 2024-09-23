@@ -19,25 +19,25 @@ public class Notification {
 
     private String message;
 
-    private LocalDateTime localDateTime;
+    private LocalDateTime notificationTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
-    public Notification(String title, String message, LocalDateTime localDateTime, User user) {
+    public Notification(String title, String message, LocalDateTime notificationTime, User user) {
         this.title = title;
         this.message = message;
-        this.localDateTime = localDateTime;
+        this.notificationTime = notificationTime;
         this.user = user;
     }
 
-    public static Notification of(String title, String body, LocalDateTime localDateTime, User user) {
+    public static Notification of(String title, String body, LocalDateTime notificationTime, User user) {
         return Notification.builder()
                 .title(title)
                 .message(body)
-                .localDateTime(localDateTime)
+                .notificationTime(notificationTime)
                 .user(user)
                 .build();
     }

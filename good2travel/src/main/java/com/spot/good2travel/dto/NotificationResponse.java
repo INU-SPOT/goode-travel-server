@@ -20,14 +20,14 @@ public class NotificationResponse {
     private final String message;
 
     @Schema(example = "2024-09-21T22:25:39.03422")
-    private final LocalDateTime localDateTime;
+    private final LocalDateTime notificationTime;
 
     @Builder
-    public NotificationResponse(Long id, String title, String message, LocalDateTime localDateTime) {
+    public NotificationResponse(Long id, String title, String message, LocalDateTime notificationTime) {
         this.id = id;
         this.title = title;
         this.message = message;
-        this.localDateTime = localDateTime;
+        this.notificationTime = notificationTime;
     }
 
     public static NotificationResponse of(Notification notification){
@@ -35,7 +35,7 @@ public class NotificationResponse {
                 .id(notification.getId())
                 .title(notification.getTitle())
                 .message(notification.getMessage())
-                .localDateTime(notification.getLocalDateTime())
+                .notificationTime(notification.getNotificationTime())
                 .build();
     }
 }
