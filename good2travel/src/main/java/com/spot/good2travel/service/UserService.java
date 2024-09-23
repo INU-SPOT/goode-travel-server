@@ -45,7 +45,7 @@ public class UserService {
         user.updateUser(request.getNickname(), request.getProfileImageName(), metropolitanGovernment);
         userRepository.save(user);
 
-        return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment().getName(), user.getProfileImageName());
+        return UserInfoResponse.of(user.getNickname(), user.getMetropolitanGovernment(), user.getProfileImageName());
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class UserService {
         String imageName = user.getProfileImageName();
 
         UserInfoResponse response = UserResponse.UserInfoResponse
-                .of(user.getNickname(), user.getMetropolitanGovernment().getName(), imageName);
+                .of(user.getNickname(), user.getMetropolitanGovernment(), imageName);
 
         return response;
     }
