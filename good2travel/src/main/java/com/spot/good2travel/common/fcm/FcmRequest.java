@@ -10,7 +10,7 @@ import lombok.Setter;
 public class FcmRequest {
 
     @Getter
-    public static class FcmMessageDto{
+    public static class FcmMessage {
 
         @Schema(example = "eMogIDKaPnLC6jUJtNeIfn:APA91bGP3G6gUng1cvA-YvMLtPIw90Eqlb30fP9vYYO22wfPQMKKigEXcKGFIVEuPPln23xPSZOqs8WaYWik6PWuOxOLrvUTV5E32jdpLyVS4G5YDpg_2bZf5ITKmpiWmHhfZk6phxxN")
         private String fcmToken;
@@ -29,7 +29,7 @@ public class FcmRequest {
 
     @Getter
     @Setter
-    public static class FcmUpdateDto {
+    public static class FcmUpdate {
         @Schema(example = "eMogIDKaPnLC6jUJtNeIfn:APA91bGP3G6gUng1cvA-YvMLtPIw90Eqlb30fP9vYYO22wfPQMKKigEXcKGFIVEuPPln23xPSZOqs8WaYWik6PWuOxOLrvUTV5E32jdpLyVS4G5YDpg_2bZf5ITKmpiWmHhfZk6phxxN")
         @NotBlank(message = "발급받은 fcm 토큰을 입력해주세요.")
         private String fcmToken;

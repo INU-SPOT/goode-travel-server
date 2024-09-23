@@ -27,6 +27,13 @@ public class Fcm extends BaseEntity {
         this.user = user;
     }
 
+    public static Fcm of(String fcmToken, User user){
+        return Fcm.builder()
+                .fcmToken(fcmToken)
+                .user(user)
+                .build();
+    }
+
     public void toUpdate(String fcmToken){
         this.fcmToken = fcmToken;
     }

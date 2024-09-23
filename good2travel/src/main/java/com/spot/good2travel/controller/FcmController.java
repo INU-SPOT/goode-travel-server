@@ -35,8 +35,8 @@ public class FcmController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "토큰 저장 완료", content = @Content(schema = @Schema(implementation = Null.class))),
     })
-    public ResponseEntity<CommonResponse<?>> updateToken(@RequestBody FcmRequest.FcmUpdateDto fcmUpdateDto, @AuthenticationPrincipal UserDetails userDetails){
-        fcmService.updateToken(fcmUpdateDto, userDetails);
+    public ResponseEntity<CommonResponse<?>> updateToken(@RequestBody FcmRequest.FcmUpdate fcmUpdate, @AuthenticationPrincipal UserDetails userDetails){
+        fcmService.updateToken(fcmUpdate, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.success("토큰 저장 완료", null));
     }
@@ -51,7 +51,7 @@ public class FcmController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "메세지 생성 완료", content = @Content(schema = @Schema(implementation = String.class))),
     })
-    public ResponseEntity<CommonResponse<?>> sendMessage(@RequestBody FcmRequest.FcmMessageDto fcmRequest) throws FirebaseMessagingException {
+    public ResponseEntity<CommonResponse<?>> sendMessage(@RequestBody FcmRequest.FcmMessage fcmRequest) throws FirebaseMessagingException {
         String response = fcmService.sendMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.success("send message", response));
