@@ -1,6 +1,6 @@
 package com.spot.good2travel.dto;
 
-import com.spot.good2travel.domain.Alarm;
+import com.spot.good2travel.domain.Notification;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class AlarmResponse {
+public class NotificationResponse {
 
     @Schema(example = "1")
     private final Long id;
@@ -23,19 +23,19 @@ public class AlarmResponse {
     private final LocalDateTime localDateTime;
 
     @Builder
-    public AlarmResponse(Long id, String title, String message, LocalDateTime localDateTime) {
+    public NotificationResponse(Long id, String title, String message, LocalDateTime localDateTime) {
         this.id = id;
         this.title = title;
         this.message = message;
         this.localDateTime = localDateTime;
     }
 
-    public static AlarmResponse of(Alarm alarm){
-        return AlarmResponse.builder()
-                .id(alarm.getId())
-                .title(alarm.getTitle())
-                .message(alarm.getMessage())
-                .localDateTime(alarm.getLocalDateTime())
+    public static NotificationResponse of(Notification notification){
+        return NotificationResponse.builder()
+                .id(notification.getId())
+                .title(notification.getTitle())
+                .message(notification.getMessage())
+                .localDateTime(notification.getLocalDateTime())
                 .build();
     }
 }

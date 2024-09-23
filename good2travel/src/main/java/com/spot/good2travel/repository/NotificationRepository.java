@@ -1,6 +1,6 @@
 package com.spot.good2travel.repository;
 
-import com.spot.good2travel.domain.Alarm;
+import com.spot.good2travel.domain.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    Optional<List<Alarm>> findByUserId(Long userId);
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    Optional<List<Notification>> findByUserId(Long userId);
 }

@@ -1,8 +1,8 @@
 package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
-import com.spot.good2travel.dto.AlarmResponse;
-import com.spot.good2travel.service.AlarmService;
+import com.spot.good2travel.dto.NotificationResponse;
+import com.spot.good2travel.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,21 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AlarmController {
+public class NotificationController {
 
-    private final AlarmService alarmService;
+    private final NotificationService notificationService;
 
-    @GetMapping("/v1/alarms")
+    @GetMapping("/v1/notification")
     @Operation(
             summary = "알람 내역 반환",
             description = "알림 내역들을 최신순으로 반환한다." +
                     "<br><br> - request : X" +
-                    "<br><br> - response : List<AlarmResponse>"
+                    "<br><br> - response : List<NotificationResponse>"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "알림 내역 반환 성공", content = @Content(schema = @Schema(implementation = AlarmResponse.class))),
+            @ApiResponse(responseCode = "200", description = "알림 내역 반환 성공", content = @Content(schema = @Schema(implementation = NotificationResponse.class))),
     })
-    public CommonResponse<?> getAlarms(@AuthenticationPrincipal UserDetails userDetails){
-        return CommonResponse.success("알람 내역 반환 성공", alarmService.getAlarms(userDetails));
+    public CommonResponse<?> getNotifications(@AuthenticationPrincipal UserDetails userDetails){
+        return CommonResponse.success("알람 내역 반환 성공", notificationService.getNotifications(userDetails));
     }
 }
