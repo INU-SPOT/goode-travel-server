@@ -5,8 +5,12 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.fcm.FcmRequest;
 import com.spot.good2travel.common.security.CustomUserDetails;
+import com.spot.good2travel.domain.Notification;
 import com.spot.good2travel.domain.Fcm;
+import com.spot.good2travel.domain.Post;
 import com.spot.good2travel.domain.User;
+import com.spot.good2travel.dto.CommentRequest;
+import com.spot.good2travel.repository.NotificationRepository;
 import com.spot.good2travel.repository.FcmRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class FcmService {
 
     private final FcmRepository fcmRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
     public String sendMessage(String token, String title, String body) throws FirebaseMessagingException {
         Message message = Message.builder()
@@ -38,18 +44,34 @@ public class FcmService {
     }
 
     @Transactional
-    public void updateToken(FcmRequest.FcmUpdateDto fcmUpdateDto, UserDetails userDetails){
+    public void updateToken(FcmRequest.FcmUpdate fcmUpdate, UserDetails userDetails){
         Long id = ((CustomUserDetails) userDetails).getId();
         Optional<Fcm> fcm = fcmRepository.findByUserId(1L);
         if (fcm.isPresent()) {
-            fcm.get().toUpdate(fcmUpdateDto.getFcmToken());
+            fcm.get().toUpdate(fcmUpdate.getFcmToken());
         } else {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
-            fcmRepository.save(Fcm.builder()
-                    .fcmToken(fcmUpdateDto.getFcmToken())
-                    .user(user)
-                    .build());
+            fcmRepository.save(Fcm.of(fcmUpdate.getFcmToken(), user));
         }
     }
+
+    public void sendMessageForComment(User user, Post post, CommentRequest.CommentCreateUpdateRequest request, LocalDateTime localDateTime) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
+        String body = request.getContent();
+        sendMessage(fcm.getFcmToken(),title, body);
+        notificationRepository.save(Notification.of(title, body, localDateTime, user));
+    }
+
+    public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request, LocalDateTime localDateTime) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
+        String body = request.getContent();
+        sendMessage(fcm.getFcmToken(),title, body);
+        notificationRepository.save(Notification.of(title, body, localDateTime, user));
+    }
+
 }

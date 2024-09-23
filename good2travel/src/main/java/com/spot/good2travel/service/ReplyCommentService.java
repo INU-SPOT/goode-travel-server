@@ -28,8 +28,6 @@ public class ReplyCommentService {
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final FcmService fcmService;
-    private final FcmRepository fcmRepository;
-    private final AlarmRepository alarmRepository;
 
     @Transactional
     public void addReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
@@ -46,17 +44,8 @@ public class ReplyCommentService {
         ReplyComment replyComment = ReplyComment.of(request, user, comment);
         replyCommentRepository.save(replyComment);
         if (!userId.equals(user.getId())) {
-            sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
+            fcmService.sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
         }
-    }
-
-    private void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request, LocalDateTime localDateTime) throws FirebaseMessagingException {
-        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
-        String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
-        String body = request.getContent();
-        fcmService.sendMessage(fcm.getFcmToken(),title, body);
-        alarmRepository.save(Alarm.of(title, body, localDateTime, user));
     }
 
     @Transactional
