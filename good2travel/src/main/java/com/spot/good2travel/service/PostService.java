@@ -198,10 +198,8 @@ public class PostService {
 
         ItemPost itemPost = itemPostRepository.findById(itemPostId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-
-        if(!itemPost.getItem().getIsOfficial()){
-            itemService.deleteUserItem(itemPost.getItem().getId());
-        }
+        
+        itemService.deleteUserItem(itemPost.getItem().getId());
 
         itemPostRepository.delete(itemPost);
     }
@@ -382,7 +380,6 @@ public class PostService {
                 }).toList();
     }
 
-    //item 추가하면 개발
     @Transactional
     public CommonPagingResponse<?> searchPosts(List<String> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -394,9 +391,10 @@ public class PostService {
     public void deletePost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+        validateUserIsPostOwner(post, userDetails);
+
         post.getItemPosts().stream()
                 .forEach(num -> itemService.deleteUserItem(num.getItem().getId()));
-        validateUserIsPostOwner(post, userDetails);
         postRepository.delete(post);
     }
 
