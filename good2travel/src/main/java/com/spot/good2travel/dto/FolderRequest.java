@@ -30,6 +30,21 @@ public class FolderRequest {
     }
 
     @Getter
+    public static class ItemFolderUpdateRequest{
+        @Schema(example = "1")
+        @NotNull(message = "itemFolder의 id를 입력 해 주세요.")
+        private Long itemFolderId;
+        @Schema(example = "남선공원에서 노래부르기")
+        private String title;
+        @Schema(example = "🌟")
+        private String emoji;
+        @Schema(example = "1")
+        private Long localGovernmentId;
+        @Schema(example = "대전광역시 무슨구 무슨로 1234")
+        private String address;
+    }
+
+    @Getter
     public static class FolderUpdateRequest {
         @Schema(example = "나의 여름 대전 여행")
         private String title;

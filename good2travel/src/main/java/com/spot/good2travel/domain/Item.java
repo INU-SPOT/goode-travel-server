@@ -1,6 +1,7 @@
 package com.spot.good2travel.domain;
 
 import com.spot.good2travel.common.entity.BaseEntity;
+import com.spot.good2travel.dto.FolderRequest;
 import com.spot.good2travel.dto.ItemRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,13 +38,13 @@ public class Item extends BaseEntity {
     private Boolean isOfficial;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<ItemCategory> itemCategories = new ArrayList<>();
+    private final List<ItemCategory> itemCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<ItemPost> itemPosts = new ArrayList<>();
+    private final List<ItemPost> itemPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-    private List<ItemFolder> itemFolders = new ArrayList<>();
+    private final List<ItemFolder> itemFolders = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_government_id")
@@ -112,5 +113,11 @@ public class Item extends BaseEntity {
         this.imageUrl = itemUpdateRequest.getImageUrl();
         this.title = itemUpdateRequest.getTitle();
         this.localGovernment = localGovernment;
+    }
+
+    public void updateUserItem(FolderRequest.ItemFolderUpdateRequest request, LocalGovernment localGovernment) {
+        this.title = request.getTitle();
+        this.localGovernment = localGovernment;
+        this.address = request.getAddress();
     }
 }

@@ -135,4 +135,13 @@ public class PostController {
         return CommonResponse.success("유저가 좋아요 누른 글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
     }
 
+    @DeleteMapping("/v1/posts/{postid}")
+    @Operation(summary = "게시글 삭제하기", description = "게시글을 삭제해봅시다 <br><br> - request: <br> accessToken을 주오... <br> Long <br><br> - response: <br> List<PostThumbnailResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
+    })
+    public CommonResponse<?> deletePost(@RequestParam Long postid, @AuthenticationPrincipal UserDetails userDetails) {
+        postService.deletePost(postid, userDetails);
+        return CommonResponse.success("게시글 삭제 성공", null);
+    }
 }

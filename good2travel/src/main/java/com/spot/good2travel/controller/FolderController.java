@@ -147,4 +147,18 @@ public class FolderController {
         return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemPostId));
     }
 
+    @PutMapping("/v1/folders/plan")
+    @Operation(
+            summary = "폴더 안 계획의 내부 정보 수정하기",
+            description = "폴더 안 계획의 내부 정보를 수정합니다. OFFICIAL PLAN을 수정할 경우: emoji만 수정 가능합니다. USER PLAN을 수정할 경우: emoji, 계획 제목, 지역구, 주소를 변경 가능합니다. PUT이기 때문에 dto 꽉 채워서 보내시면 됩니다~ Official인지 아닌지는 서버에서 검증해요!" +
+                    "<br><br> - request : ItemFolderUpdateRequest(DTO)" +
+                    "<br><br> - response : folder의 pk"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "계획 수정 완료", content = @Content(schema = @Schema(implementation = Boolean.class))),
+    })
+    public CommonResponse<?> updateUserPlan(@RequestBody FolderRequest.ItemFolderUpdateRequest request, @AuthenticationPrincipal UserDetails userDetails){
+        return CommonResponse.success("계획 수정 완료", folderService.updateItemFolder(request, userDetails));
+    }
+
 }

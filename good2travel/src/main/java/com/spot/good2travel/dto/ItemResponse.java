@@ -16,7 +16,6 @@ public class ItemResponse {
         private String address;
         private String description;
         private String localGovernmentName;
-//        private Integer temperature; todo 날씨 로직 추가 이후
 
         public static GoodeDetailsResponse of(Item item, String localGovernmentName){
             return GoodeDetailsResponse.builder()
