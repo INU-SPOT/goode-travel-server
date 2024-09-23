@@ -149,10 +149,7 @@ public class PostService {
         Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
         beforeSequence.stream()
                 .filter(num -> !afterSequenceSet.contains(num))
-                .forEach(num -> {
-                    itemService.deleteUserItem(num);
-                    deleteItemPost(num);
-                });
+                .forEach(this::deleteItemPost);
 
         return postId;
     }
@@ -198,11 +195,15 @@ public class PostService {
     }
 
     public void deleteItemPost(Long itemPostId) {
-        itemPostRepository.deleteById(itemPostId);
-    }
 
-    public void deleteItemPostImage(Long itemPostImageId){
-        itemPostImageRepository.deleteById(itemPostImageId);
+        ItemPost itemPost = itemPostRepository.findById(itemPostId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+
+        if(!itemPost.getItem().getIsOfficial()){
+            itemService.deleteUserItem(itemPost.getItem().getId());
+        }
+
+        itemPostRepository.delete(itemPost);
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
@@ -351,7 +352,7 @@ public class PostService {
 
         Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
 
-        List<Long> likePostsNum = likePosts.stream()
+        List<Long> likePostsNum = Objects.requireNonNull(likePosts).stream()
                 .map(id -> Long.parseLong(id.toString()))
                 .toList();
 
