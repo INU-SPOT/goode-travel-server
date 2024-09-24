@@ -381,9 +381,9 @@ public class PostService {
     }
 
     @Transactional
-    public CommonPagingResponse<?> searchPosts(List<String> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
+    public CommonPagingResponse<?> searchPosts(List<Long> metropolitanGovernments, List<Long> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
-        Page<Post> postPage = postRepository.searchPostsByCriteria(localGovernments, categories, keyword, pageable);
+        Page<Post> postPage = postRepository.searchPostsByCriteria(metropolitanGovernments, localGovernments, categories, keyword, pageable);
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 

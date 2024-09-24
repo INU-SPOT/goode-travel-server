@@ -49,12 +49,13 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
-    public CommonResponse<?> getPosts(@RequestParam(required = false) List<String> localGovernments,
+    public CommonResponse<?> getPosts(@RequestParam(required = false) List<Long> metropolitanGovernments,
+                                      @RequestParam(required = false) List<Long> localGovernments,
                                       @RequestParam(required = false) List<String> categories,
                                       @RequestParam(required = false) String keyword,
                                       @RequestParam(defaultValue = "0", required = false) Integer page,
                                       @RequestParam(defaultValue = "7", required = false) Integer size) {
-        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.searchPosts(localGovernments, categories, keyword, page, size));
+        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.searchPosts(metropolitanGovernments, localGovernments, categories, keyword, page, size));
     }
 
     @GetMapping("/v1/posts/{postid}")
