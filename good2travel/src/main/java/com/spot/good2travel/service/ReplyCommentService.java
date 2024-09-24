@@ -45,7 +45,7 @@ public class ReplyCommentService {
 
         ReplyComment replyComment = ReplyComment.of(request, user, comment);
         replyCommentRepository.save(replyComment);
-        if (!userId.equals(user.getId())) {
+        if (!userId.equals(comment.getPost().getUser().getId())) {
             fcmService.sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
         }
     }

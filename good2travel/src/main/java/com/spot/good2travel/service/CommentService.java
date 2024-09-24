@@ -52,7 +52,7 @@ public class CommentService {
 
         Comment comment = Comment.of(request, user, post);
         commentRepository.save(comment);
-        if (!userId.equals(user.getId())){
+        if (!userId.equals(post.getUser().getId())){
             fcmService.sendMessageForComment(user, post, request, comment.getCreateDate());
         }
     }
