@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 @Service
 @RequiredArgsConstructor
@@ -103,5 +104,11 @@ public class ReplyCommentService {
         if(comment.getUser().getId().equals(userId)){
             comment.updateReplyComment(request);
         }
+    }
+
+    public List<ReplyComment> getUserReplyComment(UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        return replyCommentRepository.findByUserId(userId);
     }
 }

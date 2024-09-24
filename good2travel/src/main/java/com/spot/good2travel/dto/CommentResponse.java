@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -104,6 +105,47 @@ public class CommentResponse {
                     .isOwner(isOwner)
                     .isModified(comment.getIsModified())
                     .content(comment.getContent())
+                    .build();
+        }
+    }
+
+    @Getter
+    public static class UserCommentResponse{
+
+        @Schema(example = "replyComment")
+        private final String type;
+        @Schema(example = "1")
+        private final Long postId;
+        @Schema(example = "환기리의 인천여행")
+        private final String postTitle;
+        @Schema(example = "2024-11-28")
+        private final LocalDate date;
+        @Schema(example = "true")
+        private final Boolean isModified;
+        private final LocalDateTime createDate;
+        @Schema(example = "이상한댓글 달지 마세요;;")
+        private final String content;
+
+        @Builder
+        public UserCommentResponse(String type, Long postId, String postTitle, LocalDate date, Boolean isModified, LocalDateTime createDate, String content) {
+            this.type = type;
+            this.postId = postId;
+            this.postTitle = postTitle;
+            this.date = date;
+            this.isModified = isModified;
+            this.createDate = createDate;
+            this.content = content;
+        }
+
+        public static UserCommentResponse of(String type, Long postId, String postTitle, LocalDate date, Boolean isModified, LocalDateTime createDate,String content){
+            return UserCommentResponse.builder()
+                    .type(type)
+                    .postId(postId)
+                    .postTitle(postTitle)
+                    .date(date)
+                    .isModified(isModified)
+                    .createDate(createDate)
+                    .content(content)
                     .build();
         }
     }

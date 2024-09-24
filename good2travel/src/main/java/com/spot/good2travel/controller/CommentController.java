@@ -36,6 +36,15 @@ public class CommentController {
         return CommonResponse.success("댓글 가져오기 성공", commentService.getPostComments(postid, userDetails));
     }
 
+    @GetMapping("/v1/users/comments")
+    @Operation(summary = "유저가 쓴 댓글 가져오기", description = "유저가 쓴 댓글을 가져옵니다.스웨거 예시에 있는 dto를 List로 응답합니다. 멍청이슈 조심. <br><br> - request: accessToken을 다오... <br><br> - response: List<UserCommentResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 댓글 가져오기 성공", content = @Content(schema = @Schema(implementation = CommentResponse.CommentDetailResponse.class))),
+    })
+    public CommonResponse<?> getUserComments(@AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 댓글 가져오기 성공", commentService.getUserComments(userDetails));
+    }
+
     @PostMapping("/v1/posts/comments")
     @Operation(summary = "게시글에 댓글달기", description = "게시글에 댓글을 달겁니다. <br><br> - request: CommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
