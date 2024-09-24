@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -20,10 +19,9 @@ public class NotificationService {
     public List<NotificationResponse> getNotifications(UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
 
-        List<Notification> alarms = notificationRepository.findByUserId(userId);
+        List<Notification> alarms = notificationRepository.findByUserIdOrderByNotificationTimeDesc(userId);
         return alarms.stream()
                 .map(NotificationResponse::of)
-                        .sorted(Comparator.comparing(NotificationResponse::getNotificationTime).reversed())
                 .toList();
     }
 }

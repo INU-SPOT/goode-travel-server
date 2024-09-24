@@ -1,6 +1,7 @@
 package com.spot.good2travel.service;
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
@@ -34,10 +35,11 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FcmService fcmService;
 
 
     @Transactional
-    public void addComment(CommentCreateRequest request, UserDetails userDetails){
+    public void addComment(CommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -48,7 +50,11 @@ public class CommentService {
         Post post  = postRepository
                 .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        commentRepository.save(Comment.of(request, user, post));
+        Comment comment = Comment.of(request, user, post);
+        commentRepository.save(comment);
+        if (!userId.equals(user.getId())){
+            fcmService.sendMessageForComment(user, post, request, comment.getCreateDate());
+        }
     }
 
     @Transactional
