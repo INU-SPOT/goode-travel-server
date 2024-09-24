@@ -55,7 +55,10 @@ public enum ExceptionMessage {
         ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST),
         
         //fcm 관련 메시지
-        FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND);
+        FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+
+        //알림 관련 메세지
+        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND);
 
 
 private final String message;

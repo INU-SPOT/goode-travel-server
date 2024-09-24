@@ -1,5 +1,7 @@
 package com.spot.good2travel.service;
 
+import com.spot.good2travel.common.exception.ExceptionMessage;
+import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Notification;
 import com.spot.good2travel.dto.NotificationResponse;
@@ -7,6 +9,7 @@ import com.spot.good2travel.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,5 +26,14 @@ public class NotificationService {
         return alarms.stream()
                 .map(NotificationResponse::of)
                 .toList();
+    }
+
+    @Transactional
+    public Boolean updateConfirm(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.NOTIFICATION_NOT_FOUND));
+
+        notification.updateConfirm();
+        return notification.getIsConfirm();
     }
 }

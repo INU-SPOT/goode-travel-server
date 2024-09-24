@@ -25,13 +25,17 @@ public class NotificationResponse {
     @Schema(example = "2024-09-21T22:25:39.03422")
     private final LocalDateTime notificationTime;
 
+    @Schema(example = "false")
+    private final Boolean isConfirm;
+
     @Builder
-    public NotificationResponse(Long id, Long postId, String title, String message, LocalDateTime notificationTime) {
+    public NotificationResponse(Long id, Long postId, String title, String message, LocalDateTime notificationTime, Boolean isConfirm) {
         this.id = id;
         this.postId = postId;
         this.title = title;
         this.message = message;
         this.notificationTime = notificationTime;
+        this.isConfirm = isConfirm;
     }
 
     public static NotificationResponse of(Notification notification){
@@ -41,6 +45,7 @@ public class NotificationResponse {
                 .title(notification.getTitle())
                 .message(notification.getMessage())
                 .notificationTime(notification.getNotificationTime())
+                .isConfirm(notification.getIsConfirm())
                 .build();
     }
 }
