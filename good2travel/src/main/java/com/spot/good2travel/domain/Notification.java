@@ -15,6 +15,8 @@ public class Notification {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long postId;
+
     private String title;
 
     private String message;
@@ -26,15 +28,17 @@ public class Notification {
     private User user;
 
     @Builder
-    public Notification(String title, String message, LocalDateTime notificationTime, User user) {
+    public Notification(Long postId, String title, String message, LocalDateTime notificationTime, User user) {
+        this.postId = postId;
         this.title = title;
         this.message = message;
         this.notificationTime = notificationTime;
         this.user = user;
     }
 
-    public static Notification of(String title, String body, LocalDateTime notificationTime, User user) {
+    public static Notification of(Long postId, String title, String body, LocalDateTime notificationTime, User user) {
         return Notification.builder()
+                .postId(postId)
                 .title(title)
                 .message(body)
                 .notificationTime(notificationTime)

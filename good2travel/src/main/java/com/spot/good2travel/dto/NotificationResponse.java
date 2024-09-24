@@ -13,6 +13,9 @@ public class NotificationResponse {
     @Schema(example = "1")
     private final Long id;
 
+    @Schema(example = "1")
+    private final Long postId;
+
     @Schema(example = "깨구링님이 '환기리의 꿀잼 인천여행' 게시물에 댓글을 달았어요.")
     private final String title;
 
@@ -23,8 +26,9 @@ public class NotificationResponse {
     private final LocalDateTime notificationTime;
 
     @Builder
-    public NotificationResponse(Long id, String title, String message, LocalDateTime notificationTime) {
+    public NotificationResponse(Long id, Long postId, String title, String message, LocalDateTime notificationTime) {
         this.id = id;
+        this.postId = postId;
         this.title = title;
         this.message = message;
         this.notificationTime = notificationTime;
@@ -33,6 +37,7 @@ public class NotificationResponse {
     public static NotificationResponse of(Notification notification){
         return NotificationResponse.builder()
                 .id(notification.getId())
+                .postId(notification.getPostId())
                 .title(notification.getTitle())
                 .message(notification.getMessage())
                 .notificationTime(notification.getNotificationTime())

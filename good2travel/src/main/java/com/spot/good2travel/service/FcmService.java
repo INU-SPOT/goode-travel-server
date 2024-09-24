@@ -62,7 +62,7 @@ public class FcmService {
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
         String body = request.getContent();
         sendMessage(fcm.getFcmToken(),title, body);
-        notificationRepository.save(Notification.of(title, body, notificationTime, user));
+        notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, user));
     }
 
     public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
@@ -71,7 +71,7 @@ public class FcmService {
         String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
         String body = request.getContent();
         sendMessage(fcm.getFcmToken(),title, body);
-        notificationRepository.save(Notification.of(title, body, notificationTime, user));
+        notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, user));
     }
 
 }
