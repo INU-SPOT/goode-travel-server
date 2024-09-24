@@ -33,7 +33,7 @@ public class ItemPost {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @OneToMany(mappedBy ="itemPost",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy ="itemPost",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPostImage> itemPostImages;
 
     @Builder

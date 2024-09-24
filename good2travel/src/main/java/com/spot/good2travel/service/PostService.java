@@ -42,6 +42,7 @@ public class PostService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
+    private final ItemService itemService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -164,18 +165,11 @@ public class PostService {
             ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
 
-            List<Long> beforeSequence = itemPost.getSequence();
-
             List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
                     .map(image -> updateItemPostImage(image, itemPost))
                     .toList();
 
             itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
-
-            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
-            beforeSequence.stream()
-                    .filter(num -> !afterSequenceSet.contains(num))
-                    .forEach(this::deleteItemPostImage);
 
             return itemPost.getId();
         }
@@ -201,11 +195,13 @@ public class PostService {
     }
 
     public void deleteItemPost(Long itemPostId) {
-        itemPostRepository.deleteById(itemPostId);
-    }
 
-    public void deleteItemPostImage(Long itemPostImageId){
-        itemPostImageRepository.deleteById(itemPostImageId);
+        ItemPost itemPost = itemPostRepository.findById(itemPostId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+        
+        itemService.deleteUserItem(itemPost.getItem().getId());
+
+        itemPostRepository.delete(itemPost);
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
@@ -354,7 +350,7 @@ public class PostService {
 
         Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
 
-        List<Long> likePostsNum = likePosts.stream()
+        List<Long> likePostsNum = Objects.requireNonNull(likePosts).stream()
                 .map(id -> Long.parseLong(id.toString()))
                 .toList();
 
@@ -384,12 +380,22 @@ public class PostService {
                 }).toList();
     }
 
-    //item 추가하면 개발
     @Transactional
     public CommonPagingResponse<?> searchPosts(List<String> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
         Page<Post> postPage = postRepository.searchPostsByCriteria(localGovernments, categories, keyword, pageable);
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
+    }
+
+    @Transactional
+    public void deletePost(Long postId, UserDetails userDetails) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+        validateUserIsPostOwner(post, userDetails);
+
+        post.getItemPosts().stream()
+                .forEach(num -> itemService.deleteUserItem(num.getItem().getId()));
+        postRepository.delete(post);
     }
 
 }

@@ -143,8 +143,8 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "계획 완료여부 변환 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
     })
-    public CommonResponse<?> switchPlanFinished(@PathVariable("itemfolderid") Long itemFolerId){
-        return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemFolerId));
+    public CommonResponse<?> switchPlanFinished(@PathVariable("itemfolderid") Long itemFolderId){
+        return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemFolderId));
     }
 
     @PutMapping("/v1/folders/plan")

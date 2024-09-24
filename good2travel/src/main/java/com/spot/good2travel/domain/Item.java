@@ -37,7 +37,7 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private Boolean isOfficial;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ItemCategory> itemCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)

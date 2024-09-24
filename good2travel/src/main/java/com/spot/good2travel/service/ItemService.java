@@ -104,7 +104,7 @@ public class ItemService {
         }
     }
 
-    public void deleteItem(Long itemId) {
+    public void deleteUserItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getIsOfficial()){
@@ -112,5 +112,9 @@ public class ItemService {
         } else {
             itemRepository.deleteById(itemId);
         }
+    }
+
+    public void deleteItem(Long itemId) {
+        itemRepository.deleteById(itemId);
     }
 }
