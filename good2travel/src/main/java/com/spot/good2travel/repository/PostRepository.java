@@ -51,4 +51,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("categories") List<String> categories,
             @Param("keyword") String keyword,
             Pageable pageable);
+
 }
