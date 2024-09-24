@@ -1,5 +1,6 @@
 package com.spot.good2travel.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.CommentRequest;
 import com.spot.good2travel.dto.CommentResponse;
@@ -41,7 +42,7 @@ public class CommentController {
             @ApiResponse(responseCode = "201", description = "게시글에 댓글 달기 성공"),
     })
     public ResponseEntity<CommonResponse<?>> addComment(@RequestBody @Valid CommentRequest.CommentCreateRequest request,
-                                                       @AuthenticationPrincipal UserDetails userDetails) {
+                                                       @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         commentService.addComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("게시글에 댓글 달기 성공", null));
     }
@@ -52,7 +53,7 @@ public class CommentController {
             @ApiResponse(responseCode = "201", description = "댓글에 답글달기 성공"),
     })
     public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody @Valid CommentRequest.ReplyCommentCreateRequest request,
-                                             @AuthenticationPrincipal UserDetails userDetails) {
+                                             @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         replyCommentService.addReplyComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
     }
