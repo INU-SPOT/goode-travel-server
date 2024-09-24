@@ -39,11 +39,11 @@ public class ReplyComment extends BaseEntity {
         this.comment = comment;
     }
 
-    public static ReplyComment of(CommentRequest.ReplyCommentCreateUpdateRequest request, User user, Comment comment){
+    public static ReplyComment of(CommentRequest.ReplyCommentCreateRequest request, User user, Comment comment){
         return new ReplyComment(request.getContent(), 0,false, user, comment);
     }
 
-    public ReplyComment updateReplyComment(CommentRequest.ReplyCommentCreateUpdateRequest request){
+    public ReplyComment updateReplyComment(CommentRequest.CommentUpdateRequest request){
         this.content = request.getContent();
         this.isModified = true;
 

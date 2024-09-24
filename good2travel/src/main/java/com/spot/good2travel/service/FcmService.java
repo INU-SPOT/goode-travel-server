@@ -46,7 +46,7 @@ public class FcmService {
     @Transactional
     public void updateToken(FcmRequest.FcmUpdate fcmUpdate, UserDetails userDetails){
         Long id = ((CustomUserDetails) userDetails).getId();
-        Optional<Fcm> fcm = fcmRepository.findByUserId(1L);
+        Optional<Fcm> fcm = fcmRepository.findByUserId(id);
         if (fcm.isPresent()) {
             fcm.get().toUpdate(fcmUpdate.getFcmToken());
         } else {
@@ -56,7 +56,7 @@ public class FcmService {
         }
     }
 
-    public void sendMessageForComment(User user, Post post, CommentRequest.CommentCreateUpdateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
+    public void sendMessageForComment(User user, Post post, CommentRequest.CommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
         Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
@@ -65,7 +65,7 @@ public class FcmService {
         notificationRepository.save(Notification.of(title, body, notificationTime, user));
     }
 
-    public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateUpdateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
+    public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
         Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
