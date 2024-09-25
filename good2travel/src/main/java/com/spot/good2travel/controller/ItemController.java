@@ -151,10 +151,10 @@ public class ItemController {
             summary = "랜덤 굳이 뽑기",
             description = "랜덤으로 굳이 하나를 가져온다." +
                     "<br><br> - request : X" +
-                    "<br><br> : - response : String (Goode의 이름)"
+                    "<br><br> : - response : GoodeRandomResponse"
     )
     @ApiResponses(
-            @ApiResponse(responseCode = "200", description = "랜덤 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = String.class)))
+            @ApiResponse(responseCode = "200", description = "랜덤 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = ItemResponse.GoodeRandomResponse.class)))
     )
     public CommonResponse<?> getRandomGoode(){
         return CommonResponse.success("랜덤 굳이 반환 완료", itemService.getRandomGoode());

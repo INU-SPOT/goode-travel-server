@@ -130,9 +130,9 @@ public class ItemService {
         itemRepository.deleteById(itemId);
     }
 
-    public String getRandomGoode() {
+    public ItemResponse.GoodeRandomResponse getRandomGoode() {
         Optional<Item> randomItem = itemRepository.findRandomItem();
-        if (randomItem.isPresent()) return randomItem.get().getTitle();
+        if (randomItem.isPresent()) return ItemResponse.GoodeRandomResponse.of(randomItem.get());
         throw new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND);
     }
 
