@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -127,6 +128,12 @@ public class ItemService {
 
     public void deleteItem(Long itemId) {
         itemRepository.deleteById(itemId);
+    }
+
+    public String getRandomGoode() {
+        Optional<Item> randomItem = itemRepository.findRandomItem();
+        if (randomItem.isPresent()) return randomItem.get().getTitle();
+        throw new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND);
     }
 
     @Transactional
