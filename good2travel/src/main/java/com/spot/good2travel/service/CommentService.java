@@ -22,10 +22,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.spot.good2travel.dto.CommentRequest.CommentCreateRequest;
 
@@ -156,7 +156,7 @@ public class CommentService {
 
     @Transactional
     public List<CommentResponse.UserCommentResponse> getUserComments(UserDetails userDetails){
-        if(userDetails == null){
+        if (userDetails == null) {
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
 
@@ -165,22 +165,15 @@ public class CommentService {
         List<Comment> comments = commentRepository.findByUserId(userId);
         List<ReplyComment> replyComments = replyCommentService.getUserReplyComment(userDetails);
 
-        List<CommentResponse.UserCommentResponse> response = new ArrayList<>();
-
-        response.addAll(comments.stream()
-                .map(comment -> CommentResponse.UserCommentResponse
-                        .of("comment", comment.getPost().getId(), comment.getPost().getTitle(),
-                                comment.getUpdateDate().toLocalDate(), comment.getIsModified(), comment.getCreateDate(),comment.getContent()))
-                .toList());
-
-        response.addAll(replyComments.stream()
-                .map(replyComment -> CommentResponse.UserCommentResponse
-                        .of("replyComment", replyComment.getComment().getPost().getId(), replyComment.getComment().getPost().getTitle(),
-                                replyComment.getUpdateDate().toLocalDate(), replyComment.getIsModified(), replyComment.getCreateDate(), replyComment.getContent()))
-                .toList());
-
-        response = response.stream()
-                .sorted(Comparator.comparing(CommentResponse.UserCommentResponse::getCreateDate).reversed())
+        List<CommentResponse.UserCommentResponse> response = Stream.concat(
+                        comments.stream()
+                                .map(comment -> CommentResponse.UserCommentResponse.of("comment", comment.getPost().getId(), comment.getPost().getTitle(),
+                                        comment.getUpdateDate().toLocalDate(), comment.getIsModified(), comment.getCreateDate(), comment.getContent())),
+                        replyComments.stream()
+                                .map(replyComment -> CommentResponse.UserCommentResponse.of("replyComment", replyComment.getComment().getPost().getId(),
+                                        replyComment.getComment().getPost().getTitle(), replyComment.getUpdateDate().toLocalDate(),
+                                        replyComment.getIsModified(), replyComment.getCreateDate(), replyComment.getContent()))
+                ).sorted(Comparator.comparing(CommentResponse.UserCommentResponse::getCreateDate).reversed())
                 .toList();
 
         return response;
