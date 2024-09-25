@@ -1,6 +1,5 @@
 package com.spot.good2travel.domain;
 
-import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,5 +28,8 @@ public class LocalGovernment {
 
     @OneToMany(mappedBy = "localGovernment",cascade = CascadeType.ALL)
     private List<Item> items;
+
+    @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
+    private List<Advertisement> advertisements;
 
 }
