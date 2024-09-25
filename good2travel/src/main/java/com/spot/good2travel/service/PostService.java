@@ -149,10 +149,7 @@ public class PostService {
         Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
         beforeSequence.stream()
                 .filter(num -> !afterSequenceSet.contains(num))
-                .forEach(num -> {
-                    itemService.deleteUserItem(num);
-                    deleteItemPost(num);
-                });
+                .forEach(this::deleteItemPost);
 
         return postId;
     }
@@ -198,11 +195,13 @@ public class PostService {
     }
 
     public void deleteItemPost(Long itemPostId) {
-        itemPostRepository.deleteById(itemPostId);
-    }
 
-    public void deleteItemPostImage(Long itemPostImageId){
-        itemPostImageRepository.deleteById(itemPostImageId);
+        ItemPost itemPost = itemPostRepository.findById(itemPostId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+
+        itemService.deleteUserItem(itemPost.getItem().getId());
+
+        itemPostRepository.delete(itemPost);
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
@@ -351,7 +350,7 @@ public class PostService {
 
         Set<Object> likePosts = redisTemplate.opsForSet().members(userLikeKey);
 
-        List<Long> likePostsNum = likePosts.stream()
+        List<Long> likePostsNum = Objects.requireNonNull(likePosts).stream()
                 .map(id -> Long.parseLong(id.toString()))
                 .toList();
 
@@ -381,7 +380,6 @@ public class PostService {
                 }).toList();
     }
 
-    //item 추가하면 개발
     @Transactional
     public CommonPagingResponse<?> searchPosts(List<String> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
@@ -393,9 +391,10 @@ public class PostService {
     public void deletePost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+        validateUserIsPostOwner(post, userDetails);
+
         post.getItemPosts().stream()
                 .forEach(num -> itemService.deleteUserItem(num.getItem().getId()));
-        validateUserIsPostOwner(post, userDetails);
         postRepository.delete(post);
     }
 

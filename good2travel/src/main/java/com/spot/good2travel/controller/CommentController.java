@@ -36,28 +36,28 @@ public class CommentController {
     }
 
     @PostMapping("/v1/posts/comments")
-    @Operation(summary = "게시글에 댓글달기", description = "게시글에 댓글을 달겁니다. <br><br> - request: CommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @Operation(summary = "게시글에 댓글달기", description = "게시글에 댓글을 달겁니다. <br><br> - request: CommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "게시글에 댓글 달기 성공"),
     })
-    public ResponseEntity<CommonResponse<?>> addComment(@RequestBody @Valid CommentRequest.CommentCreateUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> addComment(@RequestBody @Valid CommentRequest.CommentCreateRequest request,
                                                        @AuthenticationPrincipal UserDetails userDetails) {
         commentService.addComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("게시글에 댓글 달기 성공", null));
     }
 
     @PostMapping("/v1/posts/replycomments")
-    @Operation(summary = "댓글에 답글달기", description = "댓글에 답글을 달겁니다. <br><br> - request: ReplyCommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @Operation(summary = "댓글에 답글달기", description = "댓글에 답글을 달겁니다. <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글에 답글달기 성공"),
     })
-    public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody @Valid CommentRequest.ReplyCommentCreateUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody @Valid CommentRequest.ReplyCommentCreateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         replyCommentService.addReplyComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
     }
 
-    @PatchMapping("/v1/posts/report/comments")
+    @PostMapping("/v1/posts/report/comments")
     @Operation(summary = "댓글신고하기", description = "댓글을 신고할겁니다. <br><br> - request: Long commentId <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 신고하기 성공"),
@@ -67,7 +67,7 @@ public class CommentController {
         return CommonResponse.success("댓글 신고하기 성공", null);
     }
 
-    @PatchMapping("/v1/posts/report/replycomments")
+    @PostMapping("/v1/posts/report/replycomments")
     @Operation(summary = "답글신고하기", description = "답글을 신고할겁니다. <br><br> - request: Long replyCommentId <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답글 신고하기 성공"),
@@ -77,25 +77,25 @@ public class CommentController {
         return CommonResponse.success("답글 신고하기 성공", null);
     }
 
-    @PatchMapping("/v1/posts/comments/{commentid}")
-    @Operation(summary = "댓글 수정하기", description = "댓글을 수정할거에요. <br><br> - request: CommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @PutMapping("/v1/posts/comments/{commentid}")
+    @Operation(summary = "댓글 수정하기", description = "댓글을 수정할거에요. <br><br> - request: CommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
     })
     public CommonResponse<?> updateComment(@PathVariable Long commentid,
-                                             @RequestBody @Valid CommentRequest.CommentCreateUpdateRequest request,
+                                             @RequestBody @Valid CommentRequest.CommentUpdateRequest request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         commentService.updateComment(commentid, request, userDetails);
         return CommonResponse.success("댓글 수정 성공", null);
     }
 
-    @PatchMapping("/v1/posts/replycomments/{replycommentid}")
-    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요. <br><br> - request: ReplyCommentCreateUpdateRequest <br> accessToken을 헤더에... <br><br> - response: null")
+    @PutMapping("/v1/posts/replycomments/{replycommentid}")
+    @Operation(summary = "답글 수정하기", description = "답글을 수정할거에요 <br><br> - request: ReplyCommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "답글 수정 성공"),
     })
     public CommonResponse<?> updateReplyComment(@PathVariable Long replycommentid,
-                                                @RequestBody @Valid CommentRequest.ReplyCommentCreateUpdateRequest request,
+                                                @RequestBody @Valid CommentRequest.CommentUpdateRequest request,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
         replyCommentService.updateReplyComment(replycommentid, request, userDetails);
         return CommonResponse.success("답글 수정 성공", null);

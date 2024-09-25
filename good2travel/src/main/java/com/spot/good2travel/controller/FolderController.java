@@ -64,7 +64,7 @@ public class FolderController {
     @Operation(
             summary = "폴더 제목 , 계획 순서 수정",
             description = "폴더 제목과 계획 순서를 수정한다. 제목, 계획 순서 중 사용자가 변경을 한 값만 전송 해 주세요. ex) 제목을 변경하였으나 순서는 변경하지 않았으면: title에는 변경된 값을, 순서에는 null을 반환해주세요." +
-                    "<br><br> - request : itemId = folder DB상의 pk, FolderCreateRequest, 헤더에 accessToken 추가"+
+                    "<br><br> - request : itemId = folder DB상의 pk, FolderUpdateRequest, 헤더에 accessToken 추가"+
                     "<br><br> - response : Folder DB 상의 PK"
     )
     @ApiResponses(value = {
@@ -118,7 +118,7 @@ public class FolderController {
         return CommonResponse.success("폴더 삭제 성공", null);
     }
 
-    @DeleteMapping("/v1/folders/{folderId}/plan/{itempostid}")
+    @DeleteMapping("/v1/folders/{folderId}/plan/{itemfolderid}")
     @Operation(
             summary = "폴더 안의 계획 삭제",
             description = "폴더 안의 계획을 삭제한다." +
@@ -128,12 +128,12 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "계획 삭제 성공", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> deleteFolder(@PathVariable("folderId") Long folderId, @PathVariable("itempostid") Long itemPostId,
+    public CommonResponse<?> deleteItemFolder(@PathVariable("folderId") Long folderId, @PathVariable("itemfolderid") Long itemFolderId,
                                           @AuthenticationPrincipal UserDetails userDetails){
-        return CommonResponse.success("폴더 삭제 성공", folderService.deleteItemFolder(folderId, itemPostId, userDetails));
+        return CommonResponse.success("계획 삭제 성공", folderService.deleteItemFolder(folderId, itemFolderId, userDetails));
     }
 
-    @PutMapping("/v1/folders/plan/{itempostid}")
+    @PutMapping("/v1/folders/plan/{itemfolderid}")
     @Operation(
             summary = "계획이 끝난 여부 변환하기",
             description = "계획이 끝난 여부를 변환합니다." +
@@ -143,8 +143,8 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "계획 완료여부 변환 성공", content = @Content(schema = @Schema(implementation = Boolean.class))),
     })
-    public CommonResponse<?> switchPlanFinished(@PathVariable("itempostid") Long itemPostId){
-        return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemPostId));
+    public CommonResponse<?> switchPlanFinished(@PathVariable("itemfolderid") Long itemFolderId){
+        return CommonResponse.success("계획 완료여부 변환 성공", folderService.switchIsFinished(itemFolderId));
     }
 
     @PutMapping("/v1/folders/plan")

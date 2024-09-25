@@ -8,10 +8,12 @@ import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Comment;
 import com.spot.good2travel.domain.Post;
 import com.spot.good2travel.domain.User;
+import com.spot.good2travel.dto.CommentRequest;
 import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.repository.CommentRepository;
 import com.spot.good2travel.repository.PostRepository;
 import com.spot.good2travel.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-import static com.spot.good2travel.dto.CommentRequest.CommentCreateUpdateRequest;
+import static com.spot.good2travel.dto.CommentRequest.CommentCreateRequest;
 
 
 @Service
@@ -35,7 +37,7 @@ public class CommentService {
 
 
     @Transactional
-    public void addComment(CommentCreateUpdateRequest request, UserDetails userDetails){
+    public void addComment(CommentCreateRequest request, UserDetails userDetails){
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -69,7 +71,7 @@ public class CommentService {
 
         List<CommentResponse.CommentDetailResponse> response = comments.stream().map(
                 comment -> CommentResponse.CommentDetailResponse.of(comment, comment.getUser().equals(user), comment.getReplyComments().stream()
-                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, comment.getUser().equals(user)))
+                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, replyComment.getUser().equals(user)))
                         .toList()
                 )).toList();
 
@@ -127,7 +129,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void updateComment(Long commentId, CommentCreateUpdateRequest request, UserDetails userDetails){
+    public void updateComment(Long commentId, CommentRequest.@Valid CommentUpdateRequest request, UserDetails userDetails){
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
