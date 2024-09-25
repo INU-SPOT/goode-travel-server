@@ -1,0 +1,39 @@
+package com.spot.good2travel.dto;
+
+import com.spot.good2travel.domain.ItemType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+
+public class AdvertisementRequest {
+
+    @Getter
+    public static class AdItemCreateRequest {
+        @NotBlank
+        @Schema(example = "1")
+        private Long courseId; //관광코스 pk
+
+        @NotBlank
+        @Schema(example = "PLAN")
+        private ItemType type;
+
+        @NotBlank
+        @Schema(example = "(AD) 호텔 오노마 대전 숙박하기")
+        private String title;
+
+        @Schema(example = "hotel.jpg,hotel2.jpg,hotel3.jpg")
+        private String imageNames;
+
+        @NotBlank
+        @Schema(example = "대전광역시 유성구 엑스포로 1")
+        private String address;
+
+        @NotBlank
+        @Schema(example = "https://www.hotels.com/affiliates/hotel-onoma-daejeon-otogeulaepeu-keollegsyeon-daejeon-hangug.aiLj82i")
+        private String adLink;
+
+        @NotBlank
+        @Schema(example = "69")
+        private Long localGovernmentId;
+    }
+}
