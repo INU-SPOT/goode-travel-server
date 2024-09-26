@@ -267,8 +267,11 @@ public class PostService {
     public Integer getLikeNum(Long postId) {
         String postLikeNumKey = "postId:" + postId;
 
-        return (Integer) redisTemplate.opsForHash().get(postLikeNumKey, "likeNum");
+        Integer likeNum = (Integer) redisTemplate.opsForHash().get(postLikeNumKey, "likeNum");
+
+        return likeNum != null ? likeNum : 0;
     }
+
 
     public Boolean getIsPushLike(Long postId, UserDetails userDetails){
         if(userDetails != null){
