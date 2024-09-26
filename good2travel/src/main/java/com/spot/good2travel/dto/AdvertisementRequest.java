@@ -21,9 +21,6 @@ public class AdvertisementRequest {
         @Schema(example = "(AD) 호텔 오노마 대전 숙박하기")
         private String title;
 
-        @Schema(example = "hotel.jpg,hotel2.jpg,hotel3.jpg")
-        private String imageNames;
-
         @NotBlank
         @Schema(example = "대전광역시 유성구 엑스포로 1")
         private String address;

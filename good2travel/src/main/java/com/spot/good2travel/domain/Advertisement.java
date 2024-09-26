@@ -20,20 +20,17 @@ public class Advertisement {
 
     private String address;
 
-    private String imageNames;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "localgovernment_id")
     private LocalGovernment localGovernment;
 
-//    private Course coursdId;
+//    private Long courseId;
 
     @Builder
-    public Advertisement(String title, String link, String address, String imageNames, LocalGovernment localGovernment) {
+    public Advertisement(String title, String link, String address, LocalGovernment localGovernment) {
         this.title = title;
         this.link = link;
         this.address = address;
-        this.imageNames = imageNames;
         this.localGovernment = localGovernment;
     }
 
@@ -42,7 +39,6 @@ public class Advertisement {
                 .title(adItemCreateRequest.getTitle())
                 .link(adItemCreateRequest.getAdLink())
                 .address(adItemCreateRequest.getAddress())
-                .imageNames(adItemCreateRequest.getImageNames())
                 .localGovernment(localGovernment)
                 .build();
     }
