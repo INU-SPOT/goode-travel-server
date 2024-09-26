@@ -54,7 +54,9 @@ public class ItemRequest {
         @Schema(example = "/image/~")
         private String imageUrl;
 
-        @NotBlank
+        @Schema(example = "경상북도 구미시 미래로 42")
+        private String address;
+
         @Schema(example = "1")
         private Long localGovernmentId;
     }

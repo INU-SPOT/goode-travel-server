@@ -37,7 +37,7 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private Boolean isOfficial;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ItemCategory> itemCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
@@ -99,11 +99,13 @@ public class Item extends BaseEntity {
                 .build();
     }
 
-    public static Item of(ItemRequest.ItemCreateRequest request) {
+    public static Item of(ItemRequest.ItemCreateRequest request, LocalGovernment localGovernment) {
         return Item.builder()
                 .type(request.getType())
                 .title(request.getTitle())
                 .imageUrl(request.getImageUrl())
+                .address(request.getAddress())
+                .localGovernment(localGovernment)
                 .isOfficial(false)
                 .build();
     }

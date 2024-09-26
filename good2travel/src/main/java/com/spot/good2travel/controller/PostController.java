@@ -49,12 +49,13 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록(썸네일) 불러오기 성공", content = @Content(schema = @Schema(implementation = PostResponse.PostThumbnailResponse.class))),
     })
-    public CommonResponse<?> getPosts(@RequestParam(required = false) List<String> localGovernments,
+    public CommonResponse<?> getPosts(@RequestParam(required = false) List<Long> metropolitanGovernments,
+                                      @RequestParam(required = false) List<Long> localGovernments,
                                       @RequestParam(required = false) List<String> categories,
                                       @RequestParam(required = false) String keyword,
                                       @RequestParam(defaultValue = "0", required = false) Integer page,
                                       @RequestParam(defaultValue = "7", required = false) Integer size) {
-        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.searchPosts(localGovernments, categories, keyword, page, size));
+        return CommonResponse.success("게시글 목록(썸네일) 불러오기 성공", postService.searchPosts(metropolitanGovernments, localGovernments, categories, keyword, page, size));
     }
 
     @GetMapping("/v1/posts/{postid}")
@@ -135,4 +136,13 @@ public class PostController {
         return CommonResponse.success("유저가 좋아요 누른 글 불러오기 성공",postService.getUserLikePosts(page, size, userDetails));
     }
 
+    @DeleteMapping("/v1/posts/{postid}")
+    @Operation(summary = "게시글 삭제하기", description = "게시글을 삭제해봅시다 <br><br> - request: <br> accessToken을 주오... <br> Long <br><br> - response: <br> List<PostThumbnailResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
+    })
+    public CommonResponse<?> deletePost(@RequestParam Long postid, @AuthenticationPrincipal UserDetails userDetails) {
+        postService.deletePost(postid, userDetails);
+        return CommonResponse.success("게시글 삭제 성공", null);
+    }
 }

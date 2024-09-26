@@ -3,6 +3,7 @@ package com.spot.good2travel.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
@@ -34,7 +35,7 @@ public class PostRequest {
         private LocalDate endDate;
 
         @Valid
-        @NotNull(message = "게시글에 굳이/계획이 하나도 없습니다.")
+        @NotEmpty(message = "게시글에 굳이/계획이 하나도 없습니다.")
         private List<ItemPostCreateUpdateRequest> itemPosts;
 
     }

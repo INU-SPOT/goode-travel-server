@@ -60,7 +60,9 @@ public class ItemService {
     }
 
     public Long createItem(ItemRequest.ItemCreateRequest itemCreateRequest) {
-        Item item = Item.of(itemCreateRequest);
+        LocalGovernment localGovernment = localGovernmentRepository.findById(itemCreateRequest.getLocalGovernmentId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+        Item item = Item.of(itemCreateRequest, localGovernment);
         itemRepository.save(item);
 
         return item.getId();
@@ -104,7 +106,7 @@ public class ItemService {
         }
     }
 
-    public void deleteItem(Long itemId) {
+    public void deleteUserItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getIsOfficial()){
@@ -112,5 +114,9 @@ public class ItemService {
         } else {
             itemRepository.deleteById(itemId);
         }
+    }
+
+    public void deleteItem(Long itemId) {
+        itemRepository.deleteById(itemId);
     }
 }
