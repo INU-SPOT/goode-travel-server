@@ -31,7 +31,7 @@ public class FcmService {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
 
-    public String sendMessage(String token, String title, String body, Long postId) throws FirebaseMessagingException {
+    public String sendMessage(String token, String title, String body) throws FirebaseMessagingException {
         Message message = Message.builder()
                 .setToken(token)
                 .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
@@ -60,7 +60,7 @@ public class FcmService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
         String body = request.getContent();
-        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        sendMessage(fcm.getFcmToken(),title, body);
         notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
     }
 
@@ -69,7 +69,7 @@ public class FcmService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
         String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
         String body = request.getContent();
-        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        sendMessage(fcm.getFcmToken(),title, body);
         notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
     }
 
