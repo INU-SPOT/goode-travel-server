@@ -100,6 +100,8 @@ public class PostService {
         String key = "postId:" + postId;
 
         redisTemplate.delete(key);
+        redisTemplate.opsForZSet().remove("postLikes", postId);
+        redisTemplate.opsForZSet().remove("postVisits", postId);
     }
 
     @Transactional
