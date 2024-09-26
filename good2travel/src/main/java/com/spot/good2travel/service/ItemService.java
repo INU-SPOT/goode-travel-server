@@ -61,7 +61,7 @@ public class ItemService {
 
     public Long createItem(ItemRequest.ItemCreateRequest itemCreateRequest) {
         LocalGovernment localGovernment = localGovernmentRepository.findById(itemCreateRequest.getLocalGovernmentId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
         Item item = Item.of(itemCreateRequest, localGovernment);
         itemRepository.save(item);
 
