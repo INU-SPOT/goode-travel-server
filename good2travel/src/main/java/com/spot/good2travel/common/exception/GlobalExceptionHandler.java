@@ -1,5 +1,6 @@
 package com.spot.good2travel.common.exception;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.dto.CommonResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +89,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[handleUserNotAuthorizedException] {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
+
+    @ExceptionHandler(value = FirebaseMessagingException.class)
+    public ResponseEntity<CommonResponse<?>> handleFirebaseMessagingException(FirebaseMessagingException ex){
+        log.error("[handleFirebaseMessagingException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String errorMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();

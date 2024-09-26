@@ -3,6 +3,7 @@ package com.spot.good2travel.domain;
 import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +20,19 @@ public class Fcm extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Builder
+    public Fcm(String fcmToken, User user) {
+        this.fcmToken = fcmToken;
+        this.user = user;
+    }
+
+    public static Fcm of(String fcmToken, User user){
+        return Fcm.builder()
+                .fcmToken(fcmToken)
+                .user(user)
+                .build();
+    }
 
     public void toUpdate(String fcmToken){
         this.fcmToken = fcmToken;

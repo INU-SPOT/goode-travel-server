@@ -30,7 +30,7 @@ public class ItemService {
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
         LocalGovernment localGovernment = localGovernmentRepository.findById(officialItemCreateRequest.getLocalGovernmentId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
 
         //굳이인 경우에는 카테고리까지 연결
         if (officialItemCreateRequest.getType()==ItemType.GOODE){
@@ -61,7 +61,7 @@ public class ItemService {
 
     public Long createItem(ItemRequest.ItemCreateRequest itemCreateRequest) {
         LocalGovernment localGovernment = localGovernmentRepository.findById(itemCreateRequest.getLocalGovernmentId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
         Item item = Item.of(itemCreateRequest, localGovernment);
         itemRepository.save(item);
 
@@ -88,7 +88,7 @@ public class ItemService {
             throw new ItemAccessException(ExceptionMessage.ITEM_UPDATE_BAD_REQUEST);
         } else {
             LocalGovernment localGovernment = localGovernmentRepository.findById(itemUpdateRequest.getLocalGovernmentId())
-                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
             item.updateItem(itemUpdateRequest, localGovernment);
         }
         return item.getId();
