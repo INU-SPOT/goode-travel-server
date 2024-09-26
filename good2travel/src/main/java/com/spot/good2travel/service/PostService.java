@@ -96,6 +96,12 @@ public class PostService {
         redisTemplate.opsForHash().put(key, "likeNum", likeNum);
     }
 
+    public void deleteLikeAndVisit(Long postId) {
+        String key = "postId:" + postId;
+
+        redisTemplate.delete(key);
+    }
+
     @Transactional
     public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
@@ -407,6 +413,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
         validateUserIsPostOwner(post, userDetails);
+        deleteLikeAndVisit(post.getId());
 
         post.getItemPosts().stream()
                 .forEach(num -> itemService.deleteUserItem(num.getItem()));
