@@ -25,6 +25,8 @@ public class FolderService {
     private final ItemFolderRepository itemFolderRepository;
     private final UserRepository userRepository;
     private final LocalGovernmentRepository localGovernmentRepository;
+    private final ItemService itemService;
+
     /*
     새 폴더 만들기
      */
@@ -146,9 +148,8 @@ public class FolderService {
                 .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
 
         Item item = itemFolder.getItem();
-        if(!item.getIsOfficial()){
-            itemRepository.delete(item);
-        }
+
+        itemService.deleteUserItem(item);
 
         folder.getSequence().removeIf(num -> num.equals(itemFolder.getId()));
 
@@ -167,8 +168,10 @@ public class FolderService {
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
         validIsOwner(folder.getUser(), userDetails);
         //공식적이지 않은 item들만 삭제
-        List<Item> items = itemFolderRepository.findUnOfficialItemsInFolder(folderId);
-        itemRepository.deleteAll(items);
+
+        folder.getItemFolders()
+                .forEach(item -> itemService.deleteUserItem(item.getItem()));
+
         folderRepository.deleteById(folderId);
         log.info("[deleteFolder] {}번 폴더 삭제",folderId);
     }

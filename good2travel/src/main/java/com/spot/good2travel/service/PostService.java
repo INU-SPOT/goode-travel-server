@@ -96,6 +96,14 @@ public class PostService {
         redisTemplate.opsForHash().put(key, "likeNum", likeNum);
     }
 
+    public void deleteLikeAndVisit(Long postId) {
+        String key = "postId:" + postId;
+
+        redisTemplate.delete(key);
+        redisTemplate.opsForZSet().remove("postLikes", postId);
+        redisTemplate.opsForZSet().remove("postVisits", postId);
+    }
+
     @Transactional
     public PostResponse.PostDetailResponse getPost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
@@ -199,7 +207,7 @@ public class PostService {
         ItemPost itemPost = itemPostRepository.findById(itemPostId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
         
-        itemService.deleteUserItem(itemPost.getItem().getId());
+        itemService.deleteUserItem(itemPost.getItem());
 
         itemPostRepository.delete(itemPost);
     }
@@ -267,8 +275,11 @@ public class PostService {
     public Integer getLikeNum(Long postId) {
         String postLikeNumKey = "postId:" + postId;
 
-        return (Integer) redisTemplate.opsForHash().get(postLikeNumKey, "likeNum");
+        Integer likeNum = (Integer) redisTemplate.opsForHash().get(postLikeNumKey, "likeNum");
+
+        return likeNum != null ? likeNum : 0;
     }
+
 
     public Boolean getIsPushLike(Long postId, UserDetails userDetails){
         if(userDetails != null){
@@ -404,9 +415,10 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
         validateUserIsPostOwner(post, userDetails);
+        deleteLikeAndVisit(post.getId());
 
         post.getItemPosts().stream()
-                .forEach(num -> itemService.deleteUserItem(num.getItem().getId()));
+                .forEach(num -> itemService.deleteUserItem(num.getItem()));
         postRepository.delete(post);
     }
 

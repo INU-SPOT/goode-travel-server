@@ -106,13 +106,19 @@ public class ItemService {
         }
     }
 
-    public void deleteUserItem(Long itemId) {
+    public void deleteUserItemWithValidation(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getIsOfficial()){
             throw new ItemAccessException(ExceptionMessage.ITEM_DELETE_BAD_REQUEST);
         } else {
             itemRepository.deleteById(itemId);
+        }
+    }
+
+    public void deleteUserItem(Item item){
+        if (!item.getIsOfficial()){
+            itemRepository.delete(item);
         }
     }
 
