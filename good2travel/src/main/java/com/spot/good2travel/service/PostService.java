@@ -199,7 +199,7 @@ public class PostService {
         ItemPost itemPost = itemPostRepository.findById(itemPostId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
         
-        itemService.deleteUserItem(itemPost.getItem().getId());
+        itemService.deleteUserItem(itemPost.getItem());
 
         itemPostRepository.delete(itemPost);
     }
@@ -406,7 +406,7 @@ public class PostService {
         validateUserIsPostOwner(post, userDetails);
 
         post.getItemPosts().stream()
-                .forEach(num -> itemService.deleteUserItem(num.getItem().getId()));
+                .forEach(num -> itemService.deleteUserItem(num.getItem()));
         postRepository.delete(post);
     }
 

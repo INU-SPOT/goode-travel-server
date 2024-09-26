@@ -107,7 +107,7 @@ public class ItemController {
             @ApiResponse(responseCode = "200", description = "사용자의 굳이/계획 삭제 완료", content = @Content(schema = @Schema(implementation = Null.class)))
     })
     public CommonResponse<?> deleteUserItem(@PathVariable("itemId") Long itemId){
-        itemService.deleteUserItem(itemId);
+        itemService.deleteUserItemWithValidation(itemId);
         return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
     }
 
