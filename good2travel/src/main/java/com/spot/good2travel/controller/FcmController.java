@@ -52,7 +52,7 @@ public class FcmController {
             @ApiResponse(responseCode = "201", description = "메세지 생성 완료", content = @Content(schema = @Schema(implementation = String.class))),
     })
     public ResponseEntity<CommonResponse<?>> sendMessage(@RequestBody FcmRequest.FcmMessage fcmRequest) throws FirebaseMessagingException {
-        String response = fcmService.sendMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody(), 2L);
+        String response = fcmService.sendMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody(), null);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.success("send message", response));
     }
