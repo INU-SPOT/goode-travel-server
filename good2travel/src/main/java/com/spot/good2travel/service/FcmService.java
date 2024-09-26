@@ -32,13 +32,10 @@ public class FcmService {
     private final NotificationRepository notificationRepository;
 
     public String sendMessage(String token, String title, String body, Long postId) throws FirebaseMessagingException {
-        String postLink = "https://goode-travel.com/post/" +postId;
-
         Message message = Message.builder()
                 .setToken(token)
                 .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
                         .setNotification(new WebpushNotification(title, body))
-                        .setFcmOptions(WebpushFcmOptions.withLink(postLink)) //해당 게시물로 이동인데.. 왜 인지 그냥 메인 페이지로만 갑니다 ㅜ
                         .build())
                 .build();
 
