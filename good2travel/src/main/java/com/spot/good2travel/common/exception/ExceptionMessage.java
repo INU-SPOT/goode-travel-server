@@ -43,6 +43,8 @@ public enum ExceptionMessage {
         ITEM_DETAIL_INFO_NOT_FOUND("공식적인 굳이가 아니라 상세 정보를 찾을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
         ITEM_DELETE_BAD_REQUEST("잘못된 Item 삭제 요청입니다.", 0, HttpStatus.BAD_REQUEST),
         ITEM_TYPE_NOT_OFFICIAL_GOODE("Item 타입이 굳이가 아니거나 공식이 아닙니다.", 0, HttpStatus.BAD_REQUEST),
+        ITEM_TYPE_NOT_PLAN("Item 타입이 계획이 아니거나 공식이 아닙니다.", 0, HttpStatus.BAD_REQUEST),
+
         //폴더 관련 메시지
         ITEM_FOLDER_NOT_FOUND("해당 Item이 포함된 폴더를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
         FOLDER_NOT_FOUND("Folder가 존재하지 않습니다.",0,HttpStatus.NOT_FOUND),

@@ -49,8 +49,7 @@ public class Course {
         return this;
     }
 
-    public Course updateCourse(List<ItemCourse> itemCourses, List<Long> sequence){
-        this.itemCourses = itemCourses;
+    public Course updateCourse(List<Long> sequence){
         this.sequence = sequence;
 
         return this;

@@ -14,6 +14,8 @@ public class CourseResponse {
     public static class CourseDetailResponse{
 
         @Schema(example = "1")
+        private final Long courseId;
+        @Schema(example = "1")
         private final Long goodeId;
         @Schema(example = "굳이? 성심당가기")
         private final String goodeTitle;
@@ -23,15 +25,17 @@ public class CourseResponse {
         private final List<ItemCourseResponse> itemCourses;
 
         @Builder
-        public CourseDetailResponse(Long goodeId, String goodeTitle, String goodeMetropolitanGovernmentName, List<ItemCourseResponse> itemCourses){
+        public CourseDetailResponse(Long courseId, Long goodeId, String goodeTitle, String goodeMetropolitanGovernmentName, List<ItemCourseResponse> itemCourses){
+            this.courseId = courseId;
             this.goodeId = goodeId;
             this.goodeTitle = goodeTitle;
             this.goodeMetropolitanGovernmentName = goodeMetropolitanGovernmentName;
             this.itemCourses = itemCourses;
         }
 
-        public static CourseDetailResponse of(Item goode, List<ItemCourseResponse> itemCourses){
+        public static CourseDetailResponse of(Long courseId, Item goode, List<ItemCourseResponse> itemCourses){
             return CourseDetailResponse.builder()
+                    .courseId(courseId)
                     .goodeId(goode.getId())
                     .goodeTitle(goode.getTitle())
                     .goodeMetropolitanGovernmentName(goode.getLocalGovernment().getMetropolitanGovernment().getName())

@@ -55,7 +55,9 @@ public class CourseService {
     @Transactional
     public ItemCourse createItemCourse(Item item, Course course){
         ItemCourse itemCourse = ItemCourse.of(item, course);
-
+        if(item.getType().equals(ItemType.GOODE) || !item.getIsOfficial()){
+            throw new ItemTypeException(ExceptionMessage.ITEM_TYPE_NOT_PLAN);
+        }
         itemCourseRepository.save(itemCourse);
         return itemCourse;
     }
@@ -65,19 +67,16 @@ public class CourseService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COURSE_NOT_FOUND));
 
-        itemCourseRepository.deleteAll(course.getItemCourses());
+        course.getItemCourses().clear();
 
-        List<ItemCourse> itemCourses = new ArrayList<>();
         List<Long> sequence = request.getItems().stream().map(num -> {
             Item item = itemRepository.findById(num)
                     .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
             ItemCourse itemCourse = createItemCourse(item, course);
-            itemCourses.add(itemCourse);
-
             return itemCourse.getId();
         }).toList();
 
-        course.updateCourse(itemCourses, sequence);
+        course.updateCourse(sequence);
 
         return courseId;
     }
@@ -93,7 +92,7 @@ public class CourseService {
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COURSE_NOT_FOUND));
 
         CourseResponse.CourseDetailResponse response = CourseResponse.CourseDetailResponse
-                .of(goode, course.getItemCourses().stream().map(this::getItemCourseResponse).toList());
+                .of(course.getId(), goode, course.getItemCourses().stream().map(this::getItemCourseResponse).toList());
 
         return response;
     }
@@ -104,9 +103,9 @@ public class CourseService {
     }
 
     @Transactional
-    public Boolean validItemIsGoode(Item item){
+    public void validItemIsGoode(Item item){
         if(item.getIsOfficial() && item.getType() == ItemType.GOODE){
-            return true;
+            return;
         }
         throw new ItemTypeException(ExceptionMessage.ITEM_TYPE_NOT_OFFICIAL_GOODE);
     }
