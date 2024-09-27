@@ -8,14 +8,11 @@ import lombok.Getter;
 public class AdvertisementRequest {
 
     @Getter
-    public static class AdItemCreateRequest {
-        @NotBlank
-        @Schema(example = "1")
-        private Long courseId; //관광코스 pk
+    public static class AdItemCreateUpdateRequest {
 
-        @NotBlank
-        @Schema(example = "PLAN")
-        private ItemType type;
+//        @NotBlank
+//        @Schema(example = "PLAN") //광고 구분을 타입으로 할지 고민
+//        private ItemType type;
 
         @NotBlank
         @Schema(example = "(AD) 호텔 오노마 대전 숙박하기")

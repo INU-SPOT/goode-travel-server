@@ -5,11 +5,11 @@ import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.Advertisement;
 import com.spot.good2travel.domain.LocalGovernment;
 import com.spot.good2travel.dto.AdvertisementRequest;
-import com.spot.good2travel.dto.AdvertisementResponse;
 import com.spot.good2travel.repository.AdvertisementRepository;
 import com.spot.good2travel.repository.LocalGovernmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,17 +19,25 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
 
 
-    public Long createAdItem(AdvertisementRequest.AdItemCreateRequest adItemCreateRequest) {
-        LocalGovernment localGovernment = localGovernmentRepository.findById(adItemCreateRequest.getLocalGovernmentId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCALGOVERNMENT_NOT_FOUND));
-//        Course course = courseRepository.findById(adItemCreateRequest.getCourseId()); //관광코스와 연결
-        Advertisement adItem = Advertisement.ofAd(adItemCreateRequest, localGovernment);
+    public Long createAdItem(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest) {
+        LocalGovernment localGovernment = localGovernmentRepository.findById(adItemCreateUpdateRequest.getLocalGovernmentId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
+        Advertisement adItem = Advertisement.ofAd(adItemCreateUpdateRequest, localGovernment);
         return advertisementRepository.save(adItem).getId();
     }
 
-    public AdvertisementResponse.AdDetailResponse getAdItem(Long advertisementId){
-        Advertisement ad = advertisementRepository.findById(advertisementId)
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-        return AdvertisementResponse.AdDetailResponse.of(ad);
+    @Transactional
+    public Long updateAdItem(Long adId, AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest) {
+        Advertisement advertisement = advertisementRepository.findById(adId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ADVERTISEMENT_NOT_FOUND));
+        LocalGovernment localGovernment = localGovernmentRepository.findById(adItemCreateUpdateRequest.getLocalGovernmentId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
+        advertisement.updateAd(adItemCreateUpdateRequest, localGovernment);
+        return advertisement.getId();
+    }
+
+    @Transactional
+    public void deleteAdItem(Long adId) {
+        advertisementRepository.deleteById(adId);
     }
 }

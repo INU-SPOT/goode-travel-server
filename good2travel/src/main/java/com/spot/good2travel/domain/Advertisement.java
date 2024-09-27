@@ -24,8 +24,6 @@ public class Advertisement {
     @JoinColumn(name = "localgovernment_id")
     private LocalGovernment localGovernment;
 
-//    private Long courseId;
-
     @Builder
     public Advertisement(String title, String link, String address, LocalGovernment localGovernment) {
         this.title = title;
@@ -34,13 +32,19 @@ public class Advertisement {
         this.localGovernment = localGovernment;
     }
 
-    public static Advertisement ofAd(AdvertisementRequest.AdItemCreateRequest adItemCreateRequest, LocalGovernment localGovernment) {
+    public static Advertisement ofAd(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest, LocalGovernment localGovernment) {
         return Advertisement.builder()
-                .title(adItemCreateRequest.getTitle())
-                .link(adItemCreateRequest.getAdLink())
-                .address(adItemCreateRequest.getAddress())
+                .title(adItemCreateUpdateRequest.getTitle())
+                .link(adItemCreateUpdateRequest.getAdLink())
+                .address(adItemCreateUpdateRequest.getAddress())
                 .localGovernment(localGovernment)
                 .build();
     }
 
+    public void updateAd(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest, LocalGovernment localGovernment) {
+        this.title = adItemCreateUpdateRequest.getTitle();
+        this.link = adItemCreateUpdateRequest.getAdLink();
+        this.address = adItemCreateUpdateRequest.getAddress();
+        this.localGovernment = localGovernment;
+    }
 }

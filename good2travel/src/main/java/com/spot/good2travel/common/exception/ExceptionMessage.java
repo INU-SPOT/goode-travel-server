@@ -58,7 +58,10 @@ public enum ExceptionMessage {
         FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
 
         //알림 관련 메세지
-        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND);
+        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND),
+
+        //광고 관련 메세지
+        ADVERTISEMENT_NOT_FOUND("해당 광고 내용를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND);
 
 
 private final String message;
