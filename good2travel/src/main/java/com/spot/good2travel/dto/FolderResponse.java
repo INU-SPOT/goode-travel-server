@@ -58,6 +58,10 @@ public class FolderResponse {
         private Long itemId;
         @Schema(example = "1")
         private Long itemFolderId;
+        @Schema(example = "1")
+        private Long metropolitanGovernmentId;
+        @Schema(example = "1")
+        private Long localGovernmentId;
         @Schema(example = "false")
         private Boolean isOfficial;
         @Schema(example = "PLAN")
@@ -74,10 +78,12 @@ public class FolderResponse {
         private Boolean isFinished;
 
         @Builder
-        public ItemFolderResponse(Long itemId, Long itemFolderId, ItemType itemType, Boolean isOfficial, String title, String image,
+        public ItemFolderResponse(Long itemId, Long itemFolderId, Long metropolitanGovernmentId,Long localGovernmentId, ItemType itemType, Boolean isOfficial, String title, String image,
                                   String address, LocalDate finishDate, Boolean isFinished) {
             this.itemId = itemId;
             this.itemFolderId = itemFolderId;
+            this.metropolitanGovernmentId = metropolitanGovernmentId;
+            this.localGovernmentId = localGovernmentId;
             this.isOfficial = isOfficial;
             this.itemType = itemType;
             this.title = title;
@@ -92,6 +98,8 @@ public class FolderResponse {
             return ItemFolderResponse.builder()
                     .itemId(item.getId())
                     .itemFolderId(itemFolder.getId())
+                    .metropolitanGovernmentId(item.getLocalGovernment().getMetropolitanGovernment().getId())
+                    .localGovernmentId(item.getLocalGovernment().getId())
                     .title(item.getTitle())
                     .isOfficial(item.getIsOfficial())
                     .itemType(item.getType())
