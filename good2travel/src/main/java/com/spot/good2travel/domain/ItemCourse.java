@@ -22,4 +22,13 @@ public class ItemCourse {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    public ItemCourse(Item item, Course course){
+        this.item = item;
+        this.course = course;
+    }
+
+    public static ItemCourse of(Item item, Course course){
+        return new ItemCourse(item, course);
+    }
+
 }

@@ -42,7 +42,7 @@ public enum ExceptionMessage {
         ITEM_NOT_FOUND("존재하지 않는 굳이/계획 입니다.", 0, HttpStatus.NOT_FOUND),
         ITEM_DETAIL_INFO_NOT_FOUND("공식적인 굳이가 아니라 상세 정보를 찾을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
         ITEM_DELETE_BAD_REQUEST("잘못된 Item 삭제 요청입니다.", 0, HttpStatus.BAD_REQUEST),
-
+        ITEM_TYPE_NOT_OFFICIAL_GOODE("Item 타입이 굳이가 아니거나 공식이 아닙니다.", 0, HttpStatus.BAD_REQUEST),
         //폴더 관련 메시지
         ITEM_FOLDER_NOT_FOUND("해당 Item이 포함된 폴더를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
         FOLDER_NOT_FOUND("Folder가 존재하지 않습니다.",0,HttpStatus.NOT_FOUND),
@@ -58,8 +58,10 @@ public enum ExceptionMessage {
         FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
 
         //알림 관련 메세지
-        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND);
+        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND),
 
+        //코스 관련 메시지
+        COURSE_NOT_FOUND("해당 코스가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND);
 
 private final String message;
 
