@@ -104,6 +104,7 @@ public class Item extends BaseEntity {
                 .type(request.getType())
                 .title(request.getTitle())
                 .imageUrl(request.getImageUrl())
+                .address(request.getAddress())
                 .localGovernment(localGovernment)
                 .isOfficial(false)
                 .build();

@@ -1,5 +1,6 @@
 package com.spot.good2travel.controller;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.CommentRequest;
 import com.spot.good2travel.dto.CommentResponse;
@@ -35,13 +36,22 @@ public class CommentController {
         return CommonResponse.success("댓글 가져오기 성공", commentService.getPostComments(postid, userDetails));
     }
 
+    @GetMapping("/v1/users/comments")
+    @Operation(summary = "유저가 쓴 댓글 가져오기", description = "유저가 쓴 댓글을 가져옵니다.스웨거 예시에 있는 dto를 List로 응답합니다. 멍청이슈 조심. <br><br> - request: accessToken을 다오... <br><br> - response: List<UserCommentResponse>")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저의 댓글 가져오기 성공", content = @Content(schema = @Schema(implementation = CommentResponse.UserCommentResponse.class))),
+    })
+    public CommonResponse<?> getUserComments(@AuthenticationPrincipal UserDetails userDetails) {
+        return CommonResponse.success("유저의 댓글 가져오기 성공", commentService.getUserComments(userDetails));
+    }
+
     @PostMapping("/v1/posts/comments")
     @Operation(summary = "게시글에 댓글달기", description = "게시글에 댓글을 달겁니다. <br><br> - request: CommentCreateRequest <br> accessToken을 헤더에... <br><br> - response: null")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "게시글에 댓글 달기 성공"),
     })
     public ResponseEntity<CommonResponse<?>> addComment(@RequestBody @Valid CommentRequest.CommentCreateRequest request,
-                                                       @AuthenticationPrincipal UserDetails userDetails) {
+                                                       @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         commentService.addComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("게시글에 댓글 달기 성공", null));
     }
@@ -52,7 +62,7 @@ public class CommentController {
             @ApiResponse(responseCode = "201", description = "댓글에 답글달기 성공"),
     })
     public ResponseEntity<CommonResponse<?>> addReplyComment(@RequestBody @Valid CommentRequest.ReplyCommentCreateRequest request,
-                                             @AuthenticationPrincipal UserDetails userDetails) {
+                                             @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         replyCommentService.addReplyComment(request, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("댓글에 답글달기 성공", null));
     }

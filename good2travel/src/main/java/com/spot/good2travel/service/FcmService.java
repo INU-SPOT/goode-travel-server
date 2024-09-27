@@ -1,81 +1,77 @@
 package com.spot.good2travel.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.spot.good2travel.repository.FcmRepository;
-import com.spot.good2travel.common.fcm.dto.FcmMessage;
-import com.spot.good2travel.common.fcm.dto.FcmRequest;
+import com.google.firebase.messaging.*;
+import com.spot.good2travel.common.exception.ExceptionMessage;
+import com.spot.good2travel.common.exception.NotFoundElementException;
+import com.spot.good2travel.common.fcm.FcmRequest;
+import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Fcm;
+import com.spot.good2travel.domain.Notification;
+import com.spot.good2travel.domain.Post;
+import com.spot.good2travel.domain.User;
+import com.spot.good2travel.dto.CommentRequest;
+import com.spot.good2travel.repository.FcmRepository;
+import com.spot.good2travel.repository.NotificationRepository;
+import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
-import org.apache.http.HttpHeaders;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class FcmService {
 
-
-    @Value("${spring.fcm.url}")
-    private String FCM_URL;
-    private final ObjectMapper objectMapper;
     private final FcmRepository fcmRepository;
+    private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
-    public String sendMessageTo(FcmRequest fcmRequest) throws IOException{
-        String message = makeMessage(fcmRequest.getFcmToken(), fcmRequest.getTitle(), fcmRequest.getBody(), fcmRequest.isValidateOnly());
-
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(FCM_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8")
+    public String sendMessage(String token, String title, String body, Long postId) throws FirebaseMessagingException {
+        Message message = Message.builder()
+                .setToken(token)
+                .setWebpushConfig(WebpushConfig.builder().putHeader("ttl", "300")
+                        .setNotification(new WebpushNotification(title, body))
+                        .putData("postId", String.valueOf(postId))
+                        .build())
                 .build();
-        Response response = client.newCall(request).execute();
 
-        return response.body().string();
-    }
-
-    private String makeMessage(String fcmToken, String title, String message, boolean validateOnly) throws JsonProcessingException {
-        FcmMessage fcmMessage = FcmMessage.builder()
-                        .message(FcmMessage.Message.builder()
-                                .token(fcmToken)
-                                .notification(FcmMessage.Notification.builder()
-                                        .title(title)
-                                        .body(message)
-                                        .build())
-                                .build()).validateOnly(validateOnly).build();
-
-        log.info("[makeMessage] fcmToken : {}, title : {} , message : {}", fcmToken, title, message);
-        return objectMapper.writeValueAsString(fcmMessage);
-    }
-
-    private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "fcm.json";
-
-        GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-
-        googleCredentials.refreshIfExpired();
-        return googleCredentials.getAccessToken().getTokenValue();
+        return FirebaseMessaging.getInstance().send(message);
     }
 
     @Transactional
-    public String updateToken(FcmRequest.FcmUpdateDto fcmUpdateDto){
-        //todo 유저 정보 가져오기
-       Fcm fcm = fcmRepository.findFcmByUserId(1L);
-       fcm.toUpdate(fcmUpdateDto.getFcmToken());
-       return fcm.getFcmToken();
+    public void updateToken(FcmRequest.FcmUpdate fcmUpdate, UserDetails userDetails){
+        Long id = ((CustomUserDetails) userDetails).getId();
+        Optional<Fcm> fcm = fcmRepository.findByUserId(id);
+        if (fcm.isPresent()) {
+            fcm.get().toUpdate(fcmUpdate.getFcmToken());
+        } else {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
+            fcmRepository.save(Fcm.of(fcmUpdate.getFcmToken(), user));
+        }
     }
+
+    public void sendMessageForComment(User user, Post post, CommentRequest.CommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
+        String body = request.getContent();
+        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
+    }
+
+    public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
+        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+        String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
+        String body = request.getContent();
+        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
+    }
+
 }

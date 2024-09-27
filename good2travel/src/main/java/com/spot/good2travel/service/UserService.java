@@ -40,7 +40,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.USER_NOT_FOUND));
         MetropolitanGovernment metropolitanGovernment = metropolitanGovernmentRepository.findById(request.getMetropolitanGovernmentId())
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.METROPOLITANGOVERNMENT_NOT_FOUND));
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.METROPOLITAN_GOVERNMENT_NOT_FOUND));
 
         user.updateUser(request.getNickname(), request.getProfileImageName(), metropolitanGovernment);
         userRepository.save(user);

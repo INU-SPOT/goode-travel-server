@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ExceptionMessage {
+        
         //토큰 관련 메시지
         TOKEN_EXPIRED("토큰이 만료되었습니다.", 0, HttpStatus.UNAUTHORIZED),
         TOKEN_NOT_AUTHORIZED("권한이 없습니다", 0, HttpStatus.FORBIDDEN),
@@ -23,8 +24,8 @@ public enum ExceptionMessage {
         IMAGE_READ_ERROR("이미지를 읽을 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
 
         //지역구 관련 메시지
-        METROPOLITANGOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
-        LOCALGOVERNMENT_NOT_FOUND("존재하지 않는 지역 시/구 입니다.",0,HttpStatus.NOT_FOUND),
+        METROPOLITAN_GOVERNMENT_NOT_FOUND("존재하지 않는 지자체입니다.", 0, HttpStatus.NOT_FOUND),
+        LOCAL_GOVERNMENT_NOT_FOUND("존재하지 않는 지역 시/구 입니다.",0,HttpStatus.NOT_FOUND),
 
         //카테고리 관련 메시지
         CATEGORY_NOT_FOUND("존재하지 않는 굳이 카테고리 입니다.", 0, HttpStatus.NOT_FOUND),
@@ -51,7 +52,13 @@ public enum ExceptionMessage {
         REPLY_COMMENT_NOT_FOUND("답글이 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
         COMMENT_NOT_USERS("댓글 소유자가 아니여서 지울 수 없습니다.", 0, HttpStatus.BAD_REQUEST),
         ALREADY_REPORTED("이미 신고한 댓글입니다.", 0, HttpStatus.BAD_REQUEST),
-        ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST);
+        ITEM_UPDATE_BAD_REQUEST("잘못된 Item 수정 요청입니다.", 0, HttpStatus.BAD_REQUEST),
+        
+        //fcm 관련 메시지
+        FCM_TOKEN_NOT_FOUND("FCM 토큰을 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+
+        //알림 관련 메세지
+        NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND);
 
 
 private final String message;

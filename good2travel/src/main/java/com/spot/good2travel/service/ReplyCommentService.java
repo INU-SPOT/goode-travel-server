@@ -1,5 +1,6 @@
 package com.spot.good2travel.service;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 @Service
 @RequiredArgsConstructor
@@ -28,9 +30,10 @@ public class ReplyCommentService {
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FcmService fcmService;
 
     @Transactional
-    public void addReplyComment(ReplyCommentCreateRequest request, UserDetails userDetails){
+    public void addReplyComment(ReplyCommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -41,7 +44,11 @@ public class ReplyCommentService {
         Comment comment = commentRepository.findById(request.getCommentId())
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COMMENT_NOT_FOUND));
 
-        replyCommentRepository.save(ReplyComment.of(request, user, comment));
+        ReplyComment replyComment = ReplyComment.of(request, user, comment);
+        replyCommentRepository.save(replyComment);
+        if (!userId.equals(comment.getPost().getUser().getId())) {
+            fcmService.sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
+        }
     }
 
     @Transactional
@@ -97,5 +104,11 @@ public class ReplyCommentService {
         if(comment.getUser().getId().equals(userId)){
             comment.updateReplyComment(request);
         }
+    }
+
+    public List<ReplyComment> getUserReplyComment(UserDetails userDetails){
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        return replyCommentRepository.findByUserId(userId);
     }
 }

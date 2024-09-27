@@ -32,17 +32,19 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN ic.category c " +
             "WHERE ( " +
             "    (:categories IS NULL OR c.name IN :categories) " +
-            "    AND ( " +
-            "        (:metropolitanGovernments IS NOT NULL AND lg.metropolitanGovernment.id IN :metropolitanGovernments) " +
-            "        OR (:localGovernments IS NOT NULL AND lg.id IN :localGovernments) " +
+            ") " +
+            "AND ( " +
+            "    ( " +
+            "        (:metropolitanGovernments IS NULL AND :localGovernments IS NULL) " +
+            "        OR lg.metropolitanGovernment.id IN :metropolitanGovernments " +
+            "        OR lg.id IN :localGovernments " +
             "    ) " +
             ") " +
             "AND ( " +
-            "    :keyword IS NULL OR " +
-            "    LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "    LOWER(p.firstContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "    LOWER(p.lastContent) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "    (i IS NOT NULL AND (LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(ip.content) LIKE LOWER(CONCAT('%', :keyword, '%')))) " +
+            "    :keyword IS NULL " +
+            "    OR LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "    OR (i IS NOT NULL AND (LOWER(i.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "    OR LOWER(ip.content) LIKE LOWER(CONCAT('%', :keyword, '%')))) " +
             ")"
     )
     Page<Post> searchPostsByCriteria(

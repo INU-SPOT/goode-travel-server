@@ -1,30 +1,32 @@
 package com.spot.good2travel.service;
 
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Comment;
 import com.spot.good2travel.domain.Post;
+import com.spot.good2travel.domain.ReplyComment;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.dto.CommentRequest;
-import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.repository.CommentRepository;
 import com.spot.good2travel.repository.PostRepository;
 import com.spot.good2travel.repository.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.spot.good2travel.dto.CommentRequest.CommentCreateRequest;
-
+import static com.spot.good2travel.dto.CommentResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +36,12 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final FcmService fcmService;
+    private final ReplyCommentService replyCommentService;
 
 
     @Transactional
-    public void addComment(CommentCreateRequest request, UserDetails userDetails){
+    public void addComment(CommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -48,11 +52,15 @@ public class CommentService {
         Post post  = postRepository
                 .findById(request.getPostId()).orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
 
-        commentRepository.save(Comment.of(request, user, post));
+        Comment comment = Comment.of(request, user, post);
+        commentRepository.save(comment);
+        if (!userId.equals(post.getUser().getId())){
+            fcmService.sendMessageForComment(user, post, request, comment.getCreateDate());
+        }
     }
 
     @Transactional
-    public List<CommentResponse.CommentDetailResponse> getPostComments(Long postId, UserDetails userDetails){
+    public List<CommentDetailResponse> getPostComments(Long postId, UserDetails userDetails){
         List<Comment> comments  = commentRepository.findAllByPostId(postId);
 
         if(userDetails != null){
@@ -67,11 +75,11 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentResponse.CommentDetailResponse> getCommentsForLogin(List<Comment> comments, User user){
+    public List<CommentDetailResponse> getCommentsForLogin(List<Comment> comments, User user){
 
-        List<CommentResponse.CommentDetailResponse> response = comments.stream().map(
-                comment -> CommentResponse.CommentDetailResponse.of(comment, comment.getUser().equals(user), comment.getReplyComments().stream()
-                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, replyComment.getUser().equals(user)))
+        List<CommentDetailResponse> response = comments.stream().map(
+                comment -> CommentDetailResponse.of(comment, comment.getUser().equals(user), comment.getReplyComments().stream()
+                        .map(replyComment -> ReplyCommentResponse.of(replyComment, replyComment.getUser().equals(user)))
                         .toList()
                 )).toList();
 
@@ -79,11 +87,11 @@ public class CommentService {
     }
 
     @Transactional
-    public List<CommentResponse.CommentDetailResponse> getCommentsForNotLogin(List<Comment> comments){
+    public List<CommentDetailResponse> getCommentsForNotLogin(List<Comment> comments){
 
-        List<CommentResponse.CommentDetailResponse> response = comments.stream().map(
-                comment -> CommentResponse.CommentDetailResponse.of(comment, false, comment.getReplyComments().stream()
-                        .map(replyComment -> CommentResponse.ReplyCommentResponse.of(replyComment, false))
+        List<CommentDetailResponse> response = comments.stream().map(
+                comment -> CommentDetailResponse.of(comment, false, comment.getReplyComments().stream()
+                        .map(replyComment -> ReplyCommentResponse.of(replyComment, false))
                         .toList()
                 )).toList();
 
@@ -129,7 +137,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void updateComment(Long commentId, CommentRequest.@Valid CommentUpdateRequest request, UserDetails userDetails){
+    public void updateComment(Long commentId, CommentRequest.CommentUpdateRequest request, UserDetails userDetails){
         if(userDetails == null){
             throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
         }
@@ -142,6 +150,31 @@ public class CommentService {
         if(comment.getUser().getId().equals(userId)){
             comment.updateComment(request);
         }
+    }
+
+    @Transactional
+    public List<UserCommentResponse> getUserComments(UserDetails userDetails){
+        if (userDetails == null) {
+            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
+        }
+
+        Long userId = ((CustomUserDetails) userDetails).getId();
+
+        List<Comment> comments = commentRepository.findByUserId(userId);
+        List<ReplyComment> replyComments = replyCommentService.getUserReplyComment(userDetails);
+
+        List<UserCommentResponse> response = Stream.concat(
+                        comments.stream()
+                                .map(comment -> UserCommentResponse.of("comment", comment.getPost().getId(), comment.getPost().getTitle(),
+                                        comment.getUpdateDate().toLocalDate(), comment.getIsModified(), comment.getCreateDate(), comment.getContent())),
+                        replyComments.stream()
+                                .map(replyComment -> UserCommentResponse.of("replyComment", replyComment.getComment().getPost().getId(),
+                                        replyComment.getComment().getPost().getTitle(), replyComment.getUpdateDate().toLocalDate(),
+                                        replyComment.getIsModified(), replyComment.getCreateDate(), replyComment.getContent()))
+                ).sorted(Comparator.comparing(UserCommentResponse::getCreateDate).reversed())
+                .toList();
+
+        return response;
     }
 
 }

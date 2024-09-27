@@ -141,7 +141,7 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
     })
-    public CommonResponse<?> deletePost(@RequestParam Long postid, @AuthenticationPrincipal UserDetails userDetails) {
+    public CommonResponse<?> deletePost(@PathVariable Long postid, @AuthenticationPrincipal UserDetails userDetails) {
         postService.deletePost(postid, userDetails);
         return CommonResponse.success("게시글 삭제 성공", null);
     }
