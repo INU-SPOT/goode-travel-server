@@ -40,6 +40,12 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ItemCategory> itemCategories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<ItemCourse> itemCourses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "mainItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Course> courses = new ArrayList<>();
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private final List<ItemPost> itemPosts = new ArrayList<>();
 
