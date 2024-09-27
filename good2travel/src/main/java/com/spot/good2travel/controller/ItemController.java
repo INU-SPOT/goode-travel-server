@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ItemController {
@@ -97,6 +99,25 @@ public class ItemController {
         return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
     }
 
+    @GetMapping("/v1/items")
+    @Operation(summary = "굳이들 조회",
+            description = "공식적인 굳이들의 목록을 검색 기능과 함께 제공한다." +
+                    "<br><br> - request : itemId= item(DB) 상 pk" +
+                    "<br><br> - response : GoodeDetailsResponse"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "굳이들 제공 성공", content = @Content(schema = @Schema(implementation = ItemResponse.GoodeDetailsResponse.class)))
+    })
+    public CommonResponse<?> getGoodeThumbnails(@RequestParam(required = false) List<Long> metropolitanGovernments,
+                                                @RequestParam(required = false) List<Long> localGovernments,
+                                                @RequestParam(required = false) List<String> categories,
+                                                @RequestParam(required = false) String keyword,
+                                                @RequestParam(defaultValue = "0", required = false) Integer page,
+                                                @RequestParam(defaultValue = "7", required = false) Integer size){
+        return CommonResponse.success("굳이들 제공 성공", itemService.getGoodeThumbnails(metropolitanGovernments,
+                localGovernments, categories, keyword, page, size));
+    }
+
     @DeleteMapping("/v1/users/items/{itemId}")
     @Operation(summary = "사용자의 굳이/계획 삭제",
         description = "사용자의 굳이/계획을 삭제한다." +
@@ -125,5 +146,4 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
     }
 
-    //todo 굳이 관광코스 조회는 관광코스 설계 후 제작
 }

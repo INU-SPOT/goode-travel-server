@@ -1,5 +1,6 @@
 package com.spot.good2travel.service;
 
+import com.spot.good2travel.common.dto.CommonPagingResponse;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.ItemAccessException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
@@ -12,6 +13,8 @@ import com.spot.good2travel.repository.ItemRepository;
 import com.spot.good2travel.repository.LocalGovernmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,5 +127,26 @@ public class ItemService {
 
     public void deleteItem(Long itemId) {
         itemRepository.deleteById(itemId);
+    }
+
+    @Transactional
+    public CommonPagingResponse<?> getGoodeThumbnails(List<Long> metropolitanGovernments,
+                                                                        List<Long> localGovernments, List<String> categories,
+                                                                        String keyword, Integer page, Integer size){
+        PageRequest pageable = PageRequest.of(page, size);
+
+        boolean hasNoConditions = (metropolitanGovernments == null || metropolitanGovernments.isEmpty()) &&
+                (localGovernments == null || localGovernments.isEmpty()) &&
+                (categories == null || categories.isEmpty()) &&
+                (keyword == null || keyword.trim().isEmpty());
+
+        Page<Item> itemPage;
+        if (hasNoConditions) {
+            itemPage = itemRepository.findAllByType(ItemType.GOODE, pageable);
+        } else {
+            itemPage = itemRepository.searchGoode(metropolitanGovernments, localGovernments, categories, keyword, ItemType.GOODE,pageable);
+        }
+
+        return new CommonPagingResponse<>(page, size, itemPage.getTotalElements(), itemPage.getTotalPages(), itemPage.stream().map(ItemResponse.GoodeThumbnailResponse::of).toList());
     }
 }
