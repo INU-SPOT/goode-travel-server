@@ -29,7 +29,7 @@ public class FcmController {
     @Operation(
             summary = "fcm 토큰 저장 및 업데이트",
             description = "fcm 토큰을 저장하거나 업데이트 합니다" +
-                    "<br><br> - request : fcmUpdateDto" +
+                    "<br><br> - request : accessToken 헤더 추가, fcmUpdateDto" +
                     "<br><br> - response : x"
     )
     @ApiResponses(value = {

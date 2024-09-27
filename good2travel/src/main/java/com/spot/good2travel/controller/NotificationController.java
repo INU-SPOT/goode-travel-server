@@ -26,7 +26,7 @@ public class NotificationController {
     @Operation(
             summary = "알람 내역 반환",
             description = "알림 내역들을 최신순으로 반환한다." +
-                    "<br><br> - request : X" +
+                    "<br><br> - request : accessToken 헤더 추가" +
                     "<br><br> - response : List<NotificationResponse>"
     )
     @ApiResponses(value = {
@@ -40,7 +40,7 @@ public class NotificationController {
     @Operation(
             summary = "알림의 확인 여부 변경",
             description = "알림의 확인 여부를 변경한다." +
-                    "<br><br> - request : Notification DB 상의 pk" +
+                    "<br><br> - request : accessToken 헤더 추가, Notification DB 상의 pk" +
                     "<br><br> - response : 변경된 알림 확인 여부 (Boolean)"
     )
     @ApiResponses(value = {
