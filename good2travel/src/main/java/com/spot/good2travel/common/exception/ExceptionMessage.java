@@ -63,7 +63,9 @@ public enum ExceptionMessage {
         NOTIFICATION_NOT_FOUND("해당 알림 내용을 찾을 수 없습니다.", 0 ,HttpStatus.NOT_FOUND),
 
         //코스 관련 메시지
-        COURSE_NOT_FOUND("해당 코스가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND);
+        COURSE_NOT_FOUND("해당 코스가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
+        ITEM_ISEXIST_COURSE("이미 코스가 존재하는 Goode입니다.", 0, HttpStatus.BAD_REQUEST);
+
 
 private final String message;
 

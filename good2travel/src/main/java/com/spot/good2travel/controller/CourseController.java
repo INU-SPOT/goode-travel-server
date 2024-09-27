@@ -48,8 +48,7 @@ public class CourseController {
 
     @PutMapping("/v1/course/{courseid}")
     @Operation(
-            summary = "공식 굳이의 코스 수정하기 <br><br> - request: <br> pathvariable Long courseid : 공식 코스의 pk <br> CourseUpdateRequest <br><br> - response: Long courseId",
-            description = "공식 굳이의 코스를 수정할겁니다"
+            summary = "공식 굳이의 코스 수정하기", description = "공식 굳이의 코스를 수정하기<br><br> - request: <br> pathvariable Long courseid : 공식 코스의 pk <br> CourseUpdateRequest <br><br> - response: Long courseId"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "공식 굳이 수정 완료", content = @Content(schema = @Schema(implementation = Long.class)))
@@ -60,8 +59,7 @@ public class CourseController {
 
     @DeleteMapping("/v1/course/{courseid}")
     @Operation(
-            summary = "공식 굳이 삭제 <br><br> - request: <br> pathvariable Long courseid : 공식 코스의 pk <br> CourseUpdateRequest <br><br> - response: Long courseId",
-            description = "공식 굳이의 코스를 삭제할겁니다"
+            summary = "공식 굳이 삭제", description = "공식 굳이의 코스 삭제하기 <br><br> - request: <br> pathvariable Long courseid : 공식 코스의 pk <br> CourseUpdateRequest <br><br> - response: Long courseId"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "공식 굳이 코스 삭제 완료", content = @Content(schema = @Schema(implementation = Long.class)))

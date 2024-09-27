@@ -1,6 +1,7 @@
 package com.spot.good2travel.service;
 
 import com.spot.good2travel.common.exception.ExceptionMessage;
+import com.spot.good2travel.common.exception.ItemCourseIsExistException;
 import com.spot.good2travel.common.exception.ItemTypeException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.Course;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class CourseService {
         Course course = Course.of();
 
         validItemIsGoode(goode);
+        validCourseIsExist(goode);
 
         List<ItemCourse> itemCourses = new ArrayList<>();
         List<Long> sequence = request.getItems().stream().map(num -> {
@@ -108,6 +111,19 @@ public class CourseService {
             return;
         }
         throw new ItemTypeException(ExceptionMessage.ITEM_TYPE_NOT_OFFICIAL_GOODE);
+    }
+
+    /**
+     일단은 코스를 하나만 하기로 해서 멍청이슈를 줄이기 위해 하나만 생성되도록 lock
+     */
+
+    @Transactional
+    public void validCourseIsExist(Item item){
+        Optional<Course> course = courseRepository.findByMainItem(item);
+
+        if(course.isPresent()){
+            throw new ItemCourseIsExistException(ExceptionMessage.ITEM_ISEXIST_COURSE);
+        }
     }
 
     @Transactional
