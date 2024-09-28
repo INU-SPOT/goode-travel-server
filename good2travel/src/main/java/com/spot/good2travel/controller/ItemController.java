@@ -146,4 +146,17 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
     }
 
+    @GetMapping("/v1/items/random")
+    @Operation(
+            summary = "랜덤 굳이 뽑기",
+            description = "랜덤으로 굳이 하나를 가져온다." +
+                    "<br><br> - request : X" +
+                    "<br><br> : - response : GoodeRandomResponse"
+    )
+    @ApiResponses(
+            @ApiResponse(responseCode = "200", description = "랜덤 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = ItemResponse.GoodeRandomResponse.class)))
+    )
+    public CommonResponse<?> getRandomGoode(){
+        return CommonResponse.success("랜덤 굳이 반환 완료", itemService.getRandomGoode());
+    }
 }

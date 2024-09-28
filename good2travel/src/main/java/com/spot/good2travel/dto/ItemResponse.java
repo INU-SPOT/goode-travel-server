@@ -1,20 +1,30 @@
 package com.spot.good2travel.dto;
 
 import com.spot.good2travel.domain.Item;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+
 
 public class ItemResponse {
 
     @Getter
-    @Setter
     @Builder
     public static class GoodeDetailsResponse {
+
+        @Schema(example = "굳이? 성심당 가서 망고시루 먹기")
         private String title;
+
+        @Schema(example = "/image/~")
         private String imageUrl;
-        private String address;
+
+        @Schema(example = "1956년 대전역 앞 작은 찐빵집에서 시작한 ..~")
         private String description;
+
+        @Schema(example = "대전광역시 무슨구 무슨로 1234")
+        private String address;
+
+        @Schema(example = "대전광역시")
         private String localGovernmentName;
 
         public static GoodeDetailsResponse of(Item item, String localGovernmentName){
@@ -24,6 +34,24 @@ public class ItemResponse {
                     .address(item.getAddress())
                     .description(item.getDescription())
                     .localGovernmentName(localGovernmentName)
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    public static class GoodeRandomResponse {
+
+        @Schema(example = "1")
+        private Long itemId;
+
+        @Schema(example = "굳이? 성심당 가서 망고시루 먹기")
+        private String title;
+
+        public static GoodeRandomResponse of (Item item){
+            return GoodeRandomResponse.builder()
+                    .itemId(item.getId())
+                    .title(item.getTitle())
                     .build();
         }
     }

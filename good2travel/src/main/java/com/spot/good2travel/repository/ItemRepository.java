@@ -9,10 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
+
+    @Query("SELECT i FROM Item i WHERE i.type=0 ORDER BY RAND() LIMIT 1")
+    Optional<Item> findRandomItem();
 
     @Query("SELECT DISTINCT i FROM Item i " +
             "LEFT JOIN i.localGovernment lg " +
