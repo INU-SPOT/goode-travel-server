@@ -56,21 +56,17 @@ public class FcmService {
         }
     }
 
-    public void sendMessageForComment(User user, Post post, CommentRequest.CommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
-        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+    public void sendMessageForComment(User user, Post post, String token, CommentRequest.CommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
         String title = user.getNickname() + "님이 '" + post.getTitle()+"' 게시물에 댓글을 달았어요.";
         String body = request.getContent();
-        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        sendMessage(token,title, body, post.getId());
         notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
     }
 
-    public void sendMessageForReplyComment(User user, Post post, CommentRequest.ReplyCommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
-        Fcm fcm = fcmRepository.findByUserId(post.getUser().getId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FCM_TOKEN_NOT_FOUND));
+    public void sendMessageForReplyComment(User user, Post post, String token, CommentRequest.ReplyCommentCreateRequest request, LocalDateTime notificationTime) throws FirebaseMessagingException {
         String title = user.getNickname() + "님이 내 댓글에 대댓글을 달았어요.";
         String body = request.getContent();
-        sendMessage(fcm.getFcmToken(),title, body, post.getId());
+        sendMessage(token, title, body, post.getId());
         notificationRepository.save(Notification.of(post.getId(), title, body, notificationTime, post.getUser()));
     }
 
