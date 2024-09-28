@@ -56,15 +56,6 @@ public class ReplyCommentService {
             if (fcm.isPresent()) {
                 fcmService.sendMessageForReplyComment(user, comment.getPost(), fcm.get().getFcmToken(), request, replyComment.getCreateDate());
             }
-//            Optional.ofNullable(fcmRepository.findByUserId(comment.getPost().getUser().getId()))
-//                    .ifPresent(token -> {
-//                        try {
-//                            fcmService.sendMessageForReplyComment(user, comment.getPost(), String.valueOf(token), request, replyComment.getCreateDate());
-//                        } catch (FirebaseMessagingException e) {
-//                            e.getStackTrace();
-//                        }
-//                    }
-//            );
         }
     }
 
