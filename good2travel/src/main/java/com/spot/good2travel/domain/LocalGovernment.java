@@ -1,6 +1,5 @@
 package com.spot.good2travel.domain;
 
-import com.spot.good2travel.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,6 +18,12 @@ public class LocalGovernment {
 
     @Column(nullable = false)
     private String name;
+
+    private String coordinateX;
+
+    private String coordinateY;
+
+    private String todayWeatherUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "metropolitan_government_id")

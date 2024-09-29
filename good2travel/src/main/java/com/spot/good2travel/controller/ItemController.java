@@ -4,7 +4,9 @@ import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.domain.ItemType;
 import com.spot.good2travel.dto.ItemRequest;
 import com.spot.good2travel.dto.ItemResponse;
+import com.spot.good2travel.dto.WeatherResponse;
 import com.spot.good2travel.service.ItemService;
+import com.spot.good2travel.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +25,7 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
-
+    private final WeatherService weatherService;
 
     @PostMapping("/v1/item")
     @Operation(
@@ -158,6 +160,15 @@ public class ItemController {
     )
     public CommonResponse<?> getRandomGoode(){
         return CommonResponse.success("랜덤 굳이 반환 완료", itemService.getRandomGoode());
+    }
+
+    @GetMapping("/v1/items/{itemid}/weather")
+    @Operation(summary = "굳이 날씨 조회", description = "굳이의 날씨를 조회합니다. <br><br> - request: item의 pk <br><br> - response: WeatherResponse")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "굳이 날씨 조회 성공", content = @Content(schema = @Schema(implementation = WeatherResponse.class))),
+    })
+    public CommonResponse<?> isRegistered(@PathVariable Long itemid) {
+        return CommonResponse.success("굳이 날씨 조회 성공", itemService.getGoodeWeather(itemid));
     }
 
     @GetMapping("/v1/items/recommend")
