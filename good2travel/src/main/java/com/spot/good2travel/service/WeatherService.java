@@ -77,7 +77,7 @@ public class WeatherService {
                 weatherRepository.save(weather);
                 Thread.sleep(2000);
             } catch (URISyntaxException | InterruptedException e) {
-                throw new RuntimeException(e);
+                throw new WeatherReadException(ExceptionMessage.WEATHER_READ_EXCEPTION);
             }
         });
     }
@@ -225,9 +225,6 @@ public class WeatherService {
                 .bodyToMono(String.class)
                 .block();
 
-        // 응답 데이터 로그 출력
-        log.info("API 응답 데이터: {}", result);
-
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -242,7 +239,6 @@ public class WeatherService {
 
             Element item = (Element) itemList.item(0);
 
-            // sunrise 태그 가져오기
             NodeList sunriseList = item.getElementsByTagName("sunrise");
             if (sunriseList.getLength() == 0) {
                 log.error("sunrise 태그를 찾을 수 없습니다.");
@@ -251,7 +247,6 @@ public class WeatherService {
             String sunriseText = sunriseList.item(0).getTextContent().trim();
             LocalTime sunrise = LocalTime.parse(sunriseText, formatter);
 
-            // sunset 태그 가져오기
             NodeList sunsetList = item.getElementsByTagName("sunset");
             if (sunsetList.getLength() == 0) {
                 log.error("sunset 태그를 찾을 수 없습니다.");
@@ -260,9 +255,6 @@ public class WeatherService {
             String sunsetText = sunsetList.item(0).getTextContent().trim();
             LocalTime sunset = LocalTime.parse(sunsetText, formatter);
 
-            log.info("일출 시간: {}, 일몰 시간: {}", sunrise, sunset);
-
-            // Redis에 저장 (LocalTime을 문자열로 변환하여 저장)
             redisTemplate.opsForValue().set("sunrise", sunrise.toString());
             redisTemplate.opsForValue().set("sunset", sunset.toString());
 
