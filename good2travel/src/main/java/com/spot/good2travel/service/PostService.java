@@ -43,6 +43,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ReplyCommentRepository replyCommentRepository;
     private final ItemService itemService;
+    private final ImageService imageService;
 
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
@@ -115,7 +116,7 @@ public class PostService {
         Boolean isOwner = validateUserIsPostOwner(post, userDetails);
         Long commentNum = getTotalComments(postId);
 
-        String writerImageUrl = post.getUser().getProfileImageName();
+        String writerImageUrl = post.getUser().getProfileImageName() != null ? post.getUser().getProfileImageName() : imageService.getDefaultUserImageName();
 
         List<PostResponse.ItemPostResponse> itemPostResponses = post.getSequence().stream()
                 .map(num -> {
@@ -172,12 +173,18 @@ public class PostService {
 
             ItemPost itemPost = itemPostRepository.findById(itemPostCreateUpdateRequest.getItemPostId())
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
+            List<Long> beforeSequence = itemPost.getSequence();
 
             List<Long> afterSequence = itemPostCreateUpdateRequest.getImages().stream()
                     .map(image -> updateItemPostImage(image, itemPost))
                     .toList();
 
             itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
+            Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+
+            beforeSequence.stream()
+                    .filter(num -> !afterSequenceSet.contains(num))
+                    .forEach(this::deleteItemPostImage);
 
             return itemPost.getId();
         }
@@ -210,6 +217,13 @@ public class PostService {
         itemService.deleteUserItem(itemPost.getItem());
 
         itemPostRepository.delete(itemPost);
+    }
+
+    public void deleteItemPostImage(Long itemPostImageId){
+        ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageId)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
+
+        itemPostImageRepository.delete(itemPostImage);
     }
 
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
@@ -381,7 +395,7 @@ public class PostService {
                             .map(ItemPostImage::getImageName) 
                             .filter(Objects::nonNull)
                             .findFirst()
-                            .orElse(null);
+                            .orElse(imageService.getDefaultImageName());
 
                     return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageName, post.getSequence().stream().map(num -> {
                         ItemPost itemPost = itemPostRepository.findById(num)
@@ -395,7 +409,7 @@ public class PostService {
     public CommonPagingResponse<?> searchPosts(List<Long> metropolitanGovernments, List<Long> localGovernments, List<String> categories, String keyword, Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createDate"));
 
-        Boolean hasNoConditions = (metropolitanGovernments == null || metropolitanGovernments.isEmpty()) &&
+        boolean hasNoConditions = (metropolitanGovernments == null || metropolitanGovernments.isEmpty()) &&
                 (localGovernments == null || localGovernments.isEmpty()) &&
                 (categories == null || categories.isEmpty()) &&
                 (keyword == null || keyword.trim().isEmpty());
@@ -414,11 +428,13 @@ public class PostService {
     public void deletePost(Long postId, UserDetails userDetails) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.POST_NOT_FOUND));
+
         validateUserIsPostOwner(post, userDetails);
         deleteLikeAndVisit(post.getId());
 
-        post.getItemPosts().stream()
+        post.getItemPosts()
                 .forEach(num -> itemService.deleteUserItem(num.getItem()));
+
         postRepository.delete(post);
     }
 

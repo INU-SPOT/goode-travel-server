@@ -73,13 +73,13 @@ public class ItemResponse {
             this.imageUrl = imageUrl;
         }
 
-        public static GoodeThumbnailResponse of(Item item){
+        public static GoodeThumbnailResponse of(Item item, String imageUrl){
             return GoodeThumbnailResponse.builder()
                     .itemId(item.getId())
                     .metropolitanGovernmentName(item.getLocalGovernment() != null ? item.getLocalGovernment().getMetropolitanGovernment().getName() : null)
                     .localGovernmentName(item.getLocalGovernment() != null ? item.getLocalGovernment().getName() : null)
                     .title(item.getTitle())
-                    .imageUrl(item.getImageUrl())
+                    .imageUrl(imageUrl)
                     .build();
         }
     }

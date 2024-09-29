@@ -26,6 +26,7 @@ public class FolderService {
     private final UserRepository userRepository;
     private final LocalGovernmentRepository localGovernmentRepository;
     private final ItemService itemService;
+    private final ImageService imageService;
 
     /*
     새 폴더 만들기
@@ -65,7 +66,7 @@ public class FolderService {
                 .map(Item::getImageUrl)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElse(null);
+                .orElse(imageService.getDefaultImageUrl());
     }
 
     @Transactional

@@ -25,6 +25,12 @@ public class ImageService {
     @Value("${spring.image-import-url}")
     private String imageImportUrl;
 
+    @Value("${spring.default-image-name}")
+    private String defaultImageName;
+
+    @Value("${spring.default-user-image-name}")
+    private String defaultUserImageName;
+
     @Value("${spring.image-get-url}")
     private String imageGetUrl;
 
@@ -73,6 +79,18 @@ public class ImageService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    public String getDefaultImageUrl(){
+        return imageGetUrl + "/" + defaultImageName;
+    }
+
+    public String getDefaultImageName(){
+        return defaultImageName;
+    }
+
+    public String getDefaultUserImageName(){
+        return defaultUserImageName;
     }
 
 }
