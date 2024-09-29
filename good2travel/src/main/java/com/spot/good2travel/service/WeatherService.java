@@ -274,7 +274,7 @@ public class WeatherService {
     public WeatherResponse getWeather(Item item){
         LocalGovernment localGovernment = item.getLocalGovernment();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        Weather weather = localGovernment.getWeathers().get(0);
+        Weather weather = localGovernment.getWeather();
         LocalDateTime now = LocalDateTime.now();
 
         String sky = weather.getSky();

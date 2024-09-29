@@ -29,8 +29,8 @@ public class LocalGovernment {
     @JoinColumn(name = "metropolitan_government_id")
     private MetropolitanGovernment metropolitanGovernment;
 
-    @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
-    private List<Weather> weathers;
+    @OneToOne(mappedBy = "localGovernment", cascade = CascadeType.ALL)
+    private Weather weather;
 
     @OneToMany(mappedBy = "localGovernment",cascade = CascadeType.ALL)
     private List<Item> items;

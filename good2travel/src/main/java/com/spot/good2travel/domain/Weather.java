@@ -24,7 +24,7 @@ public class Weather extends BaseEntity {
 
     private String sky;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
 
