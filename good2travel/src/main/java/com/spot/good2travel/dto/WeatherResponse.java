@@ -2,9 +2,11 @@ package com.spot.good2travel.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class WeatherResponse {
 
     @Schema(example = "경상북도 구미시")

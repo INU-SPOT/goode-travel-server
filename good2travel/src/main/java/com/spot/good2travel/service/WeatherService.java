@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import reactor.core.publisher.Mono;
@@ -58,8 +57,8 @@ public class WeatherService {
         setLocalGovernmentWeather();
     }
 
-    //매일 00:05분에 실행
-    @Scheduled(cron = "00 02 23 * * *")
+    //매일 00:10분에 실행
+    @Scheduled(cron = "00 10 00 * * *")
     public void getDay() throws URISyntaxException {
         getDayData();
         updateDate();
@@ -215,43 +214,66 @@ public class WeatherService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
 
         URI url = new URI("http://apis.data.go.kr/B090041/openapi/service/RiseSetInfoService/getAreaRiseSetInfo" +
-                "?location=%EC%9D%B8%EC%B2%9C"+
-                "&locdate="+t.format(DateTimeFormatter.ofPattern("yyyyMMdd"))+
-                "&serviceKey="+weatherApiKey);
+                "?location=%EC%9D%B8%EC%B2%9C" +
+                "&locdate=" + t.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +
+                "&serviceKey=" + weatherApiKey);
+
         String result = webClient.get()
                 .uri(url)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.just(new WeatherReadException(ExceptionMessage.WEATHER_READ_EXCEPTION)))
                 .bodyToMono(String.class)
                 .block();
+
+        // 응답 데이터 로그 출력
+        log.info("API 응답 데이터: {}", result);
+
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
-
             Document document = builder.parse(new InputSource(new StringReader(result)));
             document.getDocumentElement().normalize();
+
             NodeList itemList = document.getElementsByTagName("item");
+            if (itemList.getLength() == 0) {
+                log.error("item 태그를 찾을 수 없습니다. 응답 데이터 확인 필요.");
+                return;
+            }
+
             Element item = (Element) itemList.item(0);
 
+            // sunrise 태그 가져오기
             NodeList sunriseList = item.getElementsByTagName("sunrise");
-            Node sunriseNode = sunriseList.item(0);
+            if (sunriseList.getLength() == 0) {
+                log.error("sunrise 태그를 찾을 수 없습니다.");
+                return;
+            }
+            String sunriseText = sunriseList.item(0).getTextContent().trim();
+            LocalTime sunrise = LocalTime.parse(sunriseText, formatter);
 
-            String sunrise = LocalTime.parse(sunriseNode.getTextContent(), formatter).toString();
-
+            // sunset 태그 가져오기
             NodeList sunsetList = item.getElementsByTagName("sunset");
-            Node sunsetNode = sunsetList.item(0);
-            String sunset = LocalTime.parse(sunsetNode.getTextContent(), formatter).toString();
+            if (sunsetList.getLength() == 0) {
+                log.error("sunset 태그를 찾을 수 없습니다.");
+                return;
+            }
+            String sunsetText = sunsetList.item(0).getTextContent().trim();
+            LocalTime sunset = LocalTime.parse(sunsetText, formatter);
 
-            redisTemplate.opsForValue().set("sunrise",sunrise);
-            redisTemplate.opsForValue().set("sunset",sunset);
+            log.info("일출 시간: {}, 일몰 시간: {}", sunrise, sunset);
+
+            // Redis에 저장 (LocalTime을 문자열로 변환하여 저장)
+            redisTemplate.opsForValue().set("sunrise", sunrise.toString());
+            redisTemplate.opsForValue().set("sunset", sunset.toString());
+
         } catch (Exception e) {
-            log.info("일출일몰 api 문제 발생");
+            log.error("일출일몰 api 파싱 중 문제 발생. 원인: {}", e.getMessage());
         }
     }
 
     public WeatherResponse getWeather(Item item){
         LocalGovernment localGovernment = item.getLocalGovernment();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         Weather weather = localGovernment.getWeathers().get(0);
         LocalDateTime now = LocalDateTime.now();
 
