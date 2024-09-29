@@ -276,7 +276,7 @@ public class WeatherService {
         LocalTime sunrise = LocalTime.parse(Objects.requireNonNull(redisTemplate.opsForValue().get("sunrise")).toString(), formatter);
         String day = now.toLocalTime().isAfter(sunset) && now.toLocalTime().isBefore(sunrise) ? "day":"night";
         String todayWeatherLink = localGovernment.getTodayWeatherUrl();
-        return WeatherResponse.of(localGovernment.getMetropolitanGovernment().getName() + " "+ localGovernment.getName(), now, sky,
+        return WeatherResponse.of(localGovernment.getMetropolitanGovernment().getName() + " "+ localGovernment.getName(), weather.getDate(), sky,
                 temperature, day, todayWeatherLink);
     }
 

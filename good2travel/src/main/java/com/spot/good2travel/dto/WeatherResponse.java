@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 public class WeatherResponse {
@@ -13,7 +13,7 @@ public class WeatherResponse {
     private final String region;
 
     @Schema(example = "2021-09-29")
-    private final LocalDateTime date;
+    private final LocalDate date;
 
     @Schema(example = "맑음")
     private final String sky;
@@ -28,7 +28,7 @@ public class WeatherResponse {
     private final String todayWeatherLink;
 
     @Builder
-    public WeatherResponse(String region, LocalDateTime date, String sky, String temperature, String day, String todayWeatherLink){
+    public WeatherResponse(String region, LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
         this.region = region;
         this.date = date;
         this.sky = sky;
@@ -37,7 +37,7 @@ public class WeatherResponse {
         this.todayWeatherLink = todayWeatherLink;
     }
 
-    public static WeatherResponse of(String region, LocalDateTime date, String sky, String temperature, String day, String todayWeatherLink){
+    public static WeatherResponse of(String region, LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
         return WeatherResponse.builder()
                 .region(region)
                 .date(date)
