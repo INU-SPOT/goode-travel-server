@@ -33,6 +33,7 @@ public class ItemService {
     private final ItemCategoryRepository itemCategoryRepository;
     private final ItemRepository itemRepository;
     private final ImageService imageService;
+    private final CourseService courseService;
 
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
@@ -146,13 +147,14 @@ public class ItemService {
         if (items.isEmpty()) {
             throw new NotFoundElementException(ExceptionMessage.RECOMMEND_ITEM_NOT_FOUND);
         }
-        log.info(String.valueOf(items.size()));
+
         Random random = new Random();
         int randomIndex = random.nextInt(items.size());
 
         Item recommendGoode = items.get(randomIndex);
-
-        List<CourseResponse.CourseThumbnailResponse> itemCourses = recommendGoode.getItemCourses().stream()
+        Course course = courseService.getCourseByItemId(recommendGoode);
+        
+        List<CourseResponse.CourseThumbnailResponse> itemCourses = course.getItemCourses().stream()
                 .map(itemCourse -> CourseResponse.CourseThumbnailResponse.of(itemCourse.getItem().getTitle())).toList();
 
         return ItemResponse.RecommendGoodeResponse.of(recommendGoode, itemCourses);

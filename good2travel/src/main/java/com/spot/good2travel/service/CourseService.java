@@ -91,8 +91,7 @@ public class CourseService {
 
         validItemIsGoode(goode);
 
-        Course course = courseRepository.findByMainItem(goode)
-                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COURSE_NOT_FOUND));
+        Course course = getCourseByItemId(goode);
 
         CourseResponse.CourseDetailResponse response = CourseResponse.CourseDetailResponse
                 .of(course.getId(), goode, course.getItemCourses().stream().map(this::getItemCourseResponse).toList());
@@ -129,5 +128,13 @@ public class CourseService {
     @Transactional
     public void deleteCourse(Long courseId){
         courseRepository.deleteById(courseId);
+    }
+
+    @Transactional
+    public Course getCourseByItemId(Item item){
+        Course course = courseRepository.findByMainItem(item)
+                .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.COURSE_NOT_FOUND));
+
+        return course;
     }
 }
