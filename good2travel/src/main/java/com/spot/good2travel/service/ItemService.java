@@ -5,6 +5,7 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.ItemAccessException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.*;
+import com.spot.good2travel.dto.CourseResponse;
 import com.spot.good2travel.dto.ItemRequest;
 import com.spot.good2travel.dto.ItemResponse;
 import com.spot.good2travel.repository.CategoryRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -135,6 +137,25 @@ public class ItemService {
         Optional<Item> randomItem = itemRepository.findRandomItem();
         if (randomItem.isPresent()) return ItemResponse.GoodeRandomResponse.of(randomItem.get());
         throw new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND);
+    }
+
+    @Transactional
+    public ItemResponse.RecommendGoodeResponse getRecommendGoode(){
+        List<Item> items = itemRepository.findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNull(ItemType.GOODE);
+
+        if (items.isEmpty()) {
+            throw new NotFoundElementException(ExceptionMessage.RECOMMEND_ITEM_NOT_FOUND);
+        }
+        log.info(String.valueOf(items.size()));
+        Random random = new Random();
+        int randomIndex = random.nextInt(items.size());
+
+        Item recommendGoode = items.get(randomIndex);
+
+        List<CourseResponse.CourseThumbnailResponse> itemCourses = recommendGoode.getItemCourses().stream()
+                .map(itemCourse -> CourseResponse.CourseThumbnailResponse.of(itemCourse.getItem().getTitle())).toList();
+
+        return ItemResponse.RecommendGoodeResponse.of(recommendGoode, itemCourses);
     }
 
     @Transactional

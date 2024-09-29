@@ -44,6 +44,7 @@ public enum ExceptionMessage {
         ITEM_DELETE_BAD_REQUEST("잘못된 Item 삭제 요청입니다.", 0, HttpStatus.BAD_REQUEST),
         ITEM_TYPE_NOT_OFFICIAL_GOODE("Item 타입이 굳이가 아니거나 공식이 아닙니다.", 0, HttpStatus.BAD_REQUEST),
         ITEM_TYPE_NOT_PLAN("Item 타입이 계획이 아니거나 공식이 아닙니다.", 0, HttpStatus.BAD_REQUEST),
+        RECOMMEND_ITEM_NOT_FOUND("추천 할 아이템이 없습니다.", 0, HttpStatus.NOT_FOUND),
 
         //폴더 관련 메시지
         ITEM_FOLDER_NOT_FOUND("해당 Item이 포함된 폴더를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
