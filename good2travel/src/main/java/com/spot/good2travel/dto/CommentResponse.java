@@ -49,12 +49,12 @@ public class CommentResponse {
             this.replyComments = replyComments;
         }
 
-        public static CommentDetailResponse of(Comment comment, Boolean isOwner, List<ReplyCommentResponse> replyComments){
+        public static CommentDetailResponse of(Comment comment, String profileImageName,Boolean isOwner, List<ReplyCommentResponse> replyComments){
             return CommentDetailResponse.builder()
                     .commentId(comment.getId())
                     .userId(comment.getUser().getId())
                     .nickname(comment.getUser().getNickname())
-                    .profileImageName(comment.getUser().getProfileImageName())
+                    .profileImageName(profileImageName)
                     .date(comment.getUpdateDate().toLocalDate())
                     .isOwner(isOwner)
                     .isModified(comment.getIsModified())
@@ -95,12 +95,12 @@ public class CommentResponse {
             this.content = content;
         }
 
-        public static ReplyCommentResponse of(ReplyComment comment, Boolean isOwner){
+        public static ReplyCommentResponse of(ReplyComment comment, String profileImageName, Boolean isOwner){
             return ReplyCommentResponse.builder()
                     .replyCommentId(comment.getId())
                     .userId(comment.getUser().getId())
                     .nickname(comment.getUser().getNickname())
-                    .profileImageName(comment.getUser().getProfileImageName())
+                    .profileImageName(profileImageName)
                     .date(comment.getUpdateDate().toLocalDate())
                     .isOwner(isOwner)
                     .isModified(comment.getIsModified())

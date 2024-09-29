@@ -30,6 +30,7 @@ public class ItemService {
     private final CategoryRepository categoryRepository;
     private final ItemCategoryRepository itemCategoryRepository;
     private final ItemRepository itemRepository;
+    private final ImageService imageService;
 
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
@@ -151,9 +152,16 @@ public class ItemService {
         if (hasNoConditions) {
             itemPage = itemRepository.findAllByType(ItemType.GOODE, pageable);
         } else {
-            itemPage = itemRepository.searchGoode(metropolitanGovernments, localGovernments, categories, keyword, ItemType.GOODE,pageable);
+            itemPage = itemRepository.searchGoode(metropolitanGovernments, localGovernments, categories, keyword, ItemType.GOODE, pageable);
         }
 
-        return new CommonPagingResponse<>(page, size, itemPage.getTotalElements(), itemPage.getTotalPages(), itemPage.stream().map(ItemResponse.GoodeThumbnailResponse::of).toList());
+        List<ItemResponse.GoodeThumbnailResponse> goodeThumbnails = itemPage.stream().map(item -> {
+
+            String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : imageService.getDefaultImageUrl();
+            return ItemResponse.GoodeThumbnailResponse.of(item, imageUrl);
+
+        }).toList();
+
+        return new CommonPagingResponse<>(page, size, itemPage.getTotalElements(), itemPage.getTotalPages(), goodeThumbnails);
     }
 }
