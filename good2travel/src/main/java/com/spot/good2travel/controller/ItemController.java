@@ -159,4 +159,18 @@ public class ItemController {
     public CommonResponse<?> getRandomGoode(){
         return CommonResponse.success("랜덤 굳이 반환 완료", itemService.getRandomGoode());
     }
+
+    @GetMapping("/v1/items/recommend")
+    @Operation(
+            summary = "랜덤 굳이 뽑기(홈 화면)",
+            description = "랜덤으로 사진이 있는 굳이 하나와 그 굳이의 코스를 가져온다." +
+                    "<br><br> - request : X" +
+                    "<br><br> : - response : GoodeRandomResponse"
+    )
+    @ApiResponses(
+            @ApiResponse(responseCode = "200", description = "랜덤 추천 사진있는 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = ItemResponse.RecommendGoodeResponse.class)))
+    )
+    public CommonResponse<?> getRecommendGoode(){
+        return CommonResponse.success("랜덤 추천 사진있는 굳이 뽑기 완료", itemService.getRecommendGoode());
+    }
 }

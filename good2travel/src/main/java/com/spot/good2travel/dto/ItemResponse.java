@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 
 public class ItemResponse {
 
@@ -80,6 +82,35 @@ public class ItemResponse {
                     .localGovernmentName(item.getLocalGovernment() != null ? item.getLocalGovernment().getName() : null)
                     .title(item.getTitle())
                     .imageUrl(imageUrl)
+                    .build();
+        }
+    }
+
+    @Getter
+    public static class RecommendGoodeResponse{
+        private final Long itemId;
+        private final String localGovernmentName;
+        private final String title;
+        private final String imageUrl;
+
+        private final List<CourseResponse.CourseThumbnailResponse> courses;
+
+        @Builder
+        public RecommendGoodeResponse(Long itemId, String localGovernmentName, String title, String imageUrl, List<CourseResponse.CourseThumbnailResponse> courses) {
+            this.itemId = itemId;
+            this.localGovernmentName = localGovernmentName;
+            this.title = title;
+            this.imageUrl = imageUrl;
+            this.courses = courses;
+        }
+
+        public static RecommendGoodeResponse of(Item item, List<CourseResponse.CourseThumbnailResponse> courses){
+            return RecommendGoodeResponse.builder()
+                    .itemId(item.getId())
+                    .localGovernmentName(item.getLocalGovernment().getName())
+                    .title(item.getTitle())
+                    .imageUrl(item.getImageUrl())
+                    .courses(courses)
                     .build();
         }
     }

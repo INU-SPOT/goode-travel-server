@@ -11,6 +11,20 @@ import java.util.List;
 public class CourseResponse {
 
     @Getter
+    public static class CourseThumbnailResponse{
+        @Schema(example = "남선공원 가서 산책하기")
+        private final String itemTitle;
+
+        public CourseThumbnailResponse(String itemTitle) {
+            this.itemTitle = itemTitle;
+        }
+
+        public static CourseThumbnailResponse of(String itemTitle){
+            return new CourseThumbnailResponse(itemTitle);
+        }
+    }
+
+    @Getter
     public static class CourseDetailResponse{
 
         @Schema(example = "1")
