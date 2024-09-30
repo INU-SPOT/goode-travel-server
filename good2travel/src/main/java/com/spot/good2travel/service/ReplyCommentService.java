@@ -6,11 +6,13 @@ import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
 import com.spot.good2travel.domain.Comment;
+import com.spot.good2travel.domain.Fcm;
 import com.spot.good2travel.domain.ReplyComment;
 import com.spot.good2travel.domain.User;
 import com.spot.good2travel.dto.CommentRequest.CommentUpdateRequest;
 import com.spot.good2travel.dto.CommentRequest.ReplyCommentCreateRequest;
 import com.spot.good2travel.repository.CommentRepository;
+import com.spot.good2travel.repository.FcmRepository;
 import com.spot.good2travel.repository.ReplyCommentRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ReplyCommentService {
@@ -31,6 +35,7 @@ public class ReplyCommentService {
     private final ReplyCommentRepository replyCommentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final FcmService fcmService;
+    private final FcmRepository fcmRepository;
 
     @Transactional
     public void addReplyComment(ReplyCommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
@@ -47,7 +52,10 @@ public class ReplyCommentService {
         ReplyComment replyComment = ReplyComment.of(request, user, comment);
         replyCommentRepository.save(replyComment);
         if (!userId.equals(comment.getPost().getUser().getId())) {
-            fcmService.sendMessageForReplyComment(user, comment.getPost(), request, replyComment.getCreateDate());
+            Optional<Fcm> fcm = fcmRepository.findByUserId(comment.getPost().getUser().getId());
+            if (fcm.isPresent()) {
+                fcmService.sendMessageForReplyComment(user, comment.getPost(), fcm.get().getFcmToken(), request, replyComment.getCreateDate());
+            }
         }
     }
 

@@ -6,12 +6,10 @@ import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.common.exception.UserNotAuthorizedException;
 import com.spot.good2travel.common.security.CustomUserDetails;
-import com.spot.good2travel.domain.Comment;
-import com.spot.good2travel.domain.Post;
-import com.spot.good2travel.domain.ReplyComment;
-import com.spot.good2travel.domain.User;
+import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.CommentRequest;
 import com.spot.good2travel.repository.CommentRepository;
+import com.spot.good2travel.repository.FcmRepository;
 import com.spot.good2travel.repository.PostRepository;
 import com.spot.good2travel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.spot.good2travel.dto.CommentRequest.CommentCreateRequest;
@@ -38,6 +37,8 @@ public class CommentService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final FcmService fcmService;
     private final ReplyCommentService replyCommentService;
+    private final FcmRepository fcmRepository;
+    private final ImageService imageService;
 
 
     @Transactional
@@ -55,7 +56,10 @@ public class CommentService {
         Comment comment = Comment.of(request, user, post);
         commentRepository.save(comment);
         if (!userId.equals(post.getUser().getId())){
-            fcmService.sendMessageForComment(user, post, request, comment.getCreateDate());
+            Optional<Fcm> fcm = fcmRepository.findByUserId(post.getUser().getId());
+            if (fcm.isPresent()) {
+                fcmService.sendMessageForComment(user, post, fcm.get().getFcmToken(), request, comment.getCreateDate());
+            }
         }
     }
 
@@ -78,10 +82,16 @@ public class CommentService {
     public List<CommentDetailResponse> getCommentsForLogin(List<Comment> comments, User user){
 
         List<CommentDetailResponse> response = comments.stream().map(
-                comment -> CommentDetailResponse.of(comment, comment.getUser().equals(user), comment.getReplyComments().stream()
-                        .map(replyComment -> ReplyCommentResponse.of(replyComment, replyComment.getUser().equals(user)))
-                        .toList()
-                )).toList();
+                comment -> {
+                    String commentImageName = comment.getUser().getProfileImageName() != null ? comment.getUser().getProfileImageName() : imageService.getDefaultUserImageName();
+                    return CommentDetailResponse.of(comment, commentImageName,comment.getUser().equals(user), comment.getReplyComments().stream()
+                            .map(replyComment -> {
+                                String replyCommentImageName = replyComment.getUser().getProfileImageName() != null ? replyComment.getUser().getProfileImageName() : imageService.getDefaultUserImageName();
+                                return ReplyCommentResponse.of(replyComment, replyCommentImageName, replyComment.getUser().equals(user));
+                            })
+                            .toList()
+                    );
+                }).toList();
 
         return response;
     }
@@ -90,10 +100,15 @@ public class CommentService {
     public List<CommentDetailResponse> getCommentsForNotLogin(List<Comment> comments){
 
         List<CommentDetailResponse> response = comments.stream().map(
-                comment -> CommentDetailResponse.of(comment, false, comment.getReplyComments().stream()
-                        .map(replyComment -> ReplyCommentResponse.of(replyComment, false))
-                        .toList()
-                )).toList();
+                comment -> {
+                    String commentImageName = comment.getUser().getProfileImageName() != null ? comment.getUser().getProfileImageName() : imageService.getDefaultUserImageName();
+                    return CommentDetailResponse.of(comment, commentImageName, false, comment.getReplyComments().stream()
+                            .map(replyComment -> {
+                                String replyCommentImageName = replyComment.getUser().getProfileImageName() != null ? replyComment.getUser().getProfileImageName() : imageService.getDefaultUserImageName();
+                                return ReplyCommentResponse.of(replyComment, replyCommentImageName, false);
+                            }).toList()
+                    );
+                }).toList();
 
         return response;
     }

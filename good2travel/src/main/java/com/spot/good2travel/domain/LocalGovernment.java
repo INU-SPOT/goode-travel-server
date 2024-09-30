@@ -19,12 +19,18 @@ public class LocalGovernment {
     @Column(nullable = false)
     private String name;
 
+    private String coordinateX;
+
+    private String coordinateY;
+
+    private String todayWeatherUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "metropolitan_government_id")
     private MetropolitanGovernment metropolitanGovernment;
 
-    @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
-    private List<Weather> weathers;
+    @OneToOne(mappedBy = "localGovernment", cascade = CascadeType.ALL)
+    private Weather weather;
 
     @OneToMany(mappedBy = "localGovernment",cascade = CascadeType.ALL)
     private List<Item> items;

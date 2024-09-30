@@ -90,9 +90,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
 
+    @ExceptionHandler(value = ItemTypeException.class)
+    public ResponseEntity<CommonResponse<?>> handleItemTypeException(ItemTypeException ex){
+        log.error("[handleItemTypeException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
     @ExceptionHandler(value = FirebaseMessagingException.class)
     public ResponseEntity<CommonResponse<?>> handleFirebaseMessagingException(FirebaseMessagingException ex){
         log.error("[handleFirebaseMessagingException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = ItemCourseIsExistException.class)
+    public ResponseEntity<CommonResponse<?>> handleItemCourseIsExistException(ItemCourseIsExistException ex){
+        log.error("[handleItemCourseIsExistException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = WeatherReadException.class)
+    public ResponseEntity<CommonResponse> handleWeatherReadException(WeatherReadException ex){
+        log.error("[handleWeatherReadException] {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
 

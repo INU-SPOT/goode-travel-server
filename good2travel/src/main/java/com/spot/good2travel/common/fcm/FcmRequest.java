@@ -22,7 +22,7 @@ public class FcmRequest {
         private String body;
 
         @Schema(example = "true")
-        private Boolean validateOnly;
+        private Boolean dryRun;
     }
 
 

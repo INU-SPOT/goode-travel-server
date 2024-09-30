@@ -1,21 +1,29 @@
 package com.spot.good2travel.service;
 
+import com.spot.good2travel.common.dto.CommonPagingResponse;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.ItemAccessException;
+import com.spot.good2travel.common.exception.ItemTypeException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.*;
+import com.spot.good2travel.dto.CourseResponse;
 import com.spot.good2travel.dto.ItemRequest;
 import com.spot.good2travel.dto.ItemResponse;
+import com.spot.good2travel.dto.WeatherResponse;
 import com.spot.good2travel.repository.CategoryRepository;
 import com.spot.good2travel.repository.ItemCategoryRepository;
 import com.spot.good2travel.repository.ItemRepository;
 import com.spot.good2travel.repository.LocalGovernmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +34,9 @@ public class ItemService {
     private final CategoryRepository categoryRepository;
     private final ItemCategoryRepository itemCategoryRepository;
     private final ItemRepository itemRepository;
+    private final ImageService imageService;
+    private final CourseService courseService;
+    private final WeatherService weatherService;
 
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
@@ -124,5 +135,70 @@ public class ItemService {
 
     public void deleteItem(Long itemId) {
         itemRepository.deleteById(itemId);
+    }
+
+    public ItemResponse.GoodeRandomResponse getRandomGoode() {
+        Optional<Item> randomItem = itemRepository.findRandomItem();
+        if (randomItem.isPresent()) return ItemResponse.GoodeRandomResponse.of(randomItem.get());
+        throw new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND);
+    }
+
+    @Transactional
+    public ItemResponse.RecommendGoodeResponse getRecommendGoode(){
+        List<Item> items = itemRepository.findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNull(ItemType.GOODE);
+
+        if (items.isEmpty()) {
+            throw new NotFoundElementException(ExceptionMessage.RECOMMEND_ITEM_NOT_FOUND);
+        }
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(items.size());
+
+        Item recommendGoode = items.get(randomIndex);
+        Course course = courseService.getCourseByItemId(recommendGoode);
+
+        List<CourseResponse.CourseThumbnailResponse> itemCourses = course.getItemCourses().stream()
+                .map(itemCourse -> CourseResponse.CourseThumbnailResponse.of(itemCourse.getItem().getTitle())).toList();
+
+        return ItemResponse.RecommendGoodeResponse.of(recommendGoode, itemCourses);
+    }
+
+    @Transactional
+    public CommonPagingResponse<?> getGoodeThumbnails(List<Long> metropolitanGovernments,
+                                                                        List<Long> localGovernments, List<String> categories,
+                                                                        String keyword, Integer page, Integer size){
+        PageRequest pageable = PageRequest.of(page, size);
+
+        boolean hasNoConditions = (metropolitanGovernments == null || metropolitanGovernments.isEmpty()) &&
+                (localGovernments == null || localGovernments.isEmpty()) &&
+                (categories == null || categories.isEmpty()) &&
+                (keyword == null || keyword.trim().isEmpty());
+
+        Page<Item> itemPage;
+        if (hasNoConditions) {
+            itemPage = itemRepository.findAllByType(ItemType.GOODE, pageable);
+        } else {
+            itemPage = itemRepository.searchGoode(metropolitanGovernments, localGovernments, categories, keyword, ItemType.GOODE, pageable);
+        }
+
+        List<ItemResponse.GoodeThumbnailResponse> goodeThumbnails = itemPage.stream().map(item -> {
+
+            String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : imageService.getDefaultImageUrl();
+            return ItemResponse.GoodeThumbnailResponse.of(item, imageUrl);
+
+        }).toList();
+
+        return new CommonPagingResponse<>(page, size, itemPage.getTotalElements(), itemPage.getTotalPages(), goodeThumbnails);
+    }
+
+    @Transactional
+    public WeatherResponse getGoodeWeather(Long itemId){
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+        if(item.getType() != ItemType.GOODE || !item.getIsOfficial()){
+            throw new ItemTypeException(ExceptionMessage.ITEM_TYPE_NOT_OFFICIAL_GOODE);
+        }
+        return weatherService.getWeather(item);
     }
 }

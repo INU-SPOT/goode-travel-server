@@ -4,7 +4,9 @@ import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.domain.ItemType;
 import com.spot.good2travel.dto.ItemRequest;
 import com.spot.good2travel.dto.ItemResponse;
+import com.spot.good2travel.dto.WeatherResponse;
 import com.spot.good2travel.service.ItemService;
+import com.spot.good2travel.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,12 +18,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
-
+    private final WeatherService weatherService;
 
     @PostMapping("/v1/item")
     @Operation(
@@ -97,6 +101,25 @@ public class ItemController {
         return CommonResponse.success("굳이의 상제 정보 제공 완료", itemService.getGoodeDetails(itemId));
     }
 
+    @GetMapping("/v1/items")
+    @Operation(summary = "굳이들 조회",
+            description = "공식적인 굳이들의 목록을 검색 기능과 함께 제공한다." +
+                    "<br><br> - request : itemId= item(DB) 상 pk" +
+                    "<br><br> - response : GoodeDetailsResponse"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "굳이들 제공 성공", content = @Content(schema = @Schema(implementation = ItemResponse.GoodeDetailsResponse.class)))
+    })
+    public CommonResponse<?> getGoodeThumbnails(@RequestParam(required = false) List<Long> metropolitanGovernments,
+                                                @RequestParam(required = false) List<Long> localGovernments,
+                                                @RequestParam(required = false) List<String> categories,
+                                                @RequestParam(required = false) String keyword,
+                                                @RequestParam(defaultValue = "0", required = false) Integer page,
+                                                @RequestParam(defaultValue = "7", required = false) Integer size){
+        return CommonResponse.success("굳이들 제공 성공", itemService.getGoodeThumbnails(metropolitanGovernments,
+                localGovernments, categories, keyword, page, size));
+    }
+
     @DeleteMapping("/v1/users/items/{itemId}")
     @Operation(summary = "사용자의 굳이/계획 삭제",
         description = "사용자의 굳이/계획을 삭제한다." +
@@ -125,5 +148,40 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 삭제 완료", null);
     }
 
-    //todo 굳이 관광코스 조회는 관광코스 설계 후 제작
+    @GetMapping("/v1/items/random")
+    @Operation(
+            summary = "랜덤 굳이 뽑기",
+            description = "랜덤으로 굳이 하나를 가져온다." +
+                    "<br><br> - request : X" +
+                    "<br><br> : - response : GoodeRandomResponse"
+    )
+    @ApiResponses(
+            @ApiResponse(responseCode = "200", description = "랜덤 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = ItemResponse.GoodeRandomResponse.class)))
+    )
+    public CommonResponse<?> getRandomGoode(){
+        return CommonResponse.success("랜덤 굳이 반환 완료", itemService.getRandomGoode());
+    }
+
+    @GetMapping("/v1/items/{itemid}/weather")
+    @Operation(summary = "굳이 날씨 조회", description = "굳이의 날씨를 조회합니다. <br><br> - request: item의 pk <br><br> - response: WeatherResponse")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "굳이 날씨 조회 성공", content = @Content(schema = @Schema(implementation = WeatherResponse.class))),
+    })
+    public CommonResponse<?> isRegistered(@PathVariable Long itemid) {
+        return CommonResponse.success("굳이 날씨 조회 성공", itemService.getGoodeWeather(itemid));
+    }
+
+    @GetMapping("/v1/items/recommend")
+    @Operation(
+            summary = "랜덤 굳이 뽑기(홈 화면)",
+            description = "랜덤으로 사진이 있는 굳이 하나와 그 굳이의 코스를 가져온다." +
+                    "<br><br> - request : X" +
+                    "<br><br> : - response : GoodeRandomResponse"
+    )
+    @ApiResponses(
+            @ApiResponse(responseCode = "200", description = "랜덤 추천 사진있는 굳이 뽑기 완료", content = @Content(schema = @Schema(implementation = ItemResponse.RecommendGoodeResponse.class)))
+    )
+    public CommonResponse<?> getRecommendGoode(){
+        return CommonResponse.success("랜덤 추천 사진있는 굳이 뽑기 완료", itemService.getRecommendGoode());
+    }
 }
