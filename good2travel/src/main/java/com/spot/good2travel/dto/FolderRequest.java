@@ -19,9 +19,6 @@ public class FolderRequest {
 
     @Getter
     public static class ItemFolderCreateRequest{
-        @Schema(example = "1")
-        @NotNull(message = "폴더의 id를 입력 해 주세요.")
-        private Long folderId;
         @NotNull(message = "아이템의 id를 입력 해 주세요.")
         @Schema(example = "1")
         private Long itemId;

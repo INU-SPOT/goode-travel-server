@@ -91,6 +91,10 @@ public class ItemService {
         }
     }
 
+    public List<Long> moveItems(List<Long> items){
+        return items.stream().map(this::moveItem).toList();
+    }
+
     @Transactional
     public Long updateItem(Long itemId, ItemRequest.ItemUpdateRequest itemUpdateRequest) {        
         Item item = itemRepository.findById(itemId)

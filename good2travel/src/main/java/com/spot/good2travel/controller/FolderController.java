@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("")
@@ -44,7 +46,7 @@ public class FolderController {
     리스트로 한번에 여러개 생성 할 수 있는 api가 필요할듯 함.
      */
 
-    @PostMapping("/v1/folders/plan")
+    @PostMapping("/v1/folders/{folderid}/plan")
     @Operation(
             summary = "새 계획 생성",
             description = "사용자의 폴더에 (커스텀, 공식) 계획 추가 " +
@@ -54,11 +56,30 @@ public class FolderController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "새 계획 생성 완료", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public ResponseEntity<CommonResponse<?>> createFolderPlan(@RequestBody FolderRequest.ItemFolderCreateRequest request,
+    public ResponseEntity<CommonResponse<?>> createFolderPlan(@PathVariable Long folderid,
+                                                              @RequestBody FolderRequest.ItemFolderCreateRequest request,
                                                               @AuthenticationPrincipal UserDetails userDetails){
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("새 계획 생성 완료",
-                folderService.createItemFolder(request , userDetails)));
+                folderService.createItemFolder(folderid, request, userDetails)));
     }
+
+    @PostMapping("/v1/folders/{folderid}/plans")
+    @Operation(
+            summary = "새 계획들 생성",
+            description = "사용자의 폴더에 (커스텀, 공식) 계획 추가 " +
+                    "<br><br> - request : FolderCreateRequest, 헤더에 accessToken 추가" +
+                    "<br><br> - response : Folder DB 상의 PK"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "새 계획들 생성 완료", content = @Content(schema = @Schema(implementation = Long.class))),
+    })
+    public ResponseEntity<CommonResponse<?>> createFolderPlans(@PathVariable Long folderid,
+                                                               @RequestBody List<FolderRequest.ItemFolderCreateRequest> request,
+                                                               @AuthenticationPrincipal UserDetails userDetails){
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.success("새 계획들 생성 완료",
+                folderService.createItemFolders(folderid, request , userDetails)));
+    }
+
 
     @PatchMapping("/v1/folders/{folderId}")
     @Operation(

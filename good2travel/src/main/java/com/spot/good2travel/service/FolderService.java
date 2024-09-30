@@ -70,11 +70,11 @@ public class FolderService {
     }
 
     @Transactional
-    public Long createItemFolder(FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
+    public Long createItemFolder(Long folderId, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
 
-        Folder folder = folderRepository.findById(request.getFolderId())
+        Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
 
         validIsOwner(folder.getUser(), userDetails);
@@ -90,6 +90,40 @@ public class FolderService {
         folderRepository.save(folder);
 
         return folder.getId();
+    }
+
+    @Transactional
+    public Long createItemFolder(Folder folder, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
+        Item item = itemRepository.findById(request.getItemId())
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+        validIsOwner(folder.getUser(), userDetails);
+        String emoji = request.getEmoji();
+        ItemFolder itemFolder = ItemFolder.of(emoji, item, folder);
+
+        itemFolderRepository.save(itemFolder);
+
+        List<Long> newSequence = folder.getSequence();
+        newSequence.add(itemFolder.getId());
+        folder.updateFolderSequence(newSequence);
+
+        folderRepository.save(folder);
+
+        return folder.getId();
+    }
+
+    @Transactional
+    public List<Long> createItemFolders(Long folderId, List<FolderRequest.ItemFolderCreateRequest> requests, UserDetails userDetails){
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+
+        List<Long> itemFolders = requests.stream()
+                .map(itemFolder -> {
+                    
+                    return createItemFolder(folder, itemFolder, userDetails);
+                }).toList();
+
+        return itemFolders;
     }
 
     /*
