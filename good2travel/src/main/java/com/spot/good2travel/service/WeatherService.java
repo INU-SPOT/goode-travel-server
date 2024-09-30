@@ -205,6 +205,7 @@ public class WeatherService {
         localGovernments.forEach(localGovernment -> {
             Weather weather = weatherRepository.findByLocalGovernment(localGovernment);
             weather.updateDate(LocalDate.now());
+            weatherRepository.save(weather);
         });
     }
 
