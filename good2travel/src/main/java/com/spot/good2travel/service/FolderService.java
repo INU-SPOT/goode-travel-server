@@ -12,8 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +75,11 @@ public class FolderService {
     public Long createItemFolder(Long folderId, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        Set<Long> sequence = new HashSet<>(folder.getSequence());
+
+        if(sequence.contains(request.getItemId())){
+            throw new ItemIsExistException(ExceptionMessage.ITEM_IS_EXIST);
+        }
 
         return createItemFolder(folder, request, userDetails);
     }
@@ -101,13 +108,11 @@ public class FolderService {
     public List<Long> createItemFolders(Long folderId, List<FolderRequest.ItemFolderCreateRequest> requests, UserDetails userDetails){
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        Set<Long> sequence = new HashSet<>(folder.getSequence());
 
         List<Long> itemFolders = requests.stream()
-                .map(itemFolder -> {
-                    
-                    return createItemFolder(folder, itemFolder, userDetails);
-                }).toList();
-
+                .filter(itemFolder -> !sequence.contains(itemFolder.getItemId()))
+                .map(itemFolder -> createItemFolder(folder, itemFolder, userDetails)).toList();
         return itemFolders;
     }
 

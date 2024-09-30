@@ -108,6 +108,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
     }
 
+    @ExceptionHandler(value = ItemIsExistException.class)
+    public ResponseEntity<CommonResponse<?>> handleItemIsExistException(ItemIsExistException ex){
+        log.error("[handleItemIsExistException] {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonResponse.error(ex.getMessage(), null));
+    }
+
     @ExceptionHandler(value = WeatherReadException.class)
     public ResponseEntity<CommonResponse> handleWeatherReadException(WeatherReadException ex){
         log.error("[handleWeatherReadException] {}", ex.getMessage());

@@ -67,11 +67,11 @@ public class FolderController {
     @Operation(
             summary = "새 계획들 생성",
             description = "사용자의 폴더에 (커스텀, 공식) 계획 추가 " +
-                    "<br><br> - request : FolderCreateRequest, 헤더에 accessToken 추가" +
-                    "<br><br> - response : Folder DB 상의 PK"
+                    "<br><br> - request : List FolderCreateRequest, Long folderid, 헤더에 accessToken 추가" +
+                    "<br><br> - response : Folder DB 상의 PK List"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "새 계획들 생성 완료", content = @Content(schema = @Schema(implementation = Long.class))),
+            @ApiResponse(responseCode = "201", description = "새 계획들 생성 완료", content = @Content(schema = @Schema(implementation = List.class))),
     })
     public ResponseEntity<CommonResponse<?>> createFolderPlans(@PathVariable Long folderid,
                                                                @RequestBody List<FolderRequest.ItemFolderCreateRequest> request,
