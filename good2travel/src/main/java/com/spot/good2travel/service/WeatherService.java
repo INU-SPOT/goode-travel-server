@@ -159,13 +159,11 @@ public class WeatherService {
 
         String temperature = "20";
 
-        String pty = "";
         int index = 0;
         for (int i = 0; i < itemList.size(); i++) {
             JsonObject item = itemList.get(i).getAsJsonObject();
             String category = item.get("category").getAsString();
             if (category.equals("PTY")) {
-                pty = item.get("obsrValue").getAsString();
                 index = i;
                 break;
             }
