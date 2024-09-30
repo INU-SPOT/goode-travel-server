@@ -272,7 +272,7 @@ public class WeatherService {
         String temperature = weather.getTemperature();
         LocalTime sunset = LocalTime.parse(Objects.requireNonNull(redisTemplate.opsForValue().get("sunset")).toString(), formatter);
         LocalTime sunrise = LocalTime.parse(Objects.requireNonNull(redisTemplate.opsForValue().get("sunrise")).toString(), formatter);
-        String day = now.toLocalTime().isAfter(sunset) && now.toLocalTime().isBefore(sunrise) ? "day":"night";
+        String day = now.toLocalTime().isAfter(sunrise) && now.toLocalTime().isBefore(sunset) ? "day":"night";
         String todayWeatherLink = localGovernment.getTodayWeatherUrl();
         return WeatherResponse.of(localGovernment.getMetropolitanGovernment().getName() + " "+ localGovernment.getName(), weather.getDate(), sky,
                 temperature, day, todayWeatherLink);
