@@ -91,6 +91,10 @@ public class ItemService {
         }
     }
 
+    public List<Long> moveItems(List<Long> items){
+        return items.stream().map(this::moveItem).toList();
+    }
+
     @Transactional
     public Long updateItem(Long itemId, ItemRequest.ItemUpdateRequest itemUpdateRequest) {        
         Item item = itemRepository.findById(itemId)
@@ -110,8 +114,8 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
         if (item.getType() == ItemType.GOODE && item.getIsOfficial()){
-
-            return ItemResponse.GoodeDetailsResponse.of(item, item.getLocalGovernment().getName());
+            String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : imageService.getDefaultImageUrl();
+            return ItemResponse.GoodeDetailsResponse.of(item, imageUrl, item.getLocalGovernment().getName());
         } else {
             throw new ItemAccessException(ExceptionMessage.ITEM_DETAIL_INFO_NOT_FOUND);
         }

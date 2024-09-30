@@ -12,8 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -70,12 +72,22 @@ public class FolderService {
     }
 
     @Transactional
-    public Long createItemFolder(FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
+    public Long createItemFolder(Long folderId, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        Set<Long> sequence = new HashSet<>(folder.getSequence());
+
+        if(sequence.contains(request.getItemId())){
+            throw new ItemIsExistException(ExceptionMessage.ITEM_IS_EXIST);
+        }
+
+        return createItemFolder(folder, request, userDetails);
+    }
+
+    @Transactional
+    public Long createItemFolder(Folder folder, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-
-        Folder folder = folderRepository.findById(request.getFolderId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
 
         validIsOwner(folder.getUser(), userDetails);
         String emoji = request.getEmoji();
@@ -90,6 +102,18 @@ public class FolderService {
         folderRepository.save(folder);
 
         return folder.getId();
+    }
+
+    @Transactional
+    public List<Long> createItemFolders(Long folderId, List<FolderRequest.ItemFolderCreateRequest> requests, UserDetails userDetails){
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+        Set<Long> sequence = new HashSet<>(folder.getSequence());
+
+        List<Long> itemFolders = requests.stream()
+                .filter(itemFolder -> !sequence.contains(itemFolder.getItemId()))
+                .map(itemFolder -> createItemFolder(folder, itemFolder, userDetails)).toList();
+        return itemFolders;
     }
 
     /*

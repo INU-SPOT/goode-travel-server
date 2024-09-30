@@ -52,8 +52,8 @@ public class WeatherService {
     @Value("${spring.weather-api-key}")
     private String weatherApiKey;
 
-    //매 시 35분마다 시행
-    @Scheduled(cron = "0 35 * * * *")
+    //매 시 23분마다 시행
+    @Scheduled(cron = "0 23 * * * *")
     public void getWeatherAPI(){
         setLocalGovernmentWeather();
     }
@@ -185,7 +185,7 @@ public class WeatherService {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.just(new WeatherReadException(ExceptionMessage.WEATHER_READ_EXCEPTION)))
                 .bodyToMono(String.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2)))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(5)))
                 .block();
         try {
             System.out.println(result);

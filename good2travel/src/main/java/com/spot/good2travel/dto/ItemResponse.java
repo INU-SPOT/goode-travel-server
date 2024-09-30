@@ -29,10 +29,10 @@ public class ItemResponse {
         @Schema(example = "대전광역시")
         private String localGovernmentName;
 
-        public static GoodeDetailsResponse of(Item item, String localGovernmentName){
+        public static GoodeDetailsResponse of(Item item, String imageUrl, String localGovernmentName){
             return GoodeDetailsResponse.builder()
                     .title(item.getTitle())
-                    .imageUrl(item.getImageUrl())
+                    .imageUrl(imageUrl)
                     .address(item.getAddress())
                     .description(item.getDescription())
                     .localGovernmentName(localGovernmentName)
