@@ -59,7 +59,7 @@ public class WeatherService {
     }
 
     //매일 00:10분에 실행
-    @Scheduled(cron = "0 23 16 * * *")
+    @Scheduled(cron = "0 32 16 * * *")
     public void getDay() throws URISyntaxException {
         getDayData();
         updateDate();
@@ -205,6 +205,7 @@ public class WeatherService {
         localGovernments.forEach(localGovernment -> {
             Weather weather = weatherRepository.findByLocalGovernment(localGovernment);
             weather.updateDate(LocalDate.now());
+            weatherRepository.save(weather);
         });
     }
 
