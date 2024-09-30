@@ -8,6 +8,7 @@ import com.spot.good2travel.service.CustomOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -51,7 +52,12 @@ public class SecurityConfig {
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("**/**").permitAll()
+                        .requestMatchers(PERMIT_ALL).permitAll()
+                        .requestMatchers(HttpMethod.GET, PERMIT_USER_GET).hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, PERMIT_USER_POST).hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, PERMIT_USER_DELETE).hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, PERMIT_USER_PUT).hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH, PERMIT_USER_PATCH).hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -68,10 +74,83 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(authenticationEntryPoint)
                 );
-
-
         return httpSecurity.build();
     }
+
+        String[] PERMIT_ALL = {
+            "/oauth2/**", //oauth2 로그인 서비스 접근
+            "/login/**", //oauth2 로그인창
+            "/swagger-ui/**", //스웨거 명세
+            "/v3/api-docs/**", //스웨거 명세
+            "/v1/users/image",
+            "/v1/posts/{postid}/comments",
+            "/v1/items/{itemId}",
+            "/v1/items",
+            "/v1/items/{itemid}/weather",
+            "/v1/items/recommend",
+            "/v1/items/random",
+            "/v1/item/{itemid}/course",
+            "/v1/posts",
+            "/v1/posts/{postid}",
+            "/v1/posts/top-visit",
+            "/v1/posts/top-like"
+    };
+
+    String[] PERMIT_USER_GET = {
+            "/v1/users",
+            "/v1/users/comments",
+            "/v1/folders",
+            "/v1/folders/{folderId}",
+            "/v1/users/posts",
+            "/v1/users/posts/like",
+
+    };
+
+    String[] PERMIT_USER_POST = {
+            "/v1/posts/report/replycomments",
+            "/v1/posts/report/comments",
+            "/v1/posts/replycomments",
+            "/v1/posts/comments",
+            "/v1/items",
+            "/v1/items/move",
+            "/v1/item/move",
+            "/v1/folders",
+            "/v1/folders/{folderid}/plans",
+            "/v1/folders/{folderid}/plan",
+            "/v1/posts",
+            "/v1/posts/{postid}/good",
+            "/v1/posts/image",
+            "/v1/fcm",
+            "/v1/fcm/send",
+            "/v1/auth/reissue"
+    };
+
+    String[] PERMIT_USER_PUT = {
+            "/v1/users",
+            "/v1/posts/replycomments/{replycommentid}",
+            "/v1/posts/comments/{commentid}",
+            "/v1/items/{itemId}",
+            "/v1/folders/plan",
+            "/v1/folders/plan/{itemfolderid}",
+
+    };
+
+    String[] PERMIT_USER_PATCH = {
+            "/v1/folders/{folderid}",
+            "/v1/posts/{postid}",
+            "/v1/notification/confirm/{notificationId}",
+            "/v1/notification"
+    };
+
+    String[] PERMIT_USER_DELETE = {
+            "/v1/posts/replycomments/{replycommentid}",
+            "/v1/posts/comments/{commentid}",
+            "/v1/users/items/{itemId}",
+            "/v1/folders/{folderid}",
+            "/v1/folders/{folderid}/plan/{itemfolderid}",
+            "/v1/posts/{postid}"
+    };
+
 
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
