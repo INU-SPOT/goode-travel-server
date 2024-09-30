@@ -53,13 +53,13 @@ public class WeatherService {
     private String weatherApiKey;
 
     //매 시 35분마다 시행
-    @Scheduled(cron = "0 55 * * * *")
+    @Scheduled(cron = "0 35 * * * *")
     public void getWeatherAPI(){
         setLocalGovernmentWeather();
     }
 
     //매일 00:10분에 실행
-    @Scheduled(cron = "0 42 16 * * *")
+    @Scheduled(cron = "0 05 00 * * *")
     public void getDay() throws URISyntaxException {
         getDayData();
         updateDate();
