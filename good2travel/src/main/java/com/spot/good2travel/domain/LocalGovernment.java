@@ -35,4 +35,7 @@ public class LocalGovernment {
     @OneToMany(mappedBy = "localGovernment",cascade = CascadeType.ALL)
     private List<Item> items;
 
+    @OneToMany(mappedBy = "localGovernment", cascade = CascadeType.ALL)
+    private List<Advertisement> advertisements;
+
 }

@@ -67,6 +67,9 @@ public enum ExceptionMessage {
         COURSE_NOT_FOUND("해당 코스가 존재하지 않습니다.", 0, HttpStatus.NOT_FOUND),
         ITEM_ISEXIST_COURSE("이미 코스가 존재하는 Goode입니다.", 0, HttpStatus.BAD_REQUEST),
 
+        //광고 관련 메세지
+        ADVERTISEMENT_NOT_FOUND("해당 광고를 찾을 수 없습니다.", 0, HttpStatus.NOT_FOUND),
+
         //날씨 관련 메시지
         WEATHER_READ_EXCEPTION("날씨 정보를 받아오던 중 예기치 못한 에러가 발생했습니다.", 0, HttpStatus.BAD_REQUEST);
 
