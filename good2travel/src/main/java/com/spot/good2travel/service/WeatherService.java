@@ -59,7 +59,7 @@ public class WeatherService {
     }
 
     //매일 00:10분에 실행
-    @Scheduled(cron = "0 35 16 * * *")
+    @Scheduled(cron = "0 40 16 * * *")
     public void getDay() throws URISyntaxException {
         getDayData();
         updateDate();
