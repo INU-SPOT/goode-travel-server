@@ -9,8 +9,11 @@ import java.time.LocalDate;
 @Getter
 public class WeatherResponse {
 
-    @Schema(example = "경상북도 구미시")
-    private final String region;
+    @Schema(example = "경상북도")
+    private final String metropolitanGovernmentName;
+
+    @Schema(example = "구미시")
+    private final String localGovernmentName;
 
     @Schema(example = "2021-09-29")
     private final LocalDate date;
@@ -28,8 +31,9 @@ public class WeatherResponse {
     private final String todayWeatherLink;
 
     @Builder
-    public WeatherResponse(String region, LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
-        this.region = region;
+    public WeatherResponse(String metropolitanGovernmentName, String localGovernmentName, LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
+        this.metropolitanGovernmentName = metropolitanGovernmentName;
+        this.localGovernmentName = localGovernmentName;
         this.date = date;
         this.sky = sky;
         this.temperature = temperature;
@@ -37,9 +41,11 @@ public class WeatherResponse {
         this.todayWeatherLink = todayWeatherLink;
     }
 
-    public static WeatherResponse of(String region, LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
+    public static WeatherResponse of(String metropolitanGovernmentName, String localGovernmentName,
+                                     LocalDate date, String sky, String temperature, String day, String todayWeatherLink){
         return WeatherResponse.builder()
-                .region(region)
+                .metropolitanGovernmentName(metropolitanGovernmentName)
+                .localGovernmentName(localGovernmentName)
                 .date(date)
                 .sky(sky)
                 .temperature(temperature)
