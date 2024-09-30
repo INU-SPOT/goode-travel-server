@@ -57,7 +57,7 @@ public class ItemController {
         return CommonResponse.success("사용자의 굳이/계획 추가 완료", itemService.createItem(itemCreateRequest));
     }
 
-    @PostMapping(value = "/v1/items/move", params = "itemId")
+    @PostMapping(value = "/v1/item/move", params = "itemId")
     @Operation(
             summary = "코스 -> 폴더 및 폴더 -> 게시글로 굳이/계획을 가져온다.",
             description = "굳이/계획의 공식적 여부를 확인하여 공식적이라면 pk 그대로, " +
@@ -70,6 +70,21 @@ public class ItemController {
         })
         public CommonResponse<?> moveItem(@RequestParam(name = "itemId") Long itemId){
             return CommonResponse.success("굳이/계획 가져오기 완료", itemService.moveItem(itemId));
+    }
+
+    @PostMapping(value = "/v1/items/move")
+    @Operation(
+            summary = "코스 -> 폴더 및 폴더 -> 게시글로 굳이/계획들(여러개)을 가져온다.",
+            description = "굳이/계획의 공식적 여부를 확인하여 공식적이라면 pk 그대로, " +
+                    "공식적이지 않다면 새로운 객체를 생성하여 pk 반환" +
+                    "<br><br> - request : accessToken 헤더 추가, Item(DB) 상의 pk를 body에 담아서 전송 (URL에 명시 x)" +
+                    "<br><br> - response : 가져온 굳이/계획의 item(DB)상의 pk"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "굳이/계획 가져오기 완료", content = @Content(schema = @Schema(implementation = Long.class)))
+    })
+    public CommonResponse<?> moveItems(@RequestParam List<Long> items){
+        return CommonResponse.success("굳이/계획들 가져오기 완료", itemService.moveItems(items));
     }
 
     @PutMapping("/v1/items/{itemId}")
