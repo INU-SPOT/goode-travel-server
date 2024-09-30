@@ -53,13 +53,13 @@ public class WeatherService {
     private String weatherApiKey;
 
     //매 시 35분마다 시행
-    @Scheduled(cron = "0 55 * * * *")
+    @Scheduled(cron = "0 35 * * * *")
     public void getWeatherAPI(){
         setLocalGovernmentWeather();
     }
 
     //매일 00:10분에 실행
-    @Scheduled(cron = "0 42 16 * * *")
+    @Scheduled(cron = "0 10 00 * * *")
     public void getDay() throws URISyntaxException {
         getDayData();
         updateDate();
@@ -274,7 +274,7 @@ public class WeatherService {
         LocalTime sunrise = LocalTime.parse(Objects.requireNonNull(redisTemplate.opsForValue().get("sunrise")).toString(), formatter);
         String day = now.toLocalTime().isAfter(sunrise) && now.toLocalTime().isBefore(sunset) ? "day":"night";
         String todayWeatherLink = localGovernment.getTodayWeatherUrl();
-        return WeatherResponse.of(localGovernment.getMetropolitanGovernment().getName() + " "+ localGovernment.getName(), weather.getDate(), sky,
+        return WeatherResponse.of(localGovernment.getMetropolitanGovernment().getName(), localGovernment.getName(), weather.getDate(), sky,
                 temperature, day, todayWeatherLink);
     }
 
