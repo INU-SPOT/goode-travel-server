@@ -71,25 +71,10 @@ public class FolderService {
 
     @Transactional
     public Long createItemFolder(Long folderId, FolderRequest.ItemFolderCreateRequest request, UserDetails userDetails) {
-        Item item = itemRepository.findById(request.getItemId())
-                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
-
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
 
-        validIsOwner(folder.getUser(), userDetails);
-        String emoji = request.getEmoji();
-        ItemFolder itemFolder = ItemFolder.of(emoji, item, folder);
-
-        itemFolderRepository.save(itemFolder);
-
-        List<Long> newSequence = folder.getSequence();
-        newSequence.add(itemFolder.getId());
-        folder.updateFolderSequence(newSequence);
-
-        folderRepository.save(folder);
-
-        return folder.getId();
+        return createItemFolder(folder, request, userDetails);
     }
 
     @Transactional
