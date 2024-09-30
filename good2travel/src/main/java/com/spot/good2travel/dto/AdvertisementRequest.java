@@ -1,6 +1,5 @@
 package com.spot.good2travel.dto;
 
-import com.spot.good2travel.domain.ItemType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -8,11 +7,7 @@ import lombok.Getter;
 public class AdvertisementRequest {
 
     @Getter
-    public static class AdItemCreateUpdateRequest {
-
-//        @NotBlank
-//        @Schema(example = "PLAN") //광고 구분을 타입으로 할지 고민
-//        private ItemType type;
+    public static class AdCreateUpdateRequest {
 
         @NotBlank
         @Schema(example = "(AD) 호텔 오노마 대전 숙박하기")

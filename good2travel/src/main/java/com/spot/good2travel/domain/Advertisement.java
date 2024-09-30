@@ -32,19 +32,19 @@ public class Advertisement {
         this.localGovernment = localGovernment;
     }
 
-    public static Advertisement ofAd(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest, LocalGovernment localGovernment) {
+    public static Advertisement ofAd(AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest, LocalGovernment localGovernment) {
         return Advertisement.builder()
-                .title(adItemCreateUpdateRequest.getTitle())
-                .link(adItemCreateUpdateRequest.getAdLink())
-                .address(adItemCreateUpdateRequest.getAddress())
+                .title(adCreateUpdateRequest.getTitle())
+                .link(adCreateUpdateRequest.getAdLink())
+                .address(adCreateUpdateRequest.getAddress())
                 .localGovernment(localGovernment)
                 .build();
     }
 
-    public void updateAd(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest, LocalGovernment localGovernment) {
-        this.title = adItemCreateUpdateRequest.getTitle();
-        this.link = adItemCreateUpdateRequest.getAdLink();
-        this.address = adItemCreateUpdateRequest.getAddress();
+    public void updateAd(AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest, LocalGovernment localGovernment) {
+        this.title = adCreateUpdateRequest.getTitle();
+        this.link = adCreateUpdateRequest.getAdLink();
+        this.address = adCreateUpdateRequest.getAddress();
         this.localGovernment = localGovernment;
     }
 }

@@ -2,7 +2,6 @@ package com.spot.good2travel.controller;
 
 import com.spot.good2travel.common.dto.CommonResponse;
 import com.spot.good2travel.dto.AdvertisementRequest;
-import com.spot.good2travel.dto.CommentResponse;
 import com.spot.good2travel.service.AdvertisementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,8 +28,8 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "광고용 굳이/계획 저장 완료", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> createAdItem(@RequestBody AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest){
-        return CommonResponse.success("광고용 굳이/계획 저장 완료", advertisementService.createAdItem(adItemCreateUpdateRequest));
+    public CommonResponse<?> createAdItem(@RequestBody AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest){
+        return CommonResponse.success("광고용 굳이/계획 저장 완료", advertisementService.createAdItem(adCreateUpdateRequest));
     }
 
     @PutMapping("/v1/ad/{adId}")
@@ -43,8 +42,8 @@ public class AdvertisementController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "광고용 굳이/계획 수정 완료", content = @Content(schema = @Schema(implementation = Long.class))),
     })
-    public CommonResponse<?> updateAdItem(@PathVariable("adId") Long adId, @RequestBody AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest){
-        return CommonResponse.success("광고용 굳이/계획 수정 완료", advertisementService.updateAdItem(adId, adItemCreateUpdateRequest));
+    public CommonResponse<?> updateAdItem(@PathVariable("adId") Long adId, @RequestBody AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest){
+        return CommonResponse.success("광고용 굳이/계획 수정 완료", advertisementService.updateAdItem(adId, adCreateUpdateRequest));
     }
 
     @DeleteMapping("/v1/ad/{adId}")

@@ -19,20 +19,20 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
 
 
-    public Long createAdItem(AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest) {
-        LocalGovernment localGovernment = localGovernmentRepository.findById(adItemCreateUpdateRequest.getLocalGovernmentId())
+    public Long createAdItem(AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest) {
+        LocalGovernment localGovernment = localGovernmentRepository.findById(adCreateUpdateRequest.getLocalGovernmentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
-        Advertisement adItem = Advertisement.ofAd(adItemCreateUpdateRequest, localGovernment);
+        Advertisement adItem = Advertisement.ofAd(adCreateUpdateRequest, localGovernment);
         return advertisementRepository.save(adItem).getId();
     }
 
     @Transactional
-    public Long updateAdItem(Long adId, AdvertisementRequest.AdItemCreateUpdateRequest adItemCreateUpdateRequest) {
+    public Long updateAdItem(Long adId, AdvertisementRequest.AdCreateUpdateRequest adCreateUpdateRequest) {
         Advertisement advertisement = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ADVERTISEMENT_NOT_FOUND));
-        LocalGovernment localGovernment = localGovernmentRepository.findById(adItemCreateUpdateRequest.getLocalGovernmentId())
+        LocalGovernment localGovernment = localGovernmentRepository.findById(adCreateUpdateRequest.getLocalGovernmentId())
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.LOCAL_GOVERNMENT_NOT_FOUND));
-        advertisement.updateAd(adItemCreateUpdateRequest, localGovernment);
+        advertisement.updateAd(adCreateUpdateRequest, localGovernment);
         return advertisement.getId();
     }
 
