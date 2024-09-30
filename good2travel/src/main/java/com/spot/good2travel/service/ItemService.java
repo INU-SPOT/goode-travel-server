@@ -3,11 +3,13 @@ package com.spot.good2travel.service;
 import com.spot.good2travel.common.dto.CommonPagingResponse;
 import com.spot.good2travel.common.exception.ExceptionMessage;
 import com.spot.good2travel.common.exception.ItemAccessException;
+import com.spot.good2travel.common.exception.ItemTypeException;
 import com.spot.good2travel.common.exception.NotFoundElementException;
 import com.spot.good2travel.domain.*;
 import com.spot.good2travel.dto.CourseResponse;
 import com.spot.good2travel.dto.ItemRequest;
 import com.spot.good2travel.dto.ItemResponse;
+import com.spot.good2travel.dto.WeatherResponse;
 import com.spot.good2travel.repository.CategoryRepository;
 import com.spot.good2travel.repository.ItemCategoryRepository;
 import com.spot.good2travel.repository.ItemRepository;
@@ -34,6 +36,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ImageService imageService;
     private final CourseService courseService;
+    private final WeatherService weatherService;
 
     @Transactional
     public ItemType createOfficialItem(ItemRequest.OfficialItemCreateRequest officialItemCreateRequest) {
@@ -153,7 +156,7 @@ public class ItemService {
 
         Item recommendGoode = items.get(randomIndex);
         Course course = courseService.getCourseByItemId(recommendGoode);
-        
+
         List<CourseResponse.CourseThumbnailResponse> itemCourses = course.getItemCourses().stream()
                 .map(itemCourse -> CourseResponse.CourseThumbnailResponse.of(itemCourse.getItem().getTitle())).toList();
 
@@ -186,5 +189,16 @@ public class ItemService {
         }).toList();
 
         return new CommonPagingResponse<>(page, size, itemPage.getTotalElements(), itemPage.getTotalPages(), goodeThumbnails);
+    }
+
+    @Transactional
+    public WeatherResponse getGoodeWeather(Long itemId){
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
+
+        if(item.getType() != ItemType.GOODE || !item.getIsOfficial()){
+            throw new ItemTypeException(ExceptionMessage.ITEM_TYPE_NOT_OFFICIAL_GOODE);
+        }
+        return weatherService.getWeather(item);
     }
 }
