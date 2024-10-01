@@ -43,9 +43,6 @@ public class CommentService {
 
     @Transactional
     public void addComment(CommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository
@@ -115,9 +112,6 @@ public class CommentService {
 
     @Transactional
     public void reportComment(Long commentId, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
         Long userId = ((CustomUserDetails) userDetails).getId();
         String commentReportKey = "commentId:" + commentId;
         Comment comment = commentRepository.findById(commentId)
@@ -135,10 +129,6 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long commentId, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         Comment comment = commentRepository.findById(commentId)
@@ -153,10 +143,6 @@ public class CommentService {
 
     @Transactional
     public void updateComment(Long commentId, CommentRequest.CommentUpdateRequest request, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         Comment comment = commentRepository.findById(commentId)
@@ -169,10 +155,6 @@ public class CommentService {
 
     @Transactional
     public List<UserCommentResponse> getUserComments(UserDetails userDetails){
-        if (userDetails == null) {
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         List<Comment> comments = commentRepository.findByUserId(userId);

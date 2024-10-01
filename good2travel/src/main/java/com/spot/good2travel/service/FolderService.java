@@ -121,7 +121,7 @@ public class FolderService {
      */
     @Transactional
     public List<FolderResponse.FolderListResponse> getFolderList(UserDetails userDetails) {
-        long userId = ((CustomUserDetails) userDetails).getId();
+        Long userId = ((CustomUserDetails) userDetails).getId();
         List<Folder> folders = folderRepository.findAllByUserId(userId);
         return folders
                 .stream()
