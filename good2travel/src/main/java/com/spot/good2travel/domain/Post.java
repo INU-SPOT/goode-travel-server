@@ -79,8 +79,13 @@ public class Post extends BaseEntity {
                 .build();
     }
 
-    public Post updatePostSequenceAndImageName(List<Long> sequence, String imageUrl){
+    public Post updatePostSequence(List<Long> sequence){
         this.sequence = sequence;
+
+        return this;
+    }
+
+    public Post updatePostImageName(String imageUrl){
         this.thumbnailImageName = imageUrl;
 
         return this;

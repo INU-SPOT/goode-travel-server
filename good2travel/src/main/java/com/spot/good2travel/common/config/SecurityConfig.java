@@ -91,7 +91,8 @@ public class SecurityConfig {
             "/v1/posts",
             "/v1/posts/{postid}",
             "/v1/posts/top-visit",
-            "/v1/posts/top-like"
+            "/v1/posts/top-like",
+                "/v1/users/is-registered"
     };
 
     String[] PERMIT_USER_GET = {

@@ -92,8 +92,6 @@ public class FolderService {
 
         Long itemFolderId = createItemFolder(folder, request, userDetails);
 
-        folder.updateImageName(findListImage(folder.getItemFolders()));
-
         return itemFolderId;
     }
 
@@ -105,25 +103,27 @@ public class FolderService {
         validIsOwner(folder.getUser(), userDetails);
         String emoji = request.getEmoji();
         ItemFolder itemFolder = ItemFolder.of(emoji, item, folder);
+        itemFolderRepository.save(itemFolder);
 
         List<Long> newSequence = folder.getSequence();
         newSequence.add(itemFolder.getId());
         folder.updateFolderSequence(newSequence);
-
-        return folder.getId();
+        if(folder.getImageName() == null && item.getImageUrl() != null){
+            folder.updateImageName(item.getImageUrl());
+        }
+        return itemFolder.getId();
     }
 
     @Transactional
     public List<Long> createItemFolders(Long folderId, List<FolderRequest.ItemFolderCreateRequest> requests, UserDetails userDetails){
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+
         Set<Long> sequence = folder.getItemFolders().stream().map(itemFolder -> itemFolder.getItem().getId()).collect(Collectors.toSet());
 
         List<Long> itemFoldersIds = requests.stream()
                 .filter(itemFolder -> !sequence.contains(itemFolder.getItemId()))
                 .map(itemFolder -> createItemFolder(folder, itemFolder, userDetails)).toList();
-
-        folder.updateImageName(findListImage(folder.getItemFolders()));
 
         return itemFoldersIds;
     }
