@@ -78,7 +78,7 @@ public class FolderService {
                 .map(Item::getImageUrl)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElse(imageService.getDefaultImageUrl());
+                .orElse(null);
     }
 
     @Transactional
@@ -108,7 +108,6 @@ public class FolderService {
         itemFolderRepository.save(itemFolder);
 
         List<Long> newSequence = folder.getSequence();
-        log.info(folder.getSequence().toString());
 
         newSequence.add(itemFolder.getId());
         folder.updateFolderSequence(newSequence);
@@ -116,6 +115,7 @@ public class FolderService {
         if(folder.getImageName() == null && item.getImageUrl() != null){
             folder.updateImageName(item.getImageUrl());
         }
+
         return itemFolder.getId();
     }
 
@@ -149,7 +149,8 @@ public class FolderService {
     @Transactional
     public FolderResponse.FolderListResponse toListResponse(Folder folder){
         log.info("[getFolderList] 폴더 목록 조회");
-        return new FolderResponse.FolderListResponse(folder.getId(), folder.getTitle(), folder.getImageName());
+        String imageName = folder.getImageName() != null ? folder.getImageName() : imageService.getDefaultImageUrl();
+        return new FolderResponse.FolderListResponse(folder.getId(), folder.getTitle(), imageName);
     }
 
     /*
