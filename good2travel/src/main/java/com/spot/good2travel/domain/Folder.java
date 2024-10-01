@@ -23,6 +23,9 @@ public class Folder extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
+    @Column
+    private String imageName;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @OrderColumn(name = "order_index")
     private List<Long> sequence = new ArrayList<>();
@@ -35,21 +38,22 @@ public class Folder extends BaseEntity {
     private User user;
 
     @Builder
-    public Folder(String title, List<ItemFolder> itemFolders,User user){
+    public Folder(String title, String imageName,List<ItemFolder> itemFolders, User user){
         this.title = title;
+        this.imageName = imageName;
         this.user = user;
         this.itemFolders = itemFolders;
     }
 
-    public Folder updateFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, List<Long> sequence) {
+    public Folder updateFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, List<Long> sequence, String imageName) {
         if (folderUpdateRequest.getTitle() != null) {
             this.title = folderUpdateRequest.getTitle();
         }
 
         if (sequence != null && !sequence.isEmpty()) {
             this.sequence = sequence;
+            this.imageName = imageName;
         }
-
         return this;
     }
 
@@ -59,7 +63,13 @@ public class Folder extends BaseEntity {
                 .user(user).build();
     }
 
-    public Folder updateFolderSequence(List<Long> sequence){
+    public Folder updateImageName(String imageName){
+        this.imageName = imageName;
+
+        return this;
+    }
+
+    public Folder updateFolderSequence(List<Long> newSequence) {
         this.sequence = sequence;
 
         return this;
