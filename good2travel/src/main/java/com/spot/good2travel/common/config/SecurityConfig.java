@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, PERMIT_USER_DELETE).hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, PERMIT_USER_PUT).hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, PERMIT_USER_PATCH).hasRole("USER")
+                        .anyRequest().hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
