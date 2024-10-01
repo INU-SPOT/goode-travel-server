@@ -55,12 +55,14 @@ public class FolderService {
 
         List<Long> sequence = request.getSequence();
         String imageName = null;
+        folder.updateFolder(request, sequence);
+
 
         if (sequence != null && !sequence.isEmpty()){
             imageName = findListImage(folder.getItemFolders());
         }
 
-        folder.updateFolder(request, sequence, imageName);
+        folder.updateImageName(imageName);
 
         return folderId;
     }
@@ -106,8 +108,11 @@ public class FolderService {
         itemFolderRepository.save(itemFolder);
 
         List<Long> newSequence = folder.getSequence();
+        log.info(folder.getSequence().toString());
+
         newSequence.add(itemFolder.getId());
         folder.updateFolderSequence(newSequence);
+
         if(folder.getImageName() == null && item.getImageUrl() != null){
             folder.updateImageName(item.getImageUrl());
         }
@@ -120,7 +125,7 @@ public class FolderService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
 
         Set<Long> sequence = folder.getItemFolders().stream().map(itemFolder -> itemFolder.getItem().getId()).collect(Collectors.toSet());
-
+        log.info(sequence.toString());
         List<Long> itemFoldersIds = requests.stream()
                 .filter(itemFolder -> !sequence.contains(itemFolder.getItemId()))
                 .map(itemFolder -> createItemFolder(folder, itemFolder, userDetails)).toList();
@@ -178,17 +183,21 @@ public class FolderService {
     @Transactional
     public Long deleteItemFolder(Long folderId, Long itemFolderId, UserDetails userDetails) {
         Folder folder = folderRepository.findById(folderId)
-                .orElseThrow(()->new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
         validIsOwner(folder.getUser(), userDetails);
 
         ItemFolder itemFolder = itemFolderRepository.findById(itemFolderId)
-                .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
 
-        folder.getSequence().removeIf(num -> num.equals(itemFolder.getId()));
+        List<Long> itemFolderIds = folder.getSequence();
+        itemFolderIds.removeIf(num -> num.equals(itemFolder.getId()));
+
+        folder.getItemFolders().remove(itemFolder);
         itemFolderRepository.delete(itemFolder);
-        folderRepository.save(folder);
 
-        findListImage(folder.getItemFolders());
+        folder.updateFolderSequence(itemFolderIds);
+        folder.updateImageName(findListImage(folder.getItemFolders()));
+        folderRepository.save(folder);
         return folderId;
     }
 
