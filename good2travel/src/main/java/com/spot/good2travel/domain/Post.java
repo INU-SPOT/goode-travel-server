@@ -24,6 +24,8 @@ public class Post extends BaseEntity {
     @Column(nullable = false)
     private String title;
 
+    private String thumbnailImageName;
+
     private String firstContent;
 
     private String lastContent;
@@ -51,7 +53,7 @@ public class Post extends BaseEntity {
     private User user;
 
     @Builder
-    private Post(String title, String firstContent, String lastContent, LocalDate startDate, LocalDate endDate,
+    private Post(String title, String thumbnailImageName, String firstContent, String lastContent, LocalDate startDate, LocalDate endDate,
                  Integer report, List<Long> sequence,List<ItemPost> itemPosts, List<Comment> comments, User user){
         this.title = title;
         this.firstContent = firstContent;
@@ -77,14 +79,16 @@ public class Post extends BaseEntity {
                 .build();
     }
 
-    public Post updatePostSequence(List<Long> sequence){
+    public Post updatePostSequenceAndImageName(List<Long> sequence, String imageUrl){
         this.sequence = sequence;
+        this.thumbnailImageName = imageUrl;
 
         return this;
     }
 
-    public Post updatePost(PostRequest.PostCreateUpdateRequest request, List<Long> sequence){
+    public Post updatePost(PostRequest.PostCreateUpdateRequest request, String imageName, List<Long> sequence){
         this.title = request.getTitle();
+        this.thumbnailImageName = imageName;
         this.firstContent = request.getFirstContent();
         this.lastContent =request.getLastContent();
         this.startDate = request.getStartDate();

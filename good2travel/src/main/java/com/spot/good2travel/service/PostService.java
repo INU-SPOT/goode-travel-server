@@ -60,7 +60,9 @@ public class PostService {
                 .map(itemPostCreateUpdateRequest -> createItemPost(itemPostCreateUpdateRequest, post))
                 .toList();
 
-        post.updatePostSequence(sequence);
+        String imageName = findPostThumbnailImage(post);
+
+        post.updatePostSequenceAndImageName(sequence, imageName);
         createLikeAndVisit(post.getId(), 0, 0);
         return post.getId();
     }
@@ -153,13 +155,12 @@ public class PostService {
                 .map(itemPostUpdateRequest -> updateItemPost(itemPostUpdateRequest, post))
                 .toList();
 
-        post.updatePost(postCreateUpdateRequest, afterSequence);
-
         Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
         beforeSequence.stream()
                 .filter(num -> !afterSequenceSet.contains(num))
                 .forEach(this::deleteItemPost);
 
+        post.updatePost(postCreateUpdateRequest, findPostThumbnailImage(post), afterSequence);
         return postId;
     }
 
@@ -380,18 +381,23 @@ public class PostService {
     }
 
     @Transactional
+    public String findPostThumbnailImage(Post post){
+        return post.getItemPosts().stream()
+                .flatMap(itemPost -> itemPost.getItemPostImages().stream())
+                .map(ItemPostImage::getImageName)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(imageService.getDefaultImageName());
+    }
+
+    @Transactional
     public List<PostThumbnailResponse> getPostThumbnails(Page<Post> posts){
         return posts.stream()
                 .map(post -> {
                     Long commentNum = getTotalComments(post.getId());
                     Integer likeNum = getLikeNum(post.getId());
 
-                    String imageName = post.getItemPosts().stream()
-                            .flatMap(itemPost -> itemPost.getItemPostImages().stream())
-                            .map(ItemPostImage::getImageName) 
-                            .filter(Objects::nonNull)
-                            .findFirst()
-                            .orElse(imageService.getDefaultImageName());
+                    String imageName = post.getThumbnailImageName();
 
                     return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageName, post.getSequence().stream().map(num -> {
                         ItemPost itemPost = itemPostRepository.findById(num)
