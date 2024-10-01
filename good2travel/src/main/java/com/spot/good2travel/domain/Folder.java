@@ -30,7 +30,7 @@ public class Folder extends BaseEntity {
     @OrderColumn(name = "order_index")
     private List<Long> sequence = new ArrayList<>();
 
-    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemFolder> itemFolders = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,7 +45,7 @@ public class Folder extends BaseEntity {
         this.itemFolders = itemFolders;
     }
 
-    public Folder updateFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, List<Long> sequence, String imageName) {
+    public Folder updateFolder(FolderRequest.FolderUpdateRequest folderUpdateRequest, List<Long> sequence) {
         if (folderUpdateRequest.getTitle() != null) {
             this.title = folderUpdateRequest.getTitle();
         }

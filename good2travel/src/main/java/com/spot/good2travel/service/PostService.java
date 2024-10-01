@@ -191,7 +191,9 @@ public class PostService {
                     .toList();
 
             itemPost.updateItemPost(itemPostCreateUpdateRequest, afterSequence, item, post);
+
             Set<Long> afterSequenceSet = new HashSet<>(afterSequence);
+            log.info(beforeSequence.toString());
 
             beforeSequence.stream()
                     .filter(num -> !afterSequenceSet.contains(num))
@@ -211,7 +213,7 @@ public class PostService {
             ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageRequest.getItemPostImageId())
                     .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
             itemPostImage.updateItemPostImage(itemPostImageRequest);
-
+            itemPostRepository.save(itemPost);
             return itemPostImage.getId();
         }
         else{
@@ -395,12 +397,17 @@ public class PostService {
 
     @Transactional
     public String findPostThumbnailImage(Post post){
-        return post.getItemPosts().stream()
-                .flatMap(itemPost -> itemPost.getItemPostImages().stream())
-                .map(ItemPostImage::getImageName)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
+        if(post.getItemPosts() == null){
+            return null;
+        }
+        else{
+            return post.getItemPosts().stream()
+                    .flatMap(itemPost -> itemPost.getItemPostImages().stream())
+                    .map(ItemPostImage::getImageName)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     @Transactional
