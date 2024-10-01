@@ -45,6 +45,7 @@ public class PostService {
     private final ItemService itemService;
     private final ImageService imageService;
 
+
     @Transactional
     public Long createPost(PostCreateUpdateRequest postCreateUpdateRequest, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
@@ -60,13 +61,15 @@ public class PostService {
                 .map(itemPostCreateUpdateRequest -> createItemPost(itemPostCreateUpdateRequest, post))
                 .toList();
 
-        String imageName = findPostThumbnailImage(post);
+        postRepository.save(post);
 
-        post.updatePostSequenceAndImageName(sequence, imageName);
+        post.updatePostSequence(sequence);
         createLikeAndVisit(post.getId(), 0, 0);
+
         return post.getId();
     }
 
+    @Transactional
     public Long createItemPost(ItemPostCreateUpdateRequest itemPostCreateUpdateRequest, Post post) {
         Long itemId = itemPostCreateUpdateRequest.getItemId();
 
@@ -74,24 +77,30 @@ public class PostService {
                     .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.ITEM_NOT_FOUND));
 
         ItemPost itemPost = ItemPost.of(itemPostCreateUpdateRequest, item, post);
+        itemPostRepository.save(itemPost);
 
         List<Long> sequence = itemPostCreateUpdateRequest.getImages().stream()
-                .map(image -> createItemPostImage(image, itemPost))
+                .map(image -> {
+                    if(post.getThumbnailImageName() == null && image.getImageName() != null){
+                        post.updatePostImageName(image.getImageName());
+                    }
+                    return createItemPostImage(image, itemPost);
+                })
                 .toList();
 
         itemPost.updateSequence(sequence);
-        itemPostRepository.save(itemPost);
 
         return itemPost.getId();
     }
 
+    @Transactional
     public Long createItemPostImage(PostRequest.ItemPostImageRequest itemPostImageRequest, ItemPost itemPost){
         ItemPostImage itemPostImage = ItemPostImage.of(itemPostImageRequest, itemPost);
         itemPostImageRepository.save(itemPostImage);
-
         return itemPostImage.getId();
     }
 
+    @Transactional
     public void createLikeAndVisit(Long postId, Integer visitNum, Integer likeNum) {
         String key = "postId:" + postId;
 
@@ -99,6 +108,7 @@ public class PostService {
         redisTemplate.opsForHash().put(key, "likeNum", likeNum);
     }
 
+    @Transactional
     public void deleteLikeAndVisit(Long postId) {
         String key = "postId:" + postId;
 
@@ -189,7 +199,6 @@ public class PostService {
 
             return itemPost.getId();
         }
-
         else {
             return createItemPost(itemPostCreateUpdateRequest, post);
         }
@@ -210,6 +219,7 @@ public class PostService {
         }
     }
 
+    @Transactional
     public void deleteItemPost(Long itemPostId) {
 
         ItemPost itemPost = itemPostRepository.findById(itemPostId)
@@ -220,6 +230,7 @@ public class PostService {
         itemPostRepository.delete(itemPost);
     }
 
+    @Transactional
     public void deleteItemPostImage(Long itemPostImageId){
         ItemPostImage itemPostImage = itemPostImageRepository.findById(itemPostImageId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_IMAGE_NOT_FOUND));
@@ -227,6 +238,7 @@ public class PostService {
         itemPostImageRepository.delete(itemPostImage);
     }
 
+    @Transactional
     public Boolean validateUserIsPostOwner(Post post, UserDetails userDetails){
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
@@ -236,6 +248,7 @@ public class PostService {
         return false;
     }
 
+    @Transactional
     public Long updateVisitNum(Long postId, UserDetails userDetails) {
         String postVisitNumKey = "postId:" + postId;
 
@@ -258,6 +271,7 @@ public class PostService {
         return updateVisitNum;
     }
 
+    @Transactional
     public Long updateLikeNum(Long postId, UserDetails userDetails) {
         Long userId = ((CustomUserDetails) userDetails).getId();
         String userLikeKey = "user:" + userId + "likes";
@@ -282,7 +296,7 @@ public class PostService {
         throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
     }
 
-
+    @Transactional
     public Integer getLikeNum(Long postId) {
         String postLikeNumKey = "postId:" + postId;
 
@@ -291,7 +305,7 @@ public class PostService {
         return likeNum != null ? likeNum : 0;
     }
 
-
+    @Transactional
     public Boolean getIsPushLike(Long postId, UserDetails userDetails){
         if(userDetails != null){
             Long userId = ((CustomUserDetails) userDetails).getId();
@@ -380,6 +394,7 @@ public class PostService {
         return new CommonPagingResponse<>(page, size, postPage.getTotalElements(), postPage.getTotalPages(), getPostThumbnails(postPage));
     }
 
+
     @Transactional
     public String findPostThumbnailImage(Post post){
         return post.getItemPosts().stream()
@@ -387,7 +402,7 @@ public class PostService {
                 .map(ItemPostImage::getImageName)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElse(imageService.getDefaultImageName());
+                .orElse(null);
     }
 
     @Transactional
@@ -397,7 +412,7 @@ public class PostService {
                     Long commentNum = getTotalComments(post.getId());
                     Integer likeNum = getLikeNum(post.getId());
 
-                    String imageName = post.getThumbnailImageName();
+                    String imageName = post.getThumbnailImageName() != null ? post.getThumbnailImageName() : imageService.getDefaultImageName();
 
                     return PostResponse.PostThumbnailResponse.of(post, likeNum, commentNum, imageName, post.getSequence().stream().map(num -> {
                         ItemPost itemPost = itemPostRepository.findById(num)
