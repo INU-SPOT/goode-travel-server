@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -49,7 +50,11 @@ public class JwtExceptionHandlerFilter extends OncePerRequestFilter {
             setErrorResponse(response, ExceptionMessage.TOKEN_NOT_FOUND);
             log.error("[JwtExceptionHandlerFilter] error name = NullPointerException");
         } catch (MismatchTokenTypeException e) {
+            log.error("[JwtExceptionHandlerFilter] error name = MismatchTokenTypeException");
             setErrorResponse(response, ExceptionMessage.TOKEN_TYPE_INVALID);
+        } catch (UsernameNotFoundException e){
+            log.error("[JwtExceptionHandlerFilter] error name = UsernameNotFoundException");
+            setErrorResponse(response, ExceptionMessage.USER_NOT_FOUND);
         }
     }
 
