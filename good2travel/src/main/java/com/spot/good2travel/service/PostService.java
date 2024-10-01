@@ -224,8 +224,6 @@ public class PostService {
 
         ItemPost itemPost = itemPostRepository.findById(itemPostId)
                 .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_POST_NOT_FOUND));
-        
-        itemService.deleteUserItem(itemPost.getItem());
 
         itemPostRepository.delete(itemPost);
     }

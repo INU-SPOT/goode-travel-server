@@ -184,15 +184,11 @@ public class FolderService {
         ItemFolder itemFolder = itemFolderRepository.findById(itemFolderId)
                 .orElseThrow(()->new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
 
-        Item item = itemFolder.getItem();
-
-        itemService.deleteUserItem(item);
-
         folder.getSequence().removeIf(num -> num.equals(itemFolder.getId()));
-
         itemFolderRepository.delete(itemFolder);
         folderRepository.save(folder);
 
+        findListImage(folder.getItemFolders());
         return folderId;
     }
 

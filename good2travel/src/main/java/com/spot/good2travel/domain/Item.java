@@ -46,10 +46,10 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "mainItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ItemPost> itemPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ItemFolder> itemFolders = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
