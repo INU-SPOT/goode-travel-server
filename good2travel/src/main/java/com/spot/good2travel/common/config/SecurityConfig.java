@@ -132,7 +132,7 @@ public class SecurityConfig {
             "/v1/folders/plan",
             "/v1/folders/plan/{itemfolderid}",
 
-            
+
     };
 
     String[] PERMIT_USER_PATCH = {
