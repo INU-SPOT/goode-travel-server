@@ -45,9 +45,7 @@ public class SecurityConfig {
         httpSecurity
                 .httpBasic(HttpBasicConfigurer::disable)
                 .csrf(CsrfConfigurer::disable)
-                .cors(security -> {
-                    security.configurationSource(corsConfigurationSource());
-                })
+                .cors(security -> security.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sessionManagement) ->
                         sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -59,7 +57,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, PERMIT_USER_PUT).hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH, PERMIT_USER_PATCH).hasRole("USER")
                         .anyRequest().hasRole("ADMIN")
-                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
