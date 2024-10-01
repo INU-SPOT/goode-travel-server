@@ -92,7 +92,9 @@ public class SecurityConfig {
             "/v1/posts/{postid}",
             "/v1/posts/top-visit",
             "/v1/posts/top-like",
-                "/v1/users/is-registered"
+                "/v1/users/is-registered",
+                "/v1/fcm",
+                "/v1/fcm/send"
     };
 
     String[] PERMIT_USER_GET = {
@@ -102,7 +104,7 @@ public class SecurityConfig {
             "/v1/folders/{folderId}",
             "/v1/users/posts",
             "/v1/users/posts/like",
-
+            "/v1/notification"
     };
 
     String[] PERMIT_USER_POST = {
@@ -119,8 +121,6 @@ public class SecurityConfig {
             "/v1/posts",
             "/v1/posts/{postid}/good",
             "/v1/posts/image",
-            "/v1/fcm",
-            "/v1/fcm/send",
             "/v1/auth/reissue"
     };
 
@@ -132,13 +132,13 @@ public class SecurityConfig {
             "/v1/folders/plan",
             "/v1/folders/plan/{itemfolderid}",
 
+            
     };
 
     String[] PERMIT_USER_PATCH = {
             "/v1/folders/{folderid}",
             "/v1/posts/{postid}",
             "/v1/notification/confirm/{notificationId}",
-            "/v1/notification"
     };
 
     String[] PERMIT_USER_DELETE = {
