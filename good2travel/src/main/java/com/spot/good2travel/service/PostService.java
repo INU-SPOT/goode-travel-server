@@ -258,10 +258,6 @@ public class PostService {
     }
 
     public Long updateLikeNum(Long postId, UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
         String userLikeKey = "user:" + userId + "likes";
         String postLikeNumKey = "postId:" + postId;

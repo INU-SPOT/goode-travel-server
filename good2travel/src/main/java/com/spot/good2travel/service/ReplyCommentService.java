@@ -39,9 +39,6 @@ public class ReplyCommentService {
 
     @Transactional
     public void addReplyComment(ReplyCommentCreateRequest request, UserDetails userDetails) throws FirebaseMessagingException {
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         User user = userRepository.findById(userId)
@@ -61,10 +58,6 @@ public class ReplyCommentService {
 
     @Transactional
     public void reportReplyComment(Long commentId, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
         String commentReportKey = "reportCommentId:" + commentId;
         ReplyComment comment = replyCommentRepository.findById(commentId)
@@ -82,10 +75,6 @@ public class ReplyCommentService {
 
     @Transactional
     public void deleteReplyComment(Long ReplyCommentId, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         ReplyComment comment = replyCommentRepository.findById(ReplyCommentId)
@@ -100,10 +89,6 @@ public class ReplyCommentService {
 
     @Transactional
     public void updateReplyComment(Long replyCommentId, CommentUpdateRequest request, UserDetails userDetails){
-        if(userDetails == null){
-            throw new NotFoundElementException(ExceptionMessage.TOKEN_NOT_FOUND);
-        }
-
         Long userId = ((CustomUserDetails) userDetails).getId();
 
         ReplyComment comment = replyCommentRepository.findById(replyCommentId)

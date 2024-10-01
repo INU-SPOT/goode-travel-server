@@ -52,7 +52,14 @@ public class FolderService {
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
         validIsOwner(folder.getUser(), userDetails);
-        folder.updateFolder(request, request.getSequence());
+        List<Long> sequence = folder.getSequence();
+        String imageName = null;
+
+        if (sequence != null && !sequence.isEmpty()){
+            imageName = findListImage(folder.getItemFolders());
+        }
+
+        folder.updateFolder(request, sequence, imageName);
 
         return folderId;
     }
@@ -81,7 +88,11 @@ public class FolderService {
             throw new ItemIsExistException(ExceptionMessage.ITEM_IS_EXIST);
         }
 
-        return createItemFolder(folder, request, userDetails);
+        Long itemFolderId = createItemFolder(folder, request, userDetails);
+
+        folder.updateImageName(findListImage(folder.getItemFolders()));
+
+        return itemFolderId;
     }
 
     @Transactional
@@ -98,7 +109,6 @@ public class FolderService {
         List<Long> newSequence = folder.getSequence();
         newSequence.add(itemFolder.getId());
         folder.updateFolderSequence(newSequence);
-
         folderRepository.save(folder);
 
         return folder.getId();
@@ -110,10 +120,13 @@ public class FolderService {
                 .orElseThrow(() -> new NotFoundElementException(ExceptionMessage.FOLDER_NOT_FOUND));
         Set<Long> sequence = new HashSet<>(folder.getSequence());
 
-        List<Long> itemFolders = requests.stream()
+        List<Long> itemFoldersIds = requests.stream()
                 .filter(itemFolder -> !sequence.contains(itemFolder.getItemId()))
                 .map(itemFolder -> createItemFolder(folder, itemFolder, userDetails)).toList();
-        return itemFolders;
+
+        folder.updateImageName(findListImage(folder.getItemFolders()));
+
+        return itemFoldersIds;
     }
 
     /*
@@ -121,7 +134,7 @@ public class FolderService {
      */
     @Transactional
     public List<FolderResponse.FolderListResponse> getFolderList(UserDetails userDetails) {
-        long userId = ((CustomUserDetails) userDetails).getId();
+        Long userId = ((CustomUserDetails) userDetails).getId();
         List<Folder> folders = folderRepository.findAllByUserId(userId);
         return folders
                 .stream()
@@ -131,9 +144,8 @@ public class FolderService {
 
     @Transactional
     public FolderResponse.FolderListResponse toListResponse(Folder folder){
-        String thumbnailImage = findListImage(folder.getItemFolders());
         log.info("[getFolderList] 폴더 목록 조회");
-        return new FolderResponse.FolderListResponse(folder.getId(), folder.getTitle(), thumbnailImage);
+        return new FolderResponse.FolderListResponse(folder.getId(), folder.getTitle(), folder.getImageName());
     }
 
     /*
@@ -155,8 +167,9 @@ public class FolderService {
                             .orElseThrow(()-> new NotFoundElementException(ExceptionMessage.ITEM_FOLDER_NOT_FOUND));
                     Item item = itemFolder.getItem();
                     if(item.getType().equals(ItemType.GOODE)){
+                        String imageUrl = item.getImageUrl() != null ? item.getImageUrl() : imageService.getDefaultImageUrl();
                         return FolderResponse.ItemFolderResponse
-                                .of(itemFolder.getItem(), itemFolder, itemFolder.getIsFinished(), item.getImageUrl());
+                                .of(item, itemFolder, itemFolder.getIsFinished(), imageUrl);
                     }
                     return FolderResponse.ItemFolderResponse
                                 .of(itemFolder.getItem(), itemFolder, itemFolder.getIsFinished(), itemFolder.getEmoji());
