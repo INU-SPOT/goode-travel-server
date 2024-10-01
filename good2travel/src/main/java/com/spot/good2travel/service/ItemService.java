@@ -149,7 +149,7 @@ public class ItemService {
 
     @Transactional
     public ItemResponse.RecommendGoodeResponse getRecommendGoode(){
-        List<Item> items = itemRepository.findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNullAndItemCoursesIsNotNull(ItemType.GOODE);
+        List<Item> items = itemRepository.findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNullAndCoursesIsNotNull(ItemType.GOODE);
 
         if (items.isEmpty()) {
             throw new NotFoundElementException(ExceptionMessage.RECOMMEND_ITEM_NOT_FOUND);
