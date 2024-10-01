@@ -39,5 +39,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     Page<Item> findAllByType(ItemType type, Pageable pageable);
 
-    List<Item> findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNull(ItemType type);
+    List<Item> findAllByTypeAndIsOfficialIsTrueAndImageUrlIsNotNullAndItemCoursesIsNotNull(ItemType type);
+
 }
