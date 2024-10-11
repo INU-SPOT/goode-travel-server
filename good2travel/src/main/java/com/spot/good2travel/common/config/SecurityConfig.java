@@ -147,7 +147,8 @@ public class SecurityConfig {
             "/v1/users/items/{itemId}",
             "/v1/folders/{folderid}",
             "/v1/folders/{folderid}/plan/{itemfolderid}",
-            "/v1/posts/{postid}"
+            "/v1/posts/{postid}",
+            "/v1/notification/{notificationId}"
     };
 
 
