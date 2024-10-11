@@ -21,7 +21,7 @@ public class Advertisement {
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "localgovernment_id")
+    @JoinColumn(name = "local_government_id")
     private LocalGovernment localGovernment;
 
     @Builder
